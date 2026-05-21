@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}CampusNest{% endblock %} — IUT-FV</title>
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/output.css' %}" />
+</head>
+ 
+<body class="min-h-screen bg-primary flex items-center justify-center p-4">
+  <div class="w-full max-w-4xl bg-white rounded-2xl overflow-hidden shadow-xl flex min-h-[500px]">
+ 
+    {# ── Sidebar verte (maquette exacte) ── #}
+    <div class="hidden md:flex md:w-2/5 bg-primary flex-col justify-between p-8">
+      <div>
+        <a href="/" class="flex items-center gap-2 text-secondary">
+          <span class="w-8 h-8 bg-secondary rounded-lg flex items-center justify-center text-primary font-bold text-sm">🏠</span>
+          <span class="font-semibold text-lg">CampusNest</span>
+        </a>
+        <p class="text-secondary/60 text-sm mt-3 leading-relaxed">
+          IUT de Fotso Victor — Bandjoun<br>
+          Plateforme de logements étudiants
+        </p>
+      </div>
+      <blockquote class="text-white/70 text-sm italic leading-7">
+        {% block sidebar_quote %}
+        « Trouvez votre chambre avant même d'arriver au campus. »
+        {% endblock %}
+      </blockquote>
+    </div>
+ 
+    {# ── Zone formulaire ── #}
+    <div class="flex-1 p-8 flex flex-col justify-center">
+ 
+      {# Flash messages #}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="mb-4 px-4 py-3 rounded-xl text-sm
+            {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200
+            {% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200
+            {% elif message.tags == 'warning' %}bg-amber-50 text-amber-800 border border-amber-200
+            {% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+ 
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+</body>
+</html>

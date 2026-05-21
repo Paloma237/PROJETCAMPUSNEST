@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Administration{% endblock %}
+ 
+{% block content %}
+<div class="flex min-h-screen">
+  {% include "components/sidebar_admin.html" %}
+ 
+  <div class="flex-1 p-6 lg:p-8">
+    <h1 class="text-2xl font-medium text-gray-900 mb-1">Tableau de bord</h1>
+    <p class="text-sm text-gray-500 mb-6">Vue globale de la plateforme CampusNest IUT-FV</p>
+ 
+    {% comment %} KPIs {% endcomment %}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+        <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Étudiants</p>
+        <p class="text-3xl font-medium text-gray-900">{{ stats.total_etudiants }}</p>
+      </div>
+      <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+        <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Propriétaires</p>
+        <p class="text-3xl font-medium text-gray-900">{{ stats.total_proprietaires }}</p>
+        {% if stats.proprietaires_attente %}
+          <p class="text-xs text-amber-600 mt-1">{{ stats.proprietaires_attente }} en attente</p>
+        {% endif %}
+      </div>
+      <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+        <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Chambres</p>
+        <p class="text-3xl font-medium text-gray-900">{{ stats.total_chambres }}</p>
+        <p class="text-xs text-green-600 mt-1">{{ stats.chambres_disponibles }} disponibles</p>
+      </div>
+      <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+        <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Signalements</p>
+        <p class="text-3xl font-medium {% if stats.signalements_ouverts %}text-red-700{% else %}text-gray-900{% endif %}">
+          {{ stats.signalements_ouverts }}
+        </p>
+        <p class="text-xs text-gray-500 mt-1">ouverts</p>
+      </div>
+    </div>
+ 
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+ 
+      {% comment %} Validation propriétaires {% endcomment %}
+      <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-medium text-gray-900">Propriétaires en attente</h2>
+        </div>
+        {% if proprietaires_en_attente %}
+          <div class="divide-y divide-gray-50">
+            {% for p in proprietaires_en_attente %}
+              <div class="flex items-center gap-3 py-3">
+                <div class="w-8 h-8 rounded-full bg-amber-50 text-amber-700 text-xs
+                            font-semibold flex items-center justify-center shrink-0">
+                  {{ p.prenom|first|upper }}{{ p.nom|first|upper }}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-gray-900">{{ p.get_full_name }}</p>
+                  <p class="text-xs text-gray-500">{{ p.email }} · {{ p.telephone }}</p>
+                </div>
+                <div class="flex gap-2 shrink-0">
+                  <form method="post" action="{% url 'accounts:valider_proprietaire' p.pk %}">
+                    {% csrf_token %}
+                    <button class="px-3 py-1 text-xs bg-green-50 text-green-700
+                                   border border-green-200 rounded-lg hover:bg-green-100 transition">
+                      Valider
+                    </button>
+                  </form>
+                  <form method="post" action="{% url 'accounts:suspendre_compte' p.pk %}">
+                    {% csrf_token %}
+                    <button class="px-3 py-1 text-xs bg-red-50 text-red-700
+                                   border border-red-200 rounded-lg hover:bg-red-100 transition">
+                      Rejeter
+                    </button>
+                  </form>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-sm text-gray-400 text-center py-6">Aucun compte en attente.</p>
+        {% endif %}
+      </div>
+ 
+      {% comment %} Journal d'activité {% endcomment %}
+      <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+        <h2 class="text-sm font-medium text-gray-900 mb-4">Journal récent</h2>
+        <div class="space-y-3">
+          {% for log in logs_recents %}
+            <div class="flex items-start gap-2">
+              <div class="w-1.5 h-1.5 rounded-full bg-secondary mt-1.5 shrink-0"></div>
+              <div>
+                <p class="text-xs text-gray-700 leading-snug">{{ log.action }}</p>
+                <p class="text-xs text-gray-400 mt-0.5">{{ log.date|date:"d/m H:i" }}</p>
+              </div>
+            </div>
+          {% empty %}
+            <p class="text-xs text-gray-400">Aucun log.</p>
+          {% endfor %}
+        </div>
+      </div>
+ 
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Mon profil{% endblock %}
+ 
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+  <h1 class="text-2xl font-medium text-gray-900 mb-6">Mon profil</h1>
+ 
+  <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+    {% comment %} Avatar initiales {% endcomment %}
+    <div class="flex items-center gap-4 mb-6 pb-6 border-b border-gray-100">
+      <div class="w-14 h-14 rounded-full bg-secondary flex items-center justify-center
+                  text-primary font-semibold text-xl">
+        {{ user.prenom|first|upper }}{{ user.nom|first|upper }}
+      </div>
+      <div>
+        <p class="font-medium text-gray-900">{{ user.get_full_name }}</p>
+        <p class="text-sm text-gray-500">{{ user.email }}</p>
+        <span class="inline-block mt-1 px-2 py-0.5 text-xs rounded-full
+          {% if user.role == 'admin' %}bg-red-50 text-red-700
+          {% elif user.role == 'proprietaire' %}bg-amber-50 text-amber-700
+          {% else %}bg-secondary/20 text-primary{% endif %}">
+          {{ user.get_role_display }}
+        </span>
+      </div>
+    </div>
+ 
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Nom</label>
+          {{ form.nom }}
+          {% if form.nom.errors %}<p class="text-red-600 text-xs mt-1">{{ form.nom.errors|first }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Prénom</label>
+          {{ form.prenom }}
+          {% if form.prenom.errors %}<p class="text-red-600 text-xs mt-1">{{ form.prenom.errors|first }}</p>{% endif %}
+        </div>
+      </div>
+      <div class="mb-6">
+        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Téléphone</label>
+        {{ form.telephone }}
+      </div>
+      <div class="flex items-center gap-3">
+        <button type="submit"
+                class="px-6 py-2.5 bg-primary text-secondary text-sm font-medium
+                       rounded-xl hover:bg-primary/90 transition">
+          Enregistrer
+        </button>
+        <a href="{% url 'accounts:dashboard' %}"
+           class="px-6 py-2.5 border border-gray-200 text-gray-600 text-sm
+                  rounded-xl hover:bg-gray-50 transition">
+          Annuler
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

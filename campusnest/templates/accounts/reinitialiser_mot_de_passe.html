@@ -1,0 +1,35 @@
+{% extends "accounts/base_auth.html" %}
+{% block title %}Nouveau mot de passe{% endblock %}
+{% block sidebar_quote %}« Choisissez un mot de passe fort et unique. »{% endblock %}
+ 
+{% block content %}
+<h1 class="text-2xl font-medium text-gray-900 mb-1">Nouveau mot de passe</h1>
+<p class="text-sm text-gray-500 mb-6">Choisissez un mot de passe d'au moins 8 caractères.</p>
+ 
+<form method="post" novalidate>
+  {% csrf_token %}
+  <div class="mb-4">
+    <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+      Nouveau mot de passe
+    </label>
+    {{ form.new_password1 }}
+    {% if form.new_password1.errors %}
+      <p class="text-red-600 text-xs mt-1">{{ form.new_password1.errors|first }}</p>
+    {% endif %}
+  </div>
+  <div class="mb-6">
+    <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+      Confirmer le mot de passe
+    </label>
+    {{ form.new_password2 }}
+    {% if form.new_password2.errors %}
+      <p class="text-red-600 text-xs mt-1">{{ form.new_password2.errors|first }}</p>
+    {% endif %}
+  </div>
+  <button type="submit"
+          class="w-full py-3 bg-primary text-secondary font-medium rounded-xl
+                 hover:bg-primary/90 transition text-sm">
+    Enregistrer le nouveau mot de passe
+  </button>
+</form>
+{% endblock %}

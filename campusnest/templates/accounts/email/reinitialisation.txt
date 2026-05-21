@@ -1,0 +1,12 @@
+Bonjour {{ user.prenom }},
+
+Vous recevez cet email car une demande de réinitialisation de mot de passe a été effectuée sur CampusNest IUT-FV.
+
+Cliquez sur le lien ci-dessous pour définir un nouveau mot de passe (valable 30 minutes) :
+
+{{ protocol }}://{{ domain }}{% url 'users:reinitialiser_mot_de_passe' uidb64=uid token=token %}
+
+Si vous n'avez pas fait cette demande, ignorez cet email.
+
+—
+L'équipe CampusNest IUT-FV

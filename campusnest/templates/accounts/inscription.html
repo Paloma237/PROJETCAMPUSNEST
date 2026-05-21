@@ -1,0 +1,153 @@
+{% extends "accounts/base_auth.html" %} {% block title %}Créer un compte{% endblock %} {% block sidebar_quote %}« Rejoignez la communauté de l'IUT-FV. »{% endblock %} {% block content %}
+<h1 class="mb-1 text-2xl font-medium text-gray-900">Créer un compte</h1>
+<p class="mb-4 text-sm text-gray-500">Choisissez votre profil</p>
+
+{# Sélecteur de rôle — reproduit la maquette #}
+<div class="mb-5 grid grid-cols-2 gap-3">
+  <a
+    href="?type=client"
+    class="{% if type_compte != 'proprietaire' %}border-secondary-400 bg-secondary-50 text-primary {% else %}border-gray-200 hover:border-secondary-300{% endif %} flex flex-col items-center gap-1.5 rounded-xl border py-3 text-sm font-medium text-gray-400 transition"
+  >
+    <span class="text-lg">🎓</span>
+    Étudiant
+  </a>
+  <a
+    href="?type=proprietaire"
+    class="{% if type_compte == 'proprietaire' %}border-secondary-400 bg-secondary-50 text-primary {% else %}border-gray-200 hover:border-secondary-300{% endif %} flex flex-col items-center gap-1.5 rounded-xl border py-3 text-sm font-medium text-gray-400 transition"
+  >
+    <span class="text-lg">🏢</span>
+    Propriétaire
+  </a>
+</div>
+
+<form method="post" novalidate>
+  {% csrf_token %}
+  <input type="hidden" name="type_compte" value="{{ type_compte }}" />
+  {% if form.errors %}
+  <div class="mb-3 rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-600">
+    {% for field, errors in form.errors.items %} {% for error in errors %}
+    <p>{{ field }} : {{ error }}</p>
+    {% endfor %} {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="mb-3">
+    <label class="mb-1.5 block text-xs font-medium tracking-wide text-gray-500 uppercase">Email</label>
+    <input
+      type="email"
+      name="email"
+      value="{{ form.email.value|default:'' }}"
+      placeholder="votre@email.cm"
+      class="focus:ring-secondary/50 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm transition focus:ring-2 focus:outline-none"
+    />
+    {% if form.email.errors %}
+    <p class="mt-1 text-xs text-red-600">{{ form.email.errors|first }}</p>
+    {% endif %}
+  </div>
+
+  <label class="mb-1.5 block text-xs font-medium tracking-wide text-gray-500 uppercase">Mot de passe</label>
+  <!-- Ajout d'un conteneur 'relative' pour positionner l'œil -->
+  <div class="relative">
+    <input
+      id="password1"
+      type="password"
+      name="password1"
+      placeholder="••••••••"
+      class="focus:ring-secondary/50 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm transition focus:ring-2 focus:outline-none"
+    />
+    <!-- Bouton de l'œil inséré sans modifier le style de ton input -->
+    <button type="button" id="toggle-password" class="password-toggle absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none">
+      <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+        />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+      </svg>
+    </button>
+  </div>
+
+  {% if form.password1.errors %}
+  <p class="mt-1 text-xs text-red-600">{{ form.password1.errors|first }}</p>
+  {% endif %}
+
+  <div class="mb-3">
+    <label class="mb-1.5 block text-xs font-medium tracking-wide text-gray-500 uppercase">Confirmer le mot de passe</label>
+
+    <div class="relative">
+      <input
+        type="password"
+        name="password2"
+        placeholder="••••••••"
+        class="focus:ring-secondary/50 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm transition focus:ring-2 focus:outline-none"
+      />
+
+      <!-- On utilise une classe 'password-toggle' à la place d'un ID unique -->
+      <button type="button" class="password-toggle absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+          />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+        </svg>
+      </button>
+    </div>
+
+    {% if form.password2.errors %}
+    <p class="mt-1 text-xs text-red-600">{{ form.password2.errors|first }}</p>
+    {% endif %}
+  </div>
+
+  <!-- Le script mis à jour pour écouter TOUS les boutons avec la classe .password-toggle -->
+  <script>
+    document.querySelectorAll('.password-toggle').forEach((button) => {
+      button.addEventListener('click', function () {
+        // Trouve l'input qui est dans le même bloc '.relative' que le bouton cliqué
+        const passwordInput = this.closest('.relative').querySelector('input');
+
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text';
+        } else {
+          passwordInput.type = 'password';
+        }
+      });
+    });
+  </script>
+
+  {% if type_compte == 'proprietaire' %}
+  <div class="mb-3">
+    <div>
+      <label class="mb-1.5 block text-xs font-medium tracking-wide text-gray-500 uppercase">Téléphone</label>
+      <input
+        type="text"
+        name="telephone"
+        value="{{ form.telephone.value|default:'' }}"
+        placeholder="6XX XXX XXX"
+        class="focus:ring-secondary/50 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm transition focus:ring-2 focus:outline-none"
+      />
+    </div>
+    <label class="mb-1.5 block text-xs font-medium tracking-wide text-gray-500 uppercase">N° pièce d'identité</label>
+    <input
+      type="text"
+      name="numero_piece"
+      value="{{ form.numero_piece.value|default:'' }}"
+      placeholder="CNI / Passeport"
+      class="focus:ring-secondary/50 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm transition focus:ring-2 focus:outline-none"
+    />
+    {% if form.numero_piece.errors %}
+    <p class="mt-1 text-xs text-red-600">{{ form.numero_piece.errors|first }}</p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <button type="submit" class="bg-primary text-secondary hover:bg-primary/90 mt-1 w-full rounded-xl py-3 text-sm font-medium transition">Créer mon compte</button>
+</form>
+
+<p class="mt-4 text-center text-sm text-gray-400">
+  Déjà inscrit ?
+  <a href="{% url 'users:connexion' %}" class="text-primary font-medium hover:underline">Se connecter</a>
+</p>
+{% endblock %}

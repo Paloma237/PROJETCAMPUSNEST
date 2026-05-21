@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+/* ============================================================
+   CAMPUSNEST — Tailwind v4 input.css
+   Toutes les personnalisations sont ici.
+   Pas de style= ni de @apply dans les templates.
+   ============================================================ */
+
+/* ── Thème : polices ── */
+@theme {
+  --font-heading: "Cormorant Garamond", serif;
+  --font-body: "Inter", sans-serif;
+
+  /* Couleurs principales CampusNest */
+  --color-primary:       #1A2517;  /* indigo-700 — couleur principale */
+  --color-secondary:     #ACC8A2;  /*couleur secondaire*/
+  --color-primary-dark:  #3730a3;  /* indigo-800 — hover */
+  --color-primary-light: #6366f1;  /* indigo-500 — accents */
+  --color-accent:        #fbbf24;  /* amber-400  — CTA, badges */
+  --color-accent-dark:   #f59e0b;  /* amber-500  — hover accent */
+  /*#1A2517,primaire   ACC802, secondaire*/
+
+}
+
+/* ── Couche de base ── */
+@layer base {
+  html {
+    font-family: var(--font-body);
+    font-smoothing: antialiased;
+    --color-gray: #111827;
+    background-color: #f9fafb;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+}
+
+@layer components{
+  
+}
+  
