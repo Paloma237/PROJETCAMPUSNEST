@@ -16,6 +16,9 @@ urlpatterns = [
     path("nouveau-mot-de-passe/", views.nouveau_mot_de_passe_view, name="nouveau_mot_de_passe"),
 
     # Validation propriétaire
+    path("inscription/verifier-email/", views.verifier_otp_inscription_view, name="verifier_otp_inscription"),
+    path("inscription/verifier-email/", views.verifier_otp_inscription_view, name="verifier_otp_inscription"),
+path("inscription/renvoyer-otp/", views.renvoyer_otp_inscription_view, name="renvoyer_otp_inscription"),
     path("validation-en-attente/", views.validation_en_attente_view, name="validation_en_attente"),
 
     # Profil & dashboards

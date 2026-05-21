@@ -125,7 +125,7 @@ class Utilisateur(AbstractBaseUser, PermissionsMixin):
     is_superuser = models.BooleanField(default=False)
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["nom", "prenom"]
+    
 
     objects = UserManager()
 

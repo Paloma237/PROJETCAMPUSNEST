@@ -2,35 +2,42 @@
 {% block title %}Vérification du code{% endblock %} 
 {% block sidebar_quote %}« Entrez le code reçu dans votre boîte mail. »{% endblock %} 
 {% block content %}
-<h1 class="mb-1 text-2xl font-medium text-gray-900">Vérification</h1>
+
+<h1 class="mb-1 text-2xl font-medium text-gray-900">
+  {{ titre|default:"Vérification" }}
+</h1>
 <p class="mb-2 text-sm text-gray-500">
-  Code envoyé à
-  <strong>{{ email_masque }}</strong>
+  Code envoyé à <strong>{{ email_masque }}</strong>
 </p>
 <p class="mb-6 text-xs text-gray-400">
-  Valide pendant
-  <strong>{{ expiry_minutes }} minutes</strong>
-  .
+  Valide pendant <strong>{{ expiry_minutes }} minutes</strong>.
 </p>
 
 <form method="post" novalidate>
   {% csrf_token %}
   <div class="mb-4">
-    <label class="mb-1.5 block text-center text-xs font-medium tracking-wide text-gray-500 uppercase">Code à 6 chiffres</label>
-    {{ form.code }} {% if form.code.errors %}
-    <p class="mt-2 text-center text-xs text-red-600">{{ form.code.errors|first }}</p>
+    <label class="mb-1.5 block text-center text-xs font-medium tracking-wide text-gray-500 uppercase">
+      Code à 6 chiffres
+    </label>
+    {{ form.code }}
+    {% if form.code.errors %}
+      <p class="mt-2 text-center text-xs text-red-600">{{ form.code.errors|first }}</p>
     {% endif %}
   </div>
-
-  <button type="submit" class="bg-primary text-secondary hover:bg-primary/90 mt-2 w-full rounded-xl py-3 text-sm font-medium transition">Vérifier le code</button>
+  <button type="submit" class="bg-primary text-secondary hover:bg-primary/90 mt-2 w-full rounded-xl py-3 text-sm font-medium transition">
+    Vérifier le code
+  </button>
 </form>
 
 <div class="mt-6 space-y-2 text-center">
   <p class="text-xs text-gray-400">Vous n'avez pas reçu le code ?</p>
-  <a href="{% url 'users:renvoyer_otp' %}" class="text-primary text-sm font-medium hover:underline">Renvoyer un nouveau code</a>
+  <a href="{% url renvoyer_url %}" class="text-primary text-sm font-medium hover:underline">
+    Renvoyer un nouveau code
+  </a>
 </div>
 
 <p class="mt-4 text-center text-sm text-gray-400">
-  <a href="{% url 'users:mot_de_passe_oublie' %}" class="hover:underline">← Changer d'email</a>
+  <a href="{% url retour_url %}" class="hover:underline">← {{ retour_texte|default:"Retour" }}</a>
 </p>
+
 {% endblock %}

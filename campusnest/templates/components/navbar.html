@@ -20,11 +20,13 @@
          class="px-3 py-1.5 text-xs rounded text-secondary/70 hover:text-secondary hover:bg-white/10 transition whitespace-nowrap">
         Comptes
       </a>
-      <a href="{% url 'logements:liste_admin' %}"
+      <a href="#"
+      {% comment %} "{% url 'logements:liste_admin' %}" {% endcomment %}
          class="px-3 py-1.5 text-xs rounded text-secondary/70 hover:text-secondary hover:bg-white/10 transition whitespace-nowrap">
         Logements
       </a>
-      <a href="{% url 'signalements:liste' %}"
+      <a href="#"
+      {% comment %} <a href="{% url 'signalements:liste' %}" {% endcomment %}
          class="px-3 py-1.5 text-xs rounded text-secondary/70 hover:text-secondary hover:bg-white/10 transition whitespace-nowrap">
         Signalements
       </a>

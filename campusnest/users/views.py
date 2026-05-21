@@ -20,10 +20,11 @@ from .utils import enregistrer_log, admin_requis, proprietaire_valide_requis
 # ─────────────────────────────────────────────
 #  Connexion / Déconnexion
 # ─────────────────────────────────────────────
+# Extraire la partie avant le @ de l'email
 
 def connexion_view(request):
     if request.user.is_authenticated:
-        return redirect("dashboard")
+        return redirect("users:dashboard")
 
     form = ConnexionForm(request, data=request.POST or None)
 
@@ -74,12 +75,10 @@ def _redirection_par_role(user):
 # ─────────────────────────────────────────────
 #  Inscription
 # ─────────────────────────────────────────────
-
 def inscription_view(request):
     if request.user.is_authenticated:
-        return redirect("dashboard")
+        return redirect("users:dashboard")
 
-    # Détecter le type d'inscription depuis le paramètre GET ou le POST
     type_compte = request.POST.get("type_compte") or request.GET.get("type", "client")
 
     if type_compte == "proprietaire":
@@ -88,26 +87,128 @@ def inscription_view(request):
         form = InscriptionClientForm(request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-        user = form.save()
+        user = form.save(commit=False)
+        user.est_actif = False  # ← inactif jusqu'à vérification email
+        user.save()
         enregistrer_log(request, user, f"Inscription — rôle : {user.role}")
 
-        if user.role == Utilisateur.Role.PROPRIETAIRE:
-            messages.info(
-                request,
-                "Votre compte a été créé. Attendez la validation par l'administrateur.",
-            )
-            return redirect("users:validation_en_attente")
+        # Générer et envoyer le code OTP
+        otp = OTPCode.generer_pour(user)
+        send_mail(
+            subject="CampusNest — Vérifiez votre adresse email",
+            message=(
+                f"Bonjour {user.nom_email},\n\n"
+                f"Merci de vous être inscrit sur CampusNest.\n"
+                f"Votre code de vérification est : {otp.code}\n\n"
+                f"Il est valide pendant {OTPCode.OTP_EXPIRY_MINUTES} minutes.\n"
+                f"Si vous n'avez pas créé ce compte, ignorez cet email.\n\n"
+                f"L'équipe CampusNest IUT-FV"
+            ),
+            from_email="noreply@campusnest.iutfv.cm",
+            recipient_list=[user.email],
+            fail_silently=False,
+        )
 
-        # Auto-connexion pour les étudiants
-        login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-        messages.success(request, f"Bienvenue, {user.prenom} !")
-        return redirect("users:dashboard")
+        # Stocker l'email en session pour la vérification
+        request.session["inscription_otp_email"] = user.email
+        request.session["inscription_type_compte"] = user.role
+
+        messages.success(
+            request,
+            "Un code de vérification a été envoyé à votre adresse email."
+        )
+        return redirect("users:verifier_otp_inscription")
 
     return render(request, "accounts/inscription.html", {
         "form": form,
         "type_compte": type_compte,
     })
+    
+    
+def verifier_otp_inscription_view(request):
+    email = request.session.get("inscription_otp_email")
+    if not email:
+        messages.error(request, "Session expirée. Recommencez l'inscription.")
+        return redirect("users:inscription")
 
+    form = VerifierOTPForm(request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        code = form.cleaned_data["code"]
+
+        try:
+            user = Utilisateur.objects.get(email=email, est_actif=False)
+            otp = OTPCode.objects.filter(
+                utilisateur=user,
+                code=code,
+                utilise=False,
+            ).order_by("-cree_le").first()
+
+            if otp and otp.est_valide:
+                otp.marquer_utilise()
+
+                # Activer le compte
+                user.est_actif = True
+                user.save(update_fields=["est_actif"])
+
+                request.session.pop("inscription_otp_email", None)
+                enregistrer_log(request, user, "Email vérifié — compte activé")
+
+                if user.role == Utilisateur.Role.PROPRIETAIRE:
+                    messages.info(
+                        request,
+                        "Email vérifié ! Votre compte attend la validation par l'administrateur.",
+                    )
+                    return redirect("users:validation_en_attente")
+
+                # Auto-connexion pour les clients
+                login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+                messages.success(request, f"Bienvenue, {user.prenom} ! Votre compte est activé.")
+                return redirect("users:dashboard")
+
+            else:
+                form.add_error("code", "Code incorrect ou expiré.")
+
+        except Utilisateur.DoesNotExist:
+            form.add_error("code", "Une erreur est survenue. Recommencez.")
+
+    return render(request, "accounts/otp_verification.html", {
+    "form": form,
+    "email_masque": _masquer_email(email),
+    "expiry_minutes": OTPCode.OTP_EXPIRY_MINUTES,
+    "titre": "Vérification de votre adresse email",
+    "renvoyer_url": "users:renvoyer_otp_inscription",
+    "retour_url": "users:inscription",
+    "retour_texte": "← Retour à l'inscription",
+})
+
+
+
+def renvoyer_otp_inscription_view(request):
+    email = request.session.get("inscription_otp_email")
+    if not email:
+        return redirect("users:inscription")
+
+    try:
+        user = Utilisateur.objects.get(email=email, est_actif=False)
+        otp = OTPCode.generer_pour(user)
+        send_mail(
+            subject="CampusNest — Nouveau code de vérification",
+            message=(
+                f"Bonjour {user.email},\n\n"
+                f"Votre nouveau code est : {otp.code}\n\n"
+                f"Il est valide {OTPCode.OTP_EXPIRY_MINUTES} minutes.\n\n"
+                f"L'équipe CampusNest IUT-FV"
+            ),
+            from_email="noreply@campusnest.iutfv.cm",
+            recipient_list=[user.email],
+            fail_silently=True,
+        )
+    except Utilisateur.DoesNotExist:
+        pass
+
+    messages.info(request, "Un nouveau code vous a été envoyé.")
+    return redirect("users:verifier_otp_inscription")
 
 # ─────────────────────────────────────────────
 #  En attente de validation (propriétaire)
@@ -154,7 +255,7 @@ def mot_de_passe_oublie_view(request):
             send_mail(
                 subject="CampusNest — Votre code de vérification",
                 message=(
-                    f"Bonjour {user.prenom},\n\n"
+                    f"Bonjour {user.email},\n\n"
                     f"Votre code de vérification est : {otp.code}\n\n"
                     f"Il est valide pendant {OTPCode.OTP_EXPIRY_MINUTES} minutes.\n"
                     f"Si vous n'avez pas fait cette demande, ignorez cet email.\n\n"
@@ -228,6 +329,10 @@ def verifier_otp_view(request):
         "form":                form,
         "email_masque":        _masquer_email(email),
         "expiry_minutes":      OTPCode.OTP_EXPIRY_MINUTES,
+        "titre": "Vérification",
+        "renvoyer_url": "users:renvoyer_otp",
+        "retour_url": "users:mot_de_passe_oublie",
+        "retour_texte": "← Changer d'email",
         "tentatives_restantes": tentatives_restantes,
     })
 
@@ -261,7 +366,7 @@ def nouveau_mot_de_passe_view(request):
         enregistrer_log(request, user, "Mot de passe réinitialisé via OTP")
         messages.success(request,
             "Votre mot de passe a été mis à jour. Vous pouvez maintenant vous connecter.")
-        return redirect("accounts:connexion")
+        return redirect("users:connexion")
  
     return render(request, "accounts/reinitialiser_mot_de_passe.html", {"form": form})
 
@@ -273,7 +378,7 @@ def renvoyer_otp_view(request):
     """
     email = request.session.get("otp_email")
     if not email:
-        return redirect("accounts:mot_de_passe_oublie")
+        return redirect("users:mot_de_passe_oublie")
 
     try:
         user = Utilisateur.objects.get(email=email, est_actif=True)
@@ -281,7 +386,7 @@ def renvoyer_otp_view(request):
         send_mail(
             subject="CampusNest — Nouveau code de vérification",
             message=(
-                f"Bonjour {user.prenom},\n\n"
+                f"Bonjour {user.email},\n\n"
                 f"Votre nouveau code est : {otp.code}\n\n"
                 f"Il est valide {OTPCode.OTP_EXPIRY_MINUTES} minutes.\n\n"
                 f"L'équipe CampusNest IUT-FV"
@@ -435,12 +540,12 @@ def admin_dashboard_view(request):
  
 @admin_requis
 def valider_proprietaire_view(request, pk):
-    from accounts.models import Proprietaire
+    from users.models import Proprietaire
     p = Proprietaire.objects.get(pk=pk)
     p.est_valide = True; p.date_validation = timezone.now(); p.save()
     enregistrer_log(request, request.user, f"Propriétaire validé : {p.email}")
     messages.success(request, f"Compte de {p.get_full_name()} validé.")
-    return redirect("accounts:admin_dashboard")
+    return redirect("users:admin_dashboard")
  
  
 @admin_requis
@@ -449,12 +554,13 @@ def suspendre_compte_view(request, pk):
     user.est_actif = False; user.save(update_fields=["est_actif"])
     enregistrer_log(request, request.user, f"Compte suspendu : {user.email}")
     messages.warning(request, f"Compte de {user.get_full_name()} suspendu.")
-    return redirect("accounts:admin_dashboard")
+    return redirect("users:admin_dashboard")
  
  
 # ─────────────────────────────────────────────
 #  Helpers privés
-# ─────────────────────────────────────────────
+# ─────────────────────────────
+# ────────────────
  
 def _masquer_email(email: str) -> str:
     """ex: jean.mbarga@cm  →  j***@cm"""

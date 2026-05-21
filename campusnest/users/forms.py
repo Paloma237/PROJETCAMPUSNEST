@@ -46,7 +46,7 @@ class InscriptionClientForm(forms.ModelForm):
  
     class Meta:
         model  = Utilisateur
-        fields = ["nom", "prenom", "email", "telephone"]
+        fields = ["email", "telephone"]
         widgets = {
             "email":     forms.EmailInput(attrs={"class": CSS, "placeholder": "votre@email.cm"}),
             "telephone": forms.TextInput(attrs={"class": CSS, "placeholder": "6XX XXX XXX"}),
