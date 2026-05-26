@@ -1,144 +1,125 @@
 """
-logements/models.py
-Emplacement : campusnest/logements/models.py
+campusnest/logements/models.py — VERSION TOTALEMENT CORRIGÉE
 """
 from django.db import models
 from django.utils import timezone
 
 
 class Cite(models.Model):
-    """
-    Correspond à la classe Cité du diagramme de classes.
-    Une cité appartient à un propriétaire et contient des chambres.
-    """
     proprietaire = models.ForeignKey(
         "users.Utilisateur",
         on_delete=models.CASCADE,
         related_name="cites",
         limit_choices_to={"role": "proprietaire"},
+        verbose_name="Propriétaire",
     )
-    nom         = models.CharField(max_length=150)
-    adresse     = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    latitude    = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    longitude   = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    nom           = models.CharField("Nom", max_length=150)
+    adresse       = models.CharField("Adresse", max_length=255)
+    description   = models.TextField("Description", blank=True)
+    latitude      = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude     = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     date_creation = models.DateTimeField(default=timezone.now)
 
     class Meta:
-        verbose_name = "Cité"
+        verbose_name        = "Cité"
         verbose_name_plural = "Cités"
-        ordering = ["-date_creation"]
+        ordering            = ["-date_creation"]
 
     def __str__(self):
         return self.nom
-
-    # Méthodes du diagramme de classes
-    def ajouter(self):
-        self.save()
-
-    def modifier(self, **kwargs):
-        for champ, valeur in kwargs.items():
-            setattr(self, champ, valeur)
-        self.save()
-
-    def supprimer(self):
-        self.delete()
-
-    def get_chambres_disponibles(self):
+    
+    def image_principale_url(self):
+        """Retourne l'URL de la photo principale ou None s'il n'y en a pas."""
+        # On cherche d'abord s'il y a une photo marquée 'est_principale=True'
+        photo = self.photos_cite.filter(est_principale=True).first()
+        if not photo:
+            # Sinon, on prend la toute première photo associée
+            photo = self.photos_cite.first()
+        
+        if photo and photo.image:
+            return photo.image.url
+        return None
+    
+    def chambres_disponibles(self):
         return self.chambres.filter(est_disponible=True)
 
 
 class Chambre(models.Model):
-    """
-    Correspond à la classe Chambre du diagramme de classes.
-    Une chambre appartient à une cité.
-    """
+
     class Type(models.TextChoices):
-        SIMPLE  = "simple",  "Simple"
-        DOUBLE  = "double",  "Double"
-        STUDIO  = "studio",  "Studio"
+        SIMPLE      = "simple",      "Simple"
+        DOUBLE      = "double",      "Double"
+        STUDIO      = "studio",      "Studio"
         APPARTEMENT = "appartement", "Appartement"
 
     class Etat(models.TextChoices):
-        BON      = "bon",      "Bon état"
-        MOYEN    = "moyen",    "État moyen"
+        BON        = "bon",        "Bon état"
+        MOYEN      = "moyen",      "État moyen"
         RENOVATION = "renovation", "En rénovation"
 
-    cite          = models.ForeignKey(Cite, on_delete=models.CASCADE, related_name="chambres")
-    description   = models.TextField()
-    superficie    = models.PositiveIntegerField(help_text="En m²")
-    loyer         = models.PositiveIntegerField(help_text="En FCFA par mois")
-    type          = models.CharField(max_length=20, choices=Type.choices, default=Type.SIMPLE)
-    etat          = models.CharField(max_length=20, choices=Etat.choices, default=Etat.BON)
-    est_disponible = models.BooleanField(default=True)
+    cite          = models.ForeignKey(Cite, on_delete=models.CASCADE, related_name="chambres", verbose_name="Cité")
+    description   = models.TextField("Description")
+    superficie    = models.PositiveIntegerField("Superficie (m²)")
+    loyer         = models.PositiveIntegerField("Loyer mensuel (FCFA)")
+    type          = models.CharField("Type", max_length=20, choices=Type.choices, default=Type.SIMPLE)
+    etat          = models.CharField("État", max_length=20, choices=Etat.choices, default=Etat.BON)
+    est_disponible = models.BooleanField("Disponible", default=True)
     date_ajout    = models.DateTimeField(default=timezone.now)
 
-    # Équipements (champs booléens simples — pas de table séparée)
-    meublee       = models.BooleanField(default=False)
-    salle_de_bain  = models.BooleanField(default=False)
-    cuisine       = models.BooleanField(default=False)
-    internet      = models.BooleanField(default=False)
-    eau_courante  = models.BooleanField(default=True)
-    electricite   = models.BooleanField(default=True)
+    # Équipements
+    meublee      = models.BooleanField("Meublée", default=False)
+    wc_interieur = models.BooleanField("WC intérieur", default=False)
+    cuisine      = models.BooleanField("Cuisine", default=False)
+    internet     = models.BooleanField("Internet", default=False)
+    eau_courante = models.BooleanField("Eau courante", default=True)
+    electricite  = models.BooleanField("Électricité", default=True)
 
     class Meta:
-        verbose_name = "Chambre"
+        verbose_name        = "Chambre"
         verbose_name_plural = "Chambres"
-        ordering = ["-date_ajout"]
+        ordering            = ["-date_ajout"]
 
     def __str__(self):
-        return f"{self.cite.nom} — {self.get_type_display()} ({self.superficie} m²)"
+        return f"{self.cite.nom} — {self.get_type_display()} {self.superficie}m²"
 
-    # Méthodes du diagramme de classes
-    def ajouter(self):
-        self.save()
-
-    def modifier(self, **kwargs):
-        for champ, valeur in kwargs.items():
-            setattr(self, champ, valeur)
-        self.save()
-
-    def supprimer(self):
-        self.delete()
-
-    def set_disponibilite(self, disponible: bool):
-        self.est_disponible = disponible
-        self.save(update_fields=["est_disponible"])
-
-    def get_avis_moyenne(self):
+    def note_moyenne(self):
         avis = self.avis.filter(est_visible=True)
         if not avis.exists():
             return None
-        total = sum(a.note for a in avis)
-        return round(total / avis.count(), 1)
+        return round(sum(a.note for a in avis) / avis.count(), 1)
 
-    def get_photo_principale(self):
+    def photo_principale(self):
         return self.photos.filter(est_principale=True).first() or self.photos.first()
 
 
-class Photo(models.Model):
-    """
-    Correspond à la classe Photo du diagramme de classes.
-    Photos associées à une chambre.
-    """
-    chambre      = models.ForeignKey(Chambre, on_delete=models.CASCADE, related_name="photos")
-    url          = models.ImageField(upload_to="chambres/")  # stocké dans media/chambres/
-    legende      = models.CharField(max_length=200, blank=True)
-    est_principale = models.BooleanField(default=False)
-    date_upload  = models.DateTimeField(auto_now_add=True)
+class PhotoChambre(models.Model):
+    chambre       = models.ForeignKey(Chambre, on_delete=models.CASCADE, related_name="photos", verbose_name="Chambre")
+    image         = models.ImageField("Image", upload_to="chambres/%Y/%m/")
+    legende       = models.CharField("Légende", max_length=200, blank=True)
+    est_principale = models.BooleanField("Photo principale", default=False)
+    date_upload   = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        verbose_name = "Photo"
+        verbose_name        = "Photo"
         verbose_name_plural = "Photos"
-        ordering = ["-est_principale", "date_upload"]
+        ordering            = ["-est_principale", "date_upload"]
 
     def __str__(self):
-        return f"Photo de {self.chambre} ({'principale' if self.est_principale else 'secondaire'})"
+        return f"Photo {'principale' if self.est_principale else 'secondaire'} — {self.chambre}"
+    
 
-    def telecharger(self):
-        """Retourne l'URL publique de la photo."""
-        return self.url.url
+class PhotoCity(models.Model):
+    # ✅ Modification ici : Le related_name="photos_cite" est placé au bon endroit !
+    city = models.ForeignKey(Cite, on_delete=models.CASCADE, related_name="photos_cite", verbose_name="Cite")
+    image         = models.ImageField("Image", upload_to="cites/%Y/%m/") # Changé en cites/ pour ne pas mélanger avec les chambres
+    legende       = models.CharField("Légende", max_length=200, blank=True)
+    est_principale = models.BooleanField("Photo principale", default=False)
+    date_upload   = models.DateTimeField(auto_now_add=True)
 
-    def supprimer(self):
-        self.url.delete(save=False)  # supprime le fichier physique
-        self.delete()
+    class Meta:
+        verbose_name        = "Photo Cité"
+        verbose_name_plural = "Photos Cités"
+        ordering            = ["-est_principale", "date_upload"] # ✅ Nettoyé : Plus de related_name ici !
+
+    def __str__(self):
+        return f"Photo {'principale' if self.est_principale else 'secondaire'} — {self.city}"

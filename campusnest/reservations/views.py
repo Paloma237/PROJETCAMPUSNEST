@@ -1,18 +1,12 @@
 from django.shortcuts import render
-
-# Create your views here.
-"""
-reservations/views.py
-Emplacement : campusnest/reservations/views.py
-"""
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
-from accounts.utils import client_requis, proprietaire_valide_requis, admin_requis
-from logements.models import Chambre
-from .models import Reservation
+from campusnest.users.utils import client_requis, proprietaire_valide_requis, admin_requis
+from campusnest.logements.models import Chambre
+from campusnest.reservations.models import Reservation
 from .forms import ReservationForm, DateVisiteForm
 
 
@@ -86,7 +80,7 @@ def detail_reservation_view(request, pk):
     )
     return render(request, "reservations/detail_reservation.html", {
         "reservation": reservation,
-        "montant_total": reservation.get_montant_total(),
+       # "montant_total": reservation.get_montant_total(),
     })
 
 
@@ -134,11 +128,6 @@ def demander_nouvelle_date_view(request, pk):
 
 @proprietaire_valide_requis
 def reservations_recues_view(request):
-    """
-    Liste de toutes les réservations reçues par le propriétaire connecté.
-    Filtrables par statut.
-    Template : reservations/templates/reservations/reservations_recues.html
-    """
     reservations = Reservation.objects.filter(
         chambre__cite__proprietaire=request.user
     ).select_related("client", "chambre__cite").order_by("-date_demande")

@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block title %}Gestion des logements — Admin CampusNest{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+
+  {# ── En-tête ── #}
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-900">Gestion des logements</h1>
+      <p class="text-sm text-gray-500 mt-1">
+        {{ chambres|length }} chambre{{ chambres|length|pluralize }} sur la plateforme
+      </p>
+    </div>
+  </div>
+
+  {# ── Filtres ── #}
+  <form method="get"
+        class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm mb-6
+               flex flex-wrap items-end gap-4">
+
+    {# Filtre disponibilité #}
+    <div>
+      <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+        Disponibilité
+      </label>
+      <select name="disponible"
+              class="px-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50
+                     focus:outline-none focus:ring-2 focus:ring-secondary/50">
+        <option value="">Toutes</option>
+        <option value="1" {% if request.GET.disponible == '1' %}selected{% endif %}>
+          Disponibles
+        </option>
+        <option value="0" {% if request.GET.disponible == '0' %}selected{% endif %}>
+          Occupées
+        </option>
+      </select>
+    </div>
+
+    {# Filtre propriétaire #}
+    <div>
+      <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">
+        Propriétaire
+      </label>
+      <input type="text" name="proprietaire" value="{{ request.GET.proprietaire }}"
+             placeholder="Nom du propriétaire"
+             class="px-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50
+                    focus:outline-none focus:ring-2 focus:ring-secondary/50 w-48"/>
+    </div>
+
+    <button type="submit"
+            class="px-5 py-2 bg-primary text-secondary text-sm font-medium
+                   rounded-xl hover:bg-primary/90 transition">
+      Filtrer
+    </button>
+    <a href="{% url 'logements:liste_admin' %}"
+       class="px-5 py-2 border border-gray-200 text-gray-500 text-sm rounded-xl
+              hover:bg-gray-50 transition">
+      Réinitialiser
+    </a>
+  </form>
+
+  {# ── Tableau ── #}
+  {% if chambres %}
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 border-b border-gray-100">
+          <tr>
+            <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">
+              Chambre
+            </th>
+            <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">
+              Cité
+            </th>
+            <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">
+              Propriétaire
+            </th>
+            <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">
+              Loyer
+            </th>
+            <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wide">
+              Statut
+            </th>
+            <th class="px-4 py-3"></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for chambre in chambres %}
+            <tr class="hover:bg-gray-50/50 transition">
+
+              {# Chambre #}
+              <td class="px-5 py-3">
+                <p class="font-medium text-gray-900">
+                  {{ chambre.get_type_display }}
+                </p>
+                <p class="text-xs text-gray-400 mt-0.5">
+                  {{ chambre.superficie }} m² · {{ chambre.get_etat_display }}
+                </p>
+              </td>
+
+              {# Cité #}
+              <td class="px-4 py-3">
+                <p class="text-gray-700">{{ chambre.cite.nom }}</p>
+                <p class="text-xs text-gray-400 truncate max-w-32">{{ chambre.cite.adresse }}</p>
+              </td>
+
+              {# Propriétaire #}
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full bg-secondary/20 text-primary text-xs
+                              font-semibold flex items-center justify-center shrink-0">
+                    {{ chambre.cite.proprietaire.prenom|first|upper }}
+                  </div>
+                  <span class="text-gray-700 text-xs">
+                    {{ chambre.cite.proprietaire.get_full_name }}
+                  </span>
+                </div>
+              </td>
+
+              {# Loyer #}
+              <td class="px-4 py-3">
+                <span class="font-medium text-primary">
+                  {{ chambre.loyer|floatformat:0 }}
+                </span>
+                <span class="text-xs text-gray-400">FCFA</span>
+              </td>
+
+              {# Statut #}
+              <td class="px-4 py-3">
+                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+                  {% if chambre.est_disponible %}
+                    bg-green-50 text-green-700
+                  {% else %}
+                    bg-red-50 text-red-600
+                  {% endif %}">
+                  {% if chambre.est_disponible %}Disponible{% else %}Occupée{% endif %}
+                </span>
+              </td>
+
+              {# Actions #}
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-2 justify-end">
+                  <a href="{% url 'logements:detail_chambre' chambre.pk %}"
+                     class="text-xs text-primary hover:underline">
+                    Voir
+                  </a>
+                  <form method="post"
+                        action="{% url 'logements:supprimer_admin' chambre.pk %}"
+                        onsubmit="return confirm('Supprimer cette chambre de la plateforme ?')">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="text-xs text-red-500 hover:underline">
+                      Supprimer
+                    </button>
+                  </form>
+                </div>
+              </td>
+
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  {% else %}
+    <div class="bg-white rounded-2xl border border-gray-100 p-16 text-center shadow-sm">
+      <p class="text-gray-400 text-sm">Aucun logement trouvé avec ces filtres.</p>
+      <a href="{% url 'logements:liste_admin' %}"
+         class="inline-block mt-4 text-xs text-primary hover:underline">
+        Voir tous les logements
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

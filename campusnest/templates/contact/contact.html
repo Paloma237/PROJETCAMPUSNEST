@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Contact{% endblock %}
+ 
+{% block content %}
+<div class="max-w-xl mx-auto px-4 py-8">
+  <h1 class="text-2xl font-medium text-gray-900 mb-1">Nous contacter</h1>
+  <p class="text-sm text-gray-500 mb-6">
+    Une question ? Écrivez-nous, nous vous répondons dans les meilleurs délais.
+  </p>
+ 
+  <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Nom complet</label>
+          {{ form.nom_expediteur }}
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Téléphone</label>
+          {{ form.telephone }}
+        </div>
+      </div>
+      <div class="mb-4">
+        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Email</label>
+        {{ form.email }}
+      </div>
+      <div class="mb-4">
+        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Objet</label>
+        {{ form.objet_message }}
+      </div>
+      <div class="mb-6">
+        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Message</label>
+        {{ form.message }}
+      </div>
+      <button type="submit"
+              class="w-full py-3 bg-primary text-secondary text-sm font-medium
+                     rounded-xl hover:bg-primary/90 transition">
+        Envoyer le message
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

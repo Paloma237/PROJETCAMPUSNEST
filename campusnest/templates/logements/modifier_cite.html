@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% block title %}Modifier {{ cite.nom }} — CampusNest{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+
+  {# ── Breadcrumb ── #}
+  <nav class="flex items-center gap-2 text-xs text-gray-400 mb-6">
+    <a href="{% url 'logements:mes_cites' %}" class="hover:text-primary transition">Mes cités</a>
+    <span>›</span>
+    <span class="text-gray-600">Modifier {{ cite.nom }}</span>
+  </nav>
+
+  <h1 class="text-2xl font-semibold text-gray-900 mb-6">Modifier la cité</h1>
+
+  <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+
+      {# Nom #}
+      <div class="mb-4">
+        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+          Nom de la cité <span class="text-red-400">*</span>
+        </label>
+        <input type="text" name="nom" value="{{ form.nom.value|default:'' }}"
+               class="w-full px-3 py-2.5 text-sm border rounded-xl bg-gray-50
+                      focus:outline-none focus:ring-2 focus:ring-secondary/50 transition
+                      {% if form.nom.errors %}border-red-300{% else %}border-gray-200{% endif %}"/>
+        {% if form.nom.errors %}
+          <p class="text-red-500 text-xs mt-1">{{ form.nom.errors|first }}</p>
+        {% endif %}
+      </div>
+
+      {# Adresse #}
+      <div class="mb-4">
+        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+          Adresse <span class="text-red-400">*</span>
+        </label>
+        <input type="text" name="adresse" value="{{ form.adresse.value|default:'' }}"
+               class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50
+                      focus:outline-none focus:ring-2 focus:ring-secondary/50 transition"/>
+        {% if form.adresse.errors %}
+          <p class="text-red-500 text-xs mt-1">{{ form.adresse.errors|first }}</p>
+        {% endif %}
+      </div>
+
+      {# Description #}
+      <div class="mb-4">
+        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+          Description
+        </label>
+        <textarea name="description" rows="4"
+                  class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50
+                         focus:outline-none focus:ring-2 focus:ring-secondary/50 transition resize-none"
+                  placeholder="Décrivez la cité : emplacement, ambiance, accès...">{{ form.description.value|default:'' }}</textarea>
+      </div>
+
+      {# Coordonnées GPS #}
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <div>
+          <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+            Latitude
+          </label>
+          <input type="number" name="latitude" step="0.000001"
+                 value="{{ form.latitude.value|default:'' }}"
+                 class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50
+                        focus:outline-none focus:ring-2 focus:ring-secondary/50 transition"
+                 placeholder="Ex : 5.353"/>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+            Longitude
+          </label>
+          <input type="number" name="longitude" step="0.000001"
+                 value="{{ form.longitude.value|default:'' }}"
+                 class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50
+                        focus:outline-none focus:ring-2 focus:ring-secondary/50 transition"
+                 placeholder="Ex : 10.521"/>
+        </div>
+      </div>
+
+      {#  Le champ d'upload pour ajouter de nouvelles photos #}
+      <div class="mb-6">
+        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+          Ajouter de nouvelles photos <span class="text-gray-400 normal-case">(plusieurs fichiers possibles)</span>
+        </label>
+        <input
+          type="file"
+          name="photos"
+          multiple
+          accept="image/*"
+          class="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-primary/10 file:px-3 file:py-1 file:text-xs file:font-medium file:text-primary"
+        />
+      </div>
+
+      {#  Gestion des photos existantes #}
+      {% if photos_cite %}
+      <div class="mb-6">
+        <p class="mb-2 text-xs font-medium text-gray-500 uppercase tracking-wide">Photos actuelles</p>
+        <div class="flex flex-wrap gap-2">
+          {% for photo in photos_cite %}
+          <div class="group relative h-20 w-20 overflow-hidden rounded-xl">
+            <img src="{{ photo.image.url }}" class="h-full w-full object-cover" />
+            
+            <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition group-hover:opacity-100">
+              <button type="submit" form="form-supprimer-cite-{{ photo.pk }}" class="text-xs text-white hover:underline font-medium">
+                Supprimer
+              </button>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {# Actions du formulaire d'édition #}
+      <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
+        <button type="submit"
+                class="px-6 py-2.5 bg-primary text-secondary text-sm font-medium
+                       rounded-xl hover:bg-primary/90 transition">
+          Enregistrer les modifications
+        </button>
+        <a href="{% url 'logements:mes_cites' %}"
+           class="px-6 py-2.5 border border-gray-200 text-gray-600 text-sm
+                  rounded-xl hover:bg-gray-50 transition">
+          Annuler
+        </a>
+
+        {#  Bouton de suppression de cité lié à son formulaire déporté tout en bas #}
+        <button type="submit" form="form-supprimer-cite-globale"
+                class="ml-auto px-4 py-2.5 text-xs text-red-500 border border-red-200
+                       rounded-xl hover:bg-red-50 transition">
+          Supprimer la cité
+        </button>
+      </div>
+
+    </form>
+
+    {# ──  FORMULAIRES EXTERNES (Totalement hors du formulaire d'édition pour éviter les conflits) ── #}
+    
+    {# 1. Formulaire pour la suppression totale de la cité #}
+    <form id="form-supprimer-cite-globale" method="post" action="{% url 'logements:supprimer_cite' cite.pk %}"
+          class="hidden" onsubmit="return confirm('Supprimer définitivement {{ cite.nom }} et toutes ses chambres ?')">
+      {% csrf_token %}
+    </form>
+
+    {# 2. Formulaires individuels pour les suppressions de photos #}
+    {% if photos_cite %}
+      {% for photo in photos_cite %}
+        <form id="form-supprimer-cite-{{ photo.pk }}" method="post" action="{% url 'logements:supprimer_cite' photo.pk %}" class="hidden">
+          {% csrf_token %}
+        </form>
+      {% endfor %}
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

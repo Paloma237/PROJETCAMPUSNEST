@@ -1,113 +1,82 @@
-<nav class="bg-primary h-12 flex items-center px-5 gap-3 shrink-0">
- 
-  <a href="{% url 'logements:home' %}"
-     class="flex items-center gap-2 text-secondary font-semibold text-sm shrink-0">
-    <span class="w-6 h-6 bg-secondary rounded-md flex items-center justify-center
-                 text-primary text-xs font-bold select-none">🏠</span>
-    CampusNest
+<nav class="bg-primary flex h-20 shrink-0 items-center gap-4 p-6 px-5">
+  <a href="{% url 'logements:home' %}" class="flex shrink-0 items-center gap-2 text-sm font-semibold text-white">
+    <img src="/static/images/WhatsApp_Image_2026-05-25_at_17.43.41-removebg-preview.png" alt="CampusNest Logo" class="h-8 w-8 object-contain" />
+    <span class="hidden sm:block">CampusNest</span>
   </a>
- 
-  {% if user.is_authenticated %}
- 
-    {% if user.role == 'admin' %}
-    <div class="flex items-center gap-1 flex-1 overflow-x-auto">
-      <a href="{% url 'users:dashboard' %}"
-         class="px-3 py-1.5 text-xs rounded text-secondary/70 hover:text-secondary hover:bg-white/10 transition whitespace-nowrap
-                {% if request.resolver_match.url_name == 'admin_dashboard' %}bg-white/10 text-secondary{% endif %}">
-        Tableau de bord
-      </a>
-      <a href="#"
-         class="px-3 py-1.5 text-xs rounded text-secondary/70 hover:text-secondary hover:bg-white/10 transition whitespace-nowrap">
-        Comptes
-      </a>
-      <a href="#"
-      {% comment %} "{% url 'logements:liste_admin' %}" {% endcomment %}
-         class="px-3 py-1.5 text-xs rounded text-secondary/70 hover:text-secondary hover:bg-white/10 transition whitespace-nowrap">
-        Logements
-      </a>
-      <a href="#"
-      {% comment %} <a href="{% url 'signalements:liste' %}" {% endcomment %}
-         class="px-3 py-1.5 text-xs rounded text-secondary/70 hover:text-secondary hover:bg-white/10 transition whitespace-nowrap">
-        Signalements
-      </a>
-      <a href="{% url 'admin:index' %}"
-         class="px-3 py-1.5 text-xs rounded text-secondary/70 hover:text-secondary hover:bg-white/10 transition whitespace-nowrap">
-        Admin Django
-      </a>
-    </div>
- 
+
+  <div class="flex items-center gap-1 overflow-x-auto">
+    <a
+      href="{% url 'logements:home' %}"
+      class="hover:text-secondary {% if request.resolver_match.url_name == 'home' %}bg-white/10 text-secondary{% endif %} rounded px-3 py-1.5 text-xs whitespace-nowrap text-white transition hover:bg-white/10"
+    >
+      Accueil
+    </a>
+    <a
+      href="{% url 'logements:liste_cites' %}"
+      class="hover:text-secondary {% if request.resolver_match.url_name == 'liste_cites' %}bg-white/10 text-secondary{% endif %} rounded px-3 py-1.5 text-xs whitespace-nowrap text-white transition hover:bg-white/10"
+    >
+      Logements
+    </a>
+
+    {% if user.is_authenticated %} {% if user.role == 'admin' %}
+    <a href="{% url 'users:dashboard' %}" class="hover:text-secondary rounded px-3 py-1.5 text-xs whitespace-nowrap text-white transition hover:bg-white/10">Tableau de bord</a>
+    <a href="#" class="hover:text-secondary rounded px-3 py-1.5 text-xs whitespace-nowrap text-white transition hover:bg-white/10">Comptes</a>
+    <a href="{% url 'logements:liste_admin' %}" class="hover:text-secondary rounded px-3 py-1.5 text-xs whitespace-nowrap text-white transition hover:bg-white/10">Logements Admin</a>
+    <a href="{% url 'signalements:liste' %}" class="hover:text-secondary rounded px-3 py-1.5 text-xs whitespace-nowrap text-white transition hover:bg-white/10">Signalements</a>
+    <a href="{% url 'admin:index' %}" class="hover:text-secondary rounded px-3 py-1.5 text-xs whitespace-nowrap text-white transition hover:bg-white/10">Admin Django</a>
+
     {% elif user.role == 'proprietaire' %}
-    <div class="flex items-center gap-1 flex-1 overflow-x-auto">
-      <a href="{% url 'users:dashboard' %}"
-         class="px-3 py-1.5 text-xs rounded text-secondary/70 hover:text-secondary hover:bg-white/10 transition whitespace-nowrap">
-        Tableau de bord
-      </a>
-      <a href="{% url 'logements:mes_cites' %}"
-         class="px-3 py-1.5 text-xs rounded text-secondary/70 hover:text-secondary hover:bg-white/10 transition whitespace-nowrap">
-        Mes cités
-      </a>
-      <a href="{% url 'reservations:recues' %}"
-         class="px-3 py-1.5 text-xs rounded text-secondary/70 hover:text-secondary hover:bg-white/10 transition whitespace-nowrap">
-        Réservations
-      </a>
-      <a href="#"
-         class="px-3 py-1.5 text-xs rounded text-secondary/70 hover:text-secondary hover:bg-white/10 transition whitespace-nowrap">
-        Statistiques
-      </a>
-    </div>
- 
+    <a href="{% url 'users:dashboard' %}" class="hover:text-secondary rounded px-3 py-1.5 text-xs whitespace-nowrap text-white transition hover:bg-white/10">Tableau de bord</a>
+    <a href="{% url 'logements:mes_cites' %}" class="hover:text-secondary rounded px-3 py-1.5 text-xs whitespace-nowrap text-white transition hover:bg-white/10">Mes cités</a>
+    <a href="{% url 'reservations:recues' %}" class="hover:text-secondary rounded px-3 py-1.5 text-xs whitespace-nowrap text-white transition hover:bg-white/10">Réservations</a>
+    <a href="#" class="hover:text-secondary rounded px-3 py-1.5 text-xs whitespace-nowrap text-white transition hover:bg-white/10">Statistiques</a>
+
     {% else %}
-    <div class="flex items-center gap-1 flex-1 overflow-x-auto">
-      <a href="{% url 'logements:home' %}"
-         class="px-3 py-1.5 text-xs rounded text-secondary/70 hover:text-secondary hover:bg-white/10 transition whitespace-nowrap
-                {% if request.resolver_match.url_name == 'home' %}bg-white/10 text-secondary{% endif %}">
-        Accueil
-      </a>
-      <a href="{% url 'logements:liste_cites' %}"
-         class="px-3 py-1.5 text-xs rounded text-secondary/70 hover:text-secondary hover:bg-white/10 transition whitespace-nowrap">
-        Logements
-      </a>
-      <a href="#"
-      {% comment %} {% url 'reservations:mes_reservations' %}" {% endcomment %}
-         class="px-3 py-1.5 text-xs rounded text-secondary/70 hover:text-secondary hover:bg-white/10 transition whitespace-nowrap">
-        Mes réservations
-      </a>
-      <a href="#"
-      {% comment %} {% url 'contact:contact' %}" {% endcomment %}
-         class="px-3 py-1.5 text-xs rounded text-secondary/70 hover:text-secondary hover:bg-white/10 transition whitespace-nowrap">
-        Contact
-      </a>
-    </div>
+    <a href="{% url 'reservations:mes_reservations' %}" class="hover:text-secondary rounded px-3 py-1.5 text-xs whitespace-nowrap text-white transition hover:bg-white/10">Mes réservations</a>
+    {% endif %} {% endif %}
+
+    <a
+      href="{% url 'contact:contact' %}"
+      class="hover:text-secondary {% if request.resolver_match.url_name == 'contact' %}bg-white/10 text-secondary{% endif %} rounded px-3 py-1.5 text-xs whitespace-nowrap text-white transition hover:bg-white/10"
+    >
+      Contact
+    </a>
+  </div>
+
+  <div class="mx-2 block max-w-md flex-1">
+    <form action="{% url 'logements:liste_cites' %}" method="GET" class="flex items-center gap-2">
+      <div class="relative flex-1">
+        <input
+          type="text"
+          name="q"
+          placeholder="Rechercher une cité, un quartier..."
+          value="{{ request.GET.q|default:'' }}"
+          class="focus:border-secondary/30 w-full rounded-lg border border-transparent bg-white/10 py-2.5 pr-4 px-4 pl-10 text-xs text-white placeholder-white/50 transition focus:bg-white/20 focus:outline-none"
+        />
+        <div class="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-white/50">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-3.5 w-3.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.604 10.604z" />
+          </svg>
+        </div>
+      </div>
+      <button type="submit" class="bg-secondary text-primary hover:bg-secondary/90 shrink-0 rounded-lg px-4 py-1.5 text-xs font-medium transition">Rechercher</button>
+    </form>
+  </div>
+
+  <div class="ml-auto flex shrink-0 items-center gap-3">
+    {% if user.is_authenticated %}
+    <span class="hidden text-xs text-white/60 sm:block">{{ user.get_full_name }}</span>
+    <a
+      href="{% url 'users:profil' %}"
+      title="Mon profil"
+      class="bg-secondary text-primary hover:ring-secondary/50 flex h-8 w-8 items-center justify-center rounded-full text-xs font-semibold transition select-none hover:ring-2"
+    >
+      {{ user.prenom|first|upper }}{{ user.nom|first|upper }}
+    </a>
+    <a href="{% url 'users:deconnexion' %}" class="hidden text-xs text-white/50 transition hover:text-white sm:block">Déconnexion</a>
+    {% else %}
+    <a href="{% url 'users:connexion' %}" class="border-secondary/30 hover:text-secondary hover:border-secondary/60 rounded-lg border px-4 py-1.5 text-xs text-white/80 transition">Se connecter</a>
+    <a href="{% url 'users:inscription' %}" class="bg-secondary text-primary hover:bg-secondary/90 rounded-lg px-4 py-1.5 text-xs font-medium transition">S'inscrire</a>
     {% endif %}
- 
-    <div class="flex items-center gap-3 ml-auto shrink-0">
-      <span class="text-xs text-secondary/40 hidden sm:block">{{ user.get_full_name }}</span>
-      <a href="{% url 'users:profil' %}"
-         title="Mon profil"
-         class="w-7 h-7 rounded-full bg-secondary text-primary text-xs font-semibold
-                flex items-center justify-center hover:ring-2 hover:ring-secondary/50 transition select-none">
-        {{ user.prenom|first|upper }}{{ user.nom|first|upper }}
-      </a>
-      <a href="{% url 'users:deconnexion' %}"
-         class="text-secondary/40 text-xs hover:text-secondary transition hidden sm:block">
-        Déconnexion
-      </a>
-    </div>
- 
-  {% else %}
- 
-    <div class="flex items-center gap-2 ml-auto shrink-0">
-      <a href="{% url 'users:connexion' %}"
-         class="px-4 py-1.5 text-xs rounded-lg border border-secondary/30
-                text-secondary/80 hover:text-secondary hover:border-secondary/60 transition">
-        Se connecter
-      </a>
-      <a href="{% url 'users:inscription' %}"
-         class="px-4 py-1.5 text-xs rounded-lg bg-secondary text-primary
-                font-medium hover:bg-secondary/90 transition">
-        S'inscrire
-      </a>
-    </div>
- 
-  {% endif %}
+  </div>
 </nav>

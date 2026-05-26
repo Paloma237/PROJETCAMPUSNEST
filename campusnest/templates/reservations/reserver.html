@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Réserver — {{ chambre }}{% endblock %}
+ 
+{% block content %}
+<div class="max-w-xl mx-auto px-4 py-8">
+  <a href="{% url 'logements:detail_chambre' chambre.pk %}"
+     class="text-sm text-gray-400 hover:text-primary transition mb-4 inline-block">
+    ← Retour à la chambre
+  </a>
+  <h1 class="text-2xl font-medium text-gray-900 mb-1">Demande de réservation</h1>
+  <p class="text-sm text-gray-500 mb-6">{{ chambre }} · {{ chambre.loyer|floatformat:0 }} FCFA/mois</p>
+ 
+  <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="mb-4">
+        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+          Date d'entrée
+        </label>
+        {{ form.date_debut }}
+        {% if form.date_debut.errors %}
+          <p class="text-red-600 text-xs mt-1">{{ form.date_debut.errors|first }}</p>
+        {% endif %}
+      </div>
+      <div class="mb-6">
+        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+          Date de sortie prévue
+        </label>
+        {{ form.date_fin }}
+        {% if form.date_fin.errors %}
+          <p class="text-red-600 text-xs mt-1">{{ form.date_fin.errors|first }}</p>
+        {% endif %}
+      </div>
+ 
+      <div class="flex items-center gap-3 p-3 bg-secondary/10 border border-secondary/30
+                  rounded-xl mb-6 text-xs text-primary">
+        Durée minimale : 30 jours. La chambre sera marquée indisponible après confirmation.
+      </div>
+ 
+      <button type="submit"
+              class="w-full py-3 bg-primary text-secondary text-sm font-medium
+                     rounded-xl hover:bg-primary/90 transition">
+        Envoyer la demande
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

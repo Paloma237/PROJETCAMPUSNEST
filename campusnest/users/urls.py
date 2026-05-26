@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
  
-app_name = "usesrs"
+app_name = "users"
 
 urlpatterns = [
     # Auth
@@ -17,8 +17,7 @@ urlpatterns = [
 
     # Validation propriétaire
     path("inscription/verifier-email/", views.verifier_otp_inscription_view, name="verifier_otp_inscription"),
-    path("inscription/verifier-email/", views.verifier_otp_inscription_view, name="verifier_otp_inscription"),
-path("inscription/renvoyer-otp/", views.renvoyer_otp_inscription_view, name="renvoyer_otp_inscription"),
+    path("inscription/renvoyer-otp/", views.renvoyer_otp_inscription_view, name="renvoyer_otp_inscription"),
     path("validation-en-attente/", views.validation_en_attente_view, name="validation_en_attente"),
 
     # Profil & dashboards

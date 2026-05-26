@@ -91,10 +91,10 @@ LOCAL_APPS = [
     "campusnest.users",
     "campusnest.logements",
     #"campusnest.core",
-    # "campusnest.reservation",
-    # "campusnest.avis",
-    # "campusnest.signalement",
-    # "campusnest.contact",
+    "campusnest.reservations",
+    "campusnest.avis",
+    "campusnest.signalements",
+    "campusnest.contact",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -116,8 +116,8 @@ AUTH_USER_MODEL = "users.Utilisateur"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
 LOGIN_REDIRECT_URL = "users:redirect"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
-LOGIN_URL = "account_login"
-
+#LOGIN_URL = "account_login"
+LOGIN_URL = "users:connexion"
 # PASSWORDS
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#password-hashers

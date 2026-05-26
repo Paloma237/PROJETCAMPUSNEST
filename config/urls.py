@@ -14,25 +14,22 @@ urlpatterns = [
     path("admin/", admin.site.urls),
 
     # ─── Racine : redirige vers la page d'accueil ────────────────
-    path("", include("campusnest.logements.urls")),               # home = liste des cités
+    path("", include("campusnest.logements.urls", namespace="logements")),               # home = liste des cités
 
     # ─── Authentification ────────────────────────────────────────
     path("comptes/", include("campusnest.users.urls", namespace="users")),
+    
+    # ─── Réservations ────────────────────────────────────────────
+    path("reservations/", include("campusnest.reservations.urls", namespace="reservations")),
 
-    # ─── Logements (cités + chambres) ────────────────────────────
-    path("logements/", include("campusnest.logements.urls", namespace="logements")),
+     # ─── Avis ────────────────────────────────────────────────────
+    path("avis/", include("campusnest.avis.urls", namespace="avis")),
 
-    # # ─── Réservations ────────────────────────────────────────────
-    # path("reservations/", include("campusnest.reservations.urls", namespace="reservations")),
+    # ─── Signalements ────────────────────────────────────────────
+    path("signalements/", include("campusnest.signalements.urls", namespace="signalements")),
 
-    # # ─── Avis ────────────────────────────────────────────────────
-    # path("avis/", include("campusnest.avis.urls", namespace="avis")),
-
-    # # ─── Signalements ────────────────────────────────────────────
-    # path("signalements/", include("campusnest.signalements.urls", namespace="signalements")),
-
-    # # ─── Contact ─────────────────────────────────────────────────
-    # path("contact/", include("campusnest.contact.urls", namespace="contact")),
+    # ─── Contact ─────────────────────────────────────────────────
+    path("contact/", include("campusnest.contact.urls", namespace="contact")),
 ]
 
 # ─── Servir les fichiers media en développement ──────────────────

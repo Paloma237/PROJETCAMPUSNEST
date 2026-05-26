@@ -1,0 +1,46 @@
+{% comment %}signalements/mes_signalements.html{% endcomment %}
+{% extends "base.html" %}
+{% block title %}Mes signalements{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-8">
+  <h1 class="text-2xl font-semibold text-gray-900 mb-6">Mes signalements</h1>
+
+  {% if signalements %}
+    <div class="space-y-4">
+      {% for s in signalements %}
+        <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-semibold text-gray-900 truncate">
+                {{ s.chambre }}
+              </p>
+              <p class="text-xs text-gray-500 mt-0.5">
+                {{ s.get_motif_display }} · {{ s.date_signalement|date:"d M Y" }}
+              </p>
+              <p class="text-xs text-gray-400 mt-2 line-clamp-2">
+                {{ s.description }}
+              </p>
+            </div>
+            <span class="shrink-0 text-xs px-2.5 py-1 rounded-full font-medium
+              {% if s.statut == 'ouvert'   %}bg-red-50    text-red-600
+              {% elif s.statut == 'en_cours'%}bg-amber-50  text-amber-700
+              {% else                      %}bg-green-50  text-green-700{% endif %}">
+              {{ s.get_statut_display }}
+            </span>
+          </div>
+          {% if s.date_traitement %}
+            <p class="text-xs text-gray-400 mt-3 pt-3 border-t border-gray-50">
+              Traité le {{ s.date_traitement|date:"d M Y" }}
+            </p>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="bg-white rounded-2xl border border-gray-100 p-16 text-center shadow-sm">
+      <p class="text-gray-400 text-sm">Vous n'avez soumis aucun signalement.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

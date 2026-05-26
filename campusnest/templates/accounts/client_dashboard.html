@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}Mon espace — CampusNest{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-8">
+
+  {# ── Bienvenue ── #}
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-900">
+        Bonjour, {{ user.prenom|default:user.email }} 👋
+      </h1>
+      <p class="text-sm text-gray-500 mt-1">
+        Voici un aperçu de votre espace étudiant.
+      </p>
+    </div>
+    <a href="{% url 'logements:home' %}"
+       class="px-5 py-2.5 bg-primary text-secondary text-sm font-medium
+              rounded-xl hover:bg-primary/90 transition">
+      Rechercher une chambre
+    </a>
+  </div>
+
+  {# ── Mes réservations récentes ── #}
+  <section class="mb-8">
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-base font-semibold text-gray-900">Mes réservations</h2>
+      <a href="{% url 'reservations:mes_reservations' %}"
+         class="text-sm text-primary hover:underline">Voir tout →</a>
+    </div>
+
+    {% if mes_reservations %}
+      <div class="space-y-3">
+        {% for r in mes_reservations %}
+          <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm
+                      flex items-center gap-4">
+            {# Icône chambre #}
+            <div class="w-10 h-10 rounded-xl bg-secondary/20 flex items-center
+                        justify-center shrink-0">
+              <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2
+                         m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2
+                         a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+              </svg>
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-gray-900 truncate">
+                {{ r.chambre }}
+              </p>
+              <p class="text-xs text-gray-500 truncate">
+                {{ r.chambre.cite.nom }} ·
+                {{ r.date_debut|date:"d M Y" }} → {{ r.date_fin|date:"d M Y" }}
+              </p>
+            </div>
+
+            <div class="shrink-0 text-right">
+              <span class="inline-block px-2.5 py-0.5 text-xs font-medium rounded-full
+                {% if r.statut == 'en_attente'  %}bg-amber-50  text-amber-700
+                {% elif r.statut == 'confirmee' %}bg-green-50  text-green-700
+                {% elif r.statut == 'annulee'   %}bg-red-50    text-red-700
+                {% else                         %}bg-gray-50   text-gray-500{% endif %}">
+                {{ r.get_statut_display }}
+              </span>
+              <a href="{% url 'reservations:detail' r.pk %}"
+                 class="block text-xs text-primary hover:underline mt-1">
+                Voir le détail
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="bg-white rounded-2xl border border-gray-100 p-8 text-center shadow-sm">
+        <p class="text-gray-400 text-sm mb-3">
+          Vous n'avez pas encore de réservation.
+        </p>
+        <a href="{% url 'logements:home' %}"
+           class="inline-block px-5 py-2 bg-primary text-secondary text-sm
+                  font-medium rounded-xl hover:bg-primary/90 transition">
+          Trouver une chambre
+        </a>
+      </div>
+    {% endif %}
+  </section>
+
+  {# ── Raccourcis ── #}
+  <section>
+    <h2 class="text-base font-semibold text-gray-900 mb-4">Accès rapide</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+
+      <a href="{% url 'logements:liste_cites' %}"
+         class="bg-white rounded-2xl border border-gray-100 p-5 text-center
+                hover:shadow-md hover:border-secondary/40 transition group shadow-sm">
+        <div class="w-10 h-10 bg-secondary/20 rounded-xl flex items-center justify-center
+                    mx-auto mb-3 group-hover:bg-secondary/30 transition">
+          <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
+          </svg>
+        </div>
+        <p class="text-xs font-medium text-gray-700">Toutes les cités</p>
+      </a>
+
+      <a href="{% url 'reservations:mes_reservations' %}"
+         class="bg-white rounded-2xl border border-gray-100 p-5 text-center
+                hover:shadow-md hover:border-secondary/40 transition group shadow-sm">
+        <div class="w-10 h-10 bg-secondary/20 rounded-xl flex items-center justify-center
+                    mx-auto mb-3 group-hover:bg-secondary/30 transition">
+          <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5
+                     a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <p class="text-xs font-medium text-gray-700">Mes réservations</p>
+      </a>
+
+      <a href="{% url 'signalements:mes_signalements' %}"
+         class="bg-white rounded-2xl border border-gray-100 p-5 text-center
+                hover:shadow-md hover:border-secondary/40 transition group shadow-sm">
+        <div class="w-10 h-10 bg-secondary/20 rounded-xl flex items-center justify-center
+                    mx-auto mb-3 group-hover:bg-secondary/30 transition">
+          <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667
+                     1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34
+                     16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+        <p class="text-xs font-medium text-gray-700">Mes signalements</p>
+      </a>
+
+      <a href="{% url 'contact:contact' %}"
+         class="bg-white rounded-2xl border border-gray-100 p-5 text-center
+                hover:shadow-md hover:border-secondary/40 transition group shadow-sm">
+        <div class="w-10 h-10 bg-secondary/20 rounded-xl flex items-center justify-center
+                    mx-auto mb-3 group-hover:bg-secondary/30 transition">
+          <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7
+                     a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <p class="text-xs font-medium text-gray-700">Nous contacter</p>
+      </a>
+
+    </div>
+  </section>
+
+</div>
+{% endblock %}

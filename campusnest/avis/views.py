@@ -8,11 +8,11 @@ Emplacement : campusnest/avis/views.py
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 
-from accounts.utils import client_requis, admin_requis
-from logements.models import Chambre
-from reservations.models import Reservation
-from .models import Avis
-from .forms import AvisForm
+from campusnest.users.utils import client_requis, admin_requis
+from campusnest.logements.models import Chambre
+from campusnest.reservations.models import Reservation
+from campusnest.avis.models import Avis
+from campusnest.avis.forms import AvisForm
 
 
 # ─────────────────────────────────────────────

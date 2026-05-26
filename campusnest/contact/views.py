@@ -9,8 +9,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
-from accounts.utils import client_requis, proprietaire_valide_requis, admin_requis
-from accounts.models import Utilisateur
+from campusnest.users.utils import client_requis, proprietaire_valide_requis, admin_requis
+from campusnest.users.models import Utilisateur
 from .models import MessageDeContact
 from .forms import MessageForm, ReponseForm
 

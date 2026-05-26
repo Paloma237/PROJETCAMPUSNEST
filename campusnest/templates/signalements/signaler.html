@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Signaler un logement{% endblock %}
+ 
+{% block content %}
+<div class="max-w-xl mx-auto px-4 py-8">
+  <h1 class="text-2xl font-medium text-gray-900 mb-1">Signaler un problème</h1>
+  <p class="text-sm text-gray-500 mb-6">{{ chambre }}</p>
+ 
+  <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="mb-4">
+        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Motif</label>
+        {{ form.motif }}
+      </div>
+      <div class="mb-6">
+        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Description du problème</label>
+        {{ form.description }}
+      </div>
+      <button type="submit"
+              class="w-full py-3 bg-primary text-secondary text-sm font-medium
+                     rounded-xl hover:bg-primary/90 transition">
+        Envoyer le signalement
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

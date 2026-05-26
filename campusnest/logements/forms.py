@@ -1,5 +1,5 @@
 from django import forms
-from campusnest.core.models import Cite, PhotoCity, Chambre, PhotoChambre
+from campusnest.logements.models import Cite, PhotoCity, Chambre, PhotoChambre
 
 class CiteForm(forms.ModelForm):
     """Formulaire de création / édition d'une cité."""
@@ -45,14 +45,14 @@ class PhotoCityForm(forms.ModelForm):
 
     class Meta:
         model = PhotoCity
-        fields = ['image', 'principale']
+        fields = ['image', 'est_principale']
         widgets = {
             'image': forms.ClearableFileInput(attrs={'class': 'input-field'}),
-            'principale': forms.CheckboxInput(attrs={'class': 'accent-primary'}),
+            'est_principale': forms.CheckboxInput(attrs={'class': 'accent-primary'}),
         }
         labels = {
             'image': 'Photo',
-            'principale': 'Photo principale ?',
+            'est_principale': 'Photo principale ?',
         }
 
 
@@ -102,12 +102,12 @@ class PhotoChambreForm(forms.ModelForm):
 
     class Meta:
         model = PhotoChambre
-        fields = ['image', 'principale']
+        fields = ['image', 'est_principale']
         widgets = {
             'image': forms.ClearableFileInput(attrs={'class': 'input-field'}),
-            'principale': forms.CheckboxInput(attrs={'class': 'accent-primary'}),
+            'est_principale': forms.CheckboxInput(attrs={'class': 'accent-primary'}),
         }
         labels = {
             'image': 'Photo',
-            'principale': 'Photo principale ?',
+            'est_principale': 'Photo principale ?',
         }

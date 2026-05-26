@@ -1,0 +1,142 @@
+{% comment %}reservations/historique.html{% endcomment %}
+{% extends "base.html" %}
+{% block title %}Historique des réservations{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+  <h1 class="text-2xl font-semibold text-gray-900 mb-6">Historique des réservations</h1>
+
+  {% if reservations %}
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 border-b border-gray-100">
+          <tr>
+            <th class="text-left px-5 py-3 text-xs font-medium text-gray-500 uppercase">Étudiant</th>
+            <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Chambre</th>
+            <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Période</th>
+            <th class="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Statut</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          {% for r in reservations %}
+            <tr class="hover:bg-gray-50/50 transition">
+              <td class="px-5 py-3">
+                <p class="font-medium text-gray-900">{{ r.client.get_full_name }}</p>
+                <p class="text-xs text-gray-400">{{ r.date_demande|date:"d M Y" }}</p>
+              </td>
+              <td class="px-4 py-3 text-gray-700">{{ r.chambre }}</td>
+              <td class="px-4 py-3 text-xs text-gray-500">
+                {{ r.date_debut|date:"d M" }} → {{ r.date_fin|date:"d M Y" }}
+              </td>
+              <td class="px-4 py-3">
+                <span class="text-xs px-2 py-0.5 rounded-full font-medium
+                  {% if r.statut == 'confirmee' %}bg-green-50 text-green-700
+                  {% elif r.statut == 'annulee' %}bg-red-50   text-red-700
+                  {% else                       %}bg-gray-50  text-gray-600{% endif %}">
+                  {{ r.get_statut_display }}
+                </span>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="bg-white rounded-2xl border border-gray-100 p-16 text-center shadow-sm">
+      <p class="text-gray-400 text-sm">Aucune réservation dans l'historique.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
+
+
+{% comment %}reservations/programmer_visite.html{% endcomment %}
+{% comment %}FICHIER SÉPARÉ{% endcomment %}
+{#
+{% extends "base.html" %}
+{% block title %}Programmer une visite{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto px-4 py-8">
+  <h1 class="text-2xl font-semibold text-gray-900 mb-1">Programmer une visite</h1>
+  <p class="text-sm text-gray-500 mb-6">
+    {{ reservation.client.get_full_name }} · {{ reservation.chambre }}
+  </p>
+
+  <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="mb-6">
+        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+          Date de visite
+        </label>
+        <input type="date" name="date_visite"
+               value="{{ form.date_visite.value|default:'' }}"
+               class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50
+                      focus:outline-none focus:ring-2 focus:ring-secondary/50 transition"/>
+        {% if form.date_visite.errors %}
+          <p class="text-red-500 text-xs mt-1">{{ form.date_visite.errors|first }}</p>
+        {% endif %}
+      </div>
+      <div class="flex gap-3">
+        <button type="submit"
+                class="px-6 py-2.5 bg-primary text-secondary text-sm font-medium
+                       rounded-xl hover:bg-primary/90 transition">
+          Enregistrer la date
+        </button>
+        <a href="{% url 'reservations:recues' %}"
+           class="px-6 py-2.5 border border-gray-200 text-gray-600 text-sm
+                  rounded-xl hover:bg-gray-50 transition">
+          Annuler
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+#}
+
+
+{% comment %}reservations/demander_date.html{% endcomment %}
+{% comment %}FICHIER SÉPARÉ{% endcomment %}
+{#
+{% extends "base.html" %}
+{% block title %}Proposer une date de visite{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto px-4 py-8">
+  <h1 class="text-2xl font-semibold text-gray-900 mb-1">Proposer une date de visite</h1>
+  <p class="text-sm text-gray-500 mb-6">{{ reservation.chambre }}</p>
+
+  <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="mb-6">
+        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+          Date souhaitée pour la visite
+        </label>
+        <input type="date" name="date_visite"
+               value="{{ form.date_visite.value|default:'' }}"
+               class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50
+                      focus:outline-none focus:ring-2 focus:ring-secondary/50 transition"/>
+        {% if form.date_visite.errors %}
+          <p class="text-red-500 text-xs mt-1">{{ form.date_visite.errors|first }}</p>
+        {% endif %}
+      </div>
+      <div class="flex gap-3">
+        <button type="submit"
+                class="px-6 py-2.5 bg-primary text-secondary text-sm font-medium
+                       rounded-xl hover:bg-primary/90 transition">
+          Envoyer la proposition
+        </button>
+        <a href="{% url 'reservations:detail' reservation.pk %}"
+           class="px-6 py-2.5 border border-gray-200 text-gray-600 text-sm
+                  rounded-xl hover:bg-gray-50 transition">
+          Annuler
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+#}

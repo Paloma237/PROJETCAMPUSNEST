@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Laisser un avis{% endblock %}
+ 
+{% block content %}
+<div class="max-w-xl mx-auto px-4 py-8">
+  <h1 class="text-2xl font-medium text-gray-900 mb-1">Laisser un avis</h1>
+  <p class="text-sm text-gray-500 mb-6">{{ chambre }}</p>
+ 
+  <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+    <form method="post" novalidate>
+      {% csrf_token %}
+ 
+      {% comment %} Sélecteur d'étoiles visuel {% endcomment %}
+      <div class="mb-5">
+        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-3">Note</label>
+        <div class="flex gap-2" id="stars">
+          {% for i in "12345" %}
+            <label class="cursor-pointer text-3xl transition hover:scale-110"
+                   id="star-label-{{ forloop.counter }}">
+              <input type="radio" name="note" value="{{ forloop.counter }}"
+                     class="sr-only" id="star-{{ forloop.counter }}"
+                     {% if form.note.value|add:0 == forloop.counter %}checked{% endif %}/>
+              <span class="star text-gray-300 hover:text-amber-400">★</span>
+            </label>
+          {% endfor %}
+        </div>
+        {% if form.note.errors %}
+          <p class="text-red-600 text-xs mt-1">{{ form.note.errors|first }}</p>
+        {% endif %}
+      </div>
+ 
+      <div class="mb-6">
+        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+          Commentaire
+        </label>
+        {{ form.commentaire }}
+        {% if form.commentaire.errors %}
+          <p class="text-red-600 text-xs mt-1">{{ form.commentaire.errors|first }}</p>
+        {% endif %}
+      </div>
+ 
+      <button type="submit"
+              class="w-full py-3 bg-primary text-secondary text-sm font-medium
+                     rounded-xl hover:bg-primary/90 transition">
+        Publier mon avis
+      </button>
+    </form>
+  </div>
+</div>
+ 
+<script>
+  document.querySelectorAll('input[name="note"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      const val = parseInt(radio.value);
+      document.querySelectorAll('.star').forEach((star, i) => {
+        star.classList.toggle('text-amber-400', i < val);
+        star.classList.toggle('text-gray-300',  i >= val);
+      });
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Signalement #{{ signalement.pk }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+  <a href="{% url 'signalements:liste' %}"
+     class="text-sm text-gray-400 hover:text-primary transition mb-4 inline-block">
+    ← Retour aux signalements
+  </a>
+
+  <h1 class="text-2xl font-semibold text-gray-900 mb-6">
+    Signalement #{{ signalement.pk }}
+  </h1>
+
+  <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm space-y-4">
+
+    {# Statut #}
+    <div class="flex items-center justify-between pb-4 border-b border-gray-50">
+      <span class="text-sm font-medium text-gray-700">Statut</span>
+      <span class="text-xs px-3 py-1 rounded-full font-medium
+        {% if signalement.statut == 'ouvert'    %}bg-red-50    text-red-600
+        {% elif signalement.statut == 'en_cours'%}bg-amber-50  text-amber-700
+        {% else                                 %}bg-green-50  text-green-700{% endif %}">
+        {{ signalement.get_statut_display }}
+      </span>
+    </div>
+
+    {# Chambre #}
+    <div class="flex justify-between py-2 border-b border-gray-50">
+      <span class="text-sm text-gray-500">Chambre</span>
+      <a href="{% url 'logements:detail_chambre' signalement.chambre.pk %}"
+         class="text-sm font-medium text-primary hover:underline">
+        {{ signalement.chambre }}
+      </a>
+    </div>
+
+    {# Motif #}
+    <div class="flex justify-between py-2 border-b border-gray-50">
+      <span class="text-sm text-gray-500">Motif</span>
+      <span class="text-sm text-gray-700">{{ signalement.get_motif_display }}</span>
+    </div>
+
+    {# Étudiant #}
+    <div class="flex justify-between py-2 border-b border-gray-50">
+      <span class="text-sm text-gray-500">Soumis par</span>
+      <span class="text-sm text-gray-700">
+        {{ signalement.client.get_full_name }} · {{ signalement.client.email }}
+      </span>
+    </div>
+
+    {# Date #}
+    <div class="flex justify-between py-2 border-b border-gray-50">
+      <span class="text-sm text-gray-500">Date du signalement</span>
+      <span class="text-sm text-gray-700">
+        {{ signalement.date_signalement|date:"d M Y à H:i" }}
+      </span>
+    </div>
+
+    {% if signalement.date_traitement %}
+      <div class="flex justify-between py-2 border-b border-gray-50">
+        <span class="text-sm text-gray-500">Date de traitement</span>
+        <span class="text-sm text-gray-700">
+          {{ signalement.date_traitement|date:"d M Y à H:i" }}
+        </span>
+      </div>
+    {% endif %}
+
+    {# Description #}
+    <div class="py-2">
+      <p class="text-sm text-gray-500 mb-2">Description</p>
+      <p class="text-sm text-gray-700 leading-relaxed bg-gray-50 rounded-xl p-4">
+        {{ signalement.description }}
+      </p>
+    </div>
+
+    {# Actions admin #}
+    {% if user.role == 'admin' %}
+      <div class="flex gap-3 pt-2 border-t border-gray-50">
+        {% if signalement.statut == 'ouvert' %}
+          <form method="post" action="{% url 'signalements:traiter' signalement.pk %}">
+            {% csrf_token %}
+            <button class="px-5 py-2.5 bg-amber-50 text-amber-700 border border-amber-200
+                           text-sm rounded-xl hover:bg-amber-100 transition font-medium">
+              Prendre en charge
+            </button>
+          </form>
+        {% elif signalement.statut == 'en_cours' %}
+          <form method="post" action="{% url 'signalements:cloturer' signalement.pk %}">
+            {% csrf_token %}
+            <button class="px-5 py-2.5 bg-green-50 text-green-700 border border-green-200
+                           text-sm rounded-xl hover:bg-green-100 transition font-medium">
+              Clôturer le signalement
+            </button>
+          </form>
+        {% endif %}
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

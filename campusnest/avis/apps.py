@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class AvisConfig(AppConfig):
-    name = 'avis'
+    name = 'campusnest.avis'

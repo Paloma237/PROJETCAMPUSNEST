@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Réservation #{{ reservation.pk }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+  <nav class="flex items-center gap-2 text-xs text-gray-400 mb-6">
+    <a href="{% url 'reservations:mes_reservations' %}" class="hover:text-primary">Mes réservations</a>
+    <span>›</span>
+    <span class="text-gray-600">Réservation #{{ reservation.pk }}</span>
+  </nav>
+
+  <h1 class="text-2xl font-semibold text-gray-900 mb-6">Détail de la réservation</h1>
+
+  <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm space-y-4">
+
+    {# Statut #}
+    <div class="flex items-center justify-between pb-4 border-b border-gray-50">
+      <span class="text-sm font-medium text-gray-700">Statut</span>
+      <span class="px-3 py-1 text-xs font-medium rounded-full
+        {% if reservation.statut == 'en_attente'  %}bg-amber-50  text-amber-700
+        {% elif reservation.statut == 'confirmee' %}bg-green-50  text-green-700
+        {% elif reservation.statut == 'annulee'   %}bg-red-50    text-red-700
+        {% else                                   %}bg-gray-50   text-gray-600{% endif %}">
+        {{ reservation.get_statut_display }}
+      </span>
+    </div>
+
+    {# Chambre #}
+    <div class="flex justify-between py-2 border-b border-gray-50">
+      <span class="text-sm text-gray-500">Chambre</span>
+      <a href="{% url 'logements:detail_chambre' reservation.chambre.pk %}"
+         class="text-sm font-medium text-primary hover:underline">
+        {{ reservation.chambre }}
+      </a>
+    </div>
+
+    {# Cité #}
+    <div class="flex justify-between py-2 border-b border-gray-50">
+      <span class="text-sm text-gray-500">Cité</span>
+      <span class="text-sm text-gray-700">{{ reservation.chambre.cite.nom }}</span>
+    </div>
+
+    {# Dates #}
+    <div class="flex justify-between py-2 border-b border-gray-50">
+      <span class="text-sm text-gray-500">Période</span>
+      <span class="text-sm text-gray-700">
+        {{ reservation.date_debut|date:"d M Y" }} → {{ reservation.date_fin|date:"d M Y" }}
+      </span>
+    </div>
+
+    {# Durée #}
+    <div class="flex justify-between py-2 border-b border-gray-50">
+      <span class="text-sm text-gray-500">Durée</span>
+      <span class="text-sm text-gray-700">{{ reservation.duree_jours }} jours</span>
+    </div>
+
+    {# Montant #}
+    <div class="flex justify-between py-2 border-b border-gray-50">
+      <span class="text-sm text-gray-500">Montant total estimé</span>
+      <span class="text-sm font-semibold text-primary">
+        {{ montant_total|floatformat:0 }} FCFA
+      </span>
+    </div>
+
+    {# Date visite #}
+    {% if reservation.date_visite %}
+      <div class="flex justify-between py-2 border-b border-gray-50">
+        <span class="text-sm text-gray-500">Visite prévue</span>
+        <span class="text-sm text-secondary font-medium">
+          {{ reservation.date_visite|date:"d M Y" }}
+        </span>
+      </div>
+    {% endif %}
+
+    {# Motif annulation #}
+    {% if reservation.motif_annulation %}
+      <div class="py-2">
+        <span class="text-sm text-gray-500 block mb-1">Motif d'annulation</span>
+        <p class="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-xl">
+          {{ reservation.motif_annulation }}
+        </p>
+      </div>
+    {% endif %}
+
+    {# Actions #}
+    <div class="flex gap-3 pt-2">
+      {% if reservation.statut == 'en_attente' %}
+        <form method="post" action="{% url 'reservations:annuler_client' reservation.pk %}"
+              onsubmit="return confirm('Annuler cette réservation ?')">
+          {% csrf_token %}
+          <button class="px-5 py-2.5 text-sm text-red-600 border border-red-200
+                         rounded-xl hover:bg-red-50 transition">
+            Annuler la réservation
+          </button>
+        </form>
+        <a href="{% url 'reservations:demander_date' reservation.pk %}"
+           class="px-5 py-2.5 text-sm border border-gray-200 text-gray-600
+                  rounded-xl hover:bg-gray-50 transition">
+          Proposer une date de visite
+        </a>
+      {% endif %}
+      <a href="{% url 'reservations:mes_reservations' %}"
+         class="ml-auto text-sm text-gray-400 hover:text-primary transition self-center">
+        ← Retour
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

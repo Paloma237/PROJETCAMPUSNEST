@@ -8,8 +8,8 @@ Emplacement : campusnest/signalements/views.py
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 
-from accounts.utils import client_requis, admin_requis
-from logements.models import Chambre
+from campusnest.users.utils import client_requis, admin_requis
+from campusnest.logements.models import Chambre
 from .models import Signalement
 from .forms import SignalementForm
 
