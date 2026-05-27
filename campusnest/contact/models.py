@@ -37,7 +37,7 @@ class MessageDeContact(models.Model):
         ordering            = ["-date_envoi"]
 
     def __str__(self):
-        return f"Message de {self.nom_expediteur or self.expediteur} — {self.objet}"
+        return f"Message de {self.nom_expediteur or self.expediteur} — {self.objet_message}"
 
     def marquer_lu(self):
         self.est_lu = True

@@ -84,7 +84,7 @@
         </a>
         {% elif not user.is_authenticated %}
         <a
-          href="{% url 'accounts:connexion' %}?next={{ request.path }}"
+          href="{% url 'users:connexion' %}?next={{ request.path }}"
           class="bg-primary text-secondary hover:bg-primary/90 mb-3 block w-full rounded-xl py-3 text-center text-sm font-medium transition"
         >
           Connectez-vous pour réserver

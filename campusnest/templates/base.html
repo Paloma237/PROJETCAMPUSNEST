@@ -15,10 +15,10 @@
 
 <body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
 
-  
+  {# Inclusion de la navbar #}
   {% include "components/navbar.html" %}
 
-  
+  {# Messages Flash Django #}
   {% if messages %}
     <div class="max-w-7xl mx-auto w-full px-4 pt-4">
       {% for message in messages %}
@@ -38,7 +38,7 @@
     {% block content %}{% endblock %}
   </main>
 
- 
+  {# Footer #}
   <footer class="bg-primary text-secondary/60 text-center text-xs py-4 mt-auto">
     © 2026 CampusNest IUT-FV — IUT de Fotso Victor, Bandjoun
   </footer>

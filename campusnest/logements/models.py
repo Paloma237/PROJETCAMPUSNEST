@@ -1,6 +1,3 @@
-"""
-campusnest/logements/models.py — VERSION TOTALEMENT CORRIGÉE
-"""
 from django.db import models
 from django.utils import timezone
 
@@ -18,6 +15,8 @@ class Cite(models.Model):
     description   = models.TextField("Description", blank=True)
     latitude      = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude     = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    est_actif = models.BooleanField("Visible sur le site", default=True)
+    motif_suppression = models.TextField("Raison de la suppression/rejet", blank=True)
     date_creation = models.DateTimeField(default=timezone.now)
 
     class Meta:
@@ -65,6 +64,8 @@ class Chambre(models.Model):
     etat          = models.CharField("État", max_length=20, choices=Etat.choices, default=Etat.BON)
     est_disponible = models.BooleanField("Disponible", default=True)
     date_ajout    = models.DateTimeField(default=timezone.now)
+    est_actif = models.BooleanField("Visible sur le site", default=True)
+    motif_suppression = models.TextField("Raison de la désactivation/suppression", blank=True, help_text="Expliquez ici au propriétaire pourquoi sa chambre n'est plus visible.")
 
     # Équipements
     meublee      = models.BooleanField("Meublée", default=False)
@@ -73,6 +74,7 @@ class Chambre(models.Model):
     internet     = models.BooleanField("Internet", default=False)
     eau_courante = models.BooleanField("Eau courante", default=True)
     electricite  = models.BooleanField("Électricité", default=True)
+    
 
     class Meta:
         verbose_name        = "Chambre"
@@ -109,8 +111,7 @@ class PhotoChambre(models.Model):
     
 
 class PhotoCity(models.Model):
-    # ✅ Modification ici : Le related_name="photos_cite" est placé au bon endroit !
-    city = models.ForeignKey(Cite, on_delete=models.CASCADE, related_name="photos_cite", verbose_name="Cite")
+    city= models.ForeignKey(Cite, on_delete=models.CASCADE, related_name="photos_cite", verbose_name="Cite")
     image         = models.ImageField("Image", upload_to="cites/%Y/%m/") # Changé en cites/ pour ne pas mélanger avec les chambres
     legende       = models.CharField("Légende", max_length=200, blank=True)
     est_principale = models.BooleanField("Photo principale", default=False)
