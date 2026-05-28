@@ -8,6 +8,8 @@ urlpatterns = [
     path("connexion/",   views.connexion_view,   name="connexion"),
     path("deconnexion/", views.deconnexion_view, name="deconnexion"),
     path("inscription/", views.inscription_view, name="inscription"),
+    path("devenir-proprietaire/", views.devenir_proprietaire, name="devenir_proprietaire"),
+
 
     # Reset mot de passe — flux OTP en 3 étapes
     path("mot-de-passe-oublie/", views.mot_de_passe_oublie_view, name="mot_de_passe_oublie"),

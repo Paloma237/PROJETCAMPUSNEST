@@ -35,8 +35,20 @@
     font-family: var(--font-heading);
   }
 }
+  
+@layer components {
+  /* Style pour tous les inputs textuels, select et textarea du formulaire */
+  .form-professional input[type="text"],
+  .form-professional input[type="number"],
+  .form-professional textarea,
+  .form-professional select {
+    @apply w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 transition-colors duration-200;
+    @apply focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none;
+  }
 
-@layer components{
-  
+  /* Style spécifique pour les checkboxes */
+  .form-professional input[type="checkbox"] {
+    @apply h-4 w-4 rounded border-gray-300 text-primary transition-colors;
+    @apply focus:ring-primary/20 focus:ring-offset-0;
+  }
 }
-  

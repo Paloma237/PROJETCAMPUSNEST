@@ -24,10 +24,13 @@ from .forms import (
 from .models import LogActivite, OTPCode, ProfilProprietaire, Utilisateur
 from .utils import enregistrer_log, admin_requis, proprietaire_valide_requis
 
+def devenir_proprietaire(request):
+    return render(request, "accounts/devenir_proprietaire.html")
+
 
 # ─────────────────────────────────────────────
 #  Helper — redirection par rôle  ← CORRIGÉ
-# ─────────────────────────────────────────────
+# ────────────────────────────────────────────
 
 def _redirection_par_role(user):
     if user.role == Utilisateur.Role.ADMIN:
