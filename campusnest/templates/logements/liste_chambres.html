@@ -114,52 +114,17 @@
     {% if chambres %}
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {% for chambre in chambres %}
-          <div class="flex flex-col bg-white rounded-2xl border border-gray-200/80 overflow-hidden
-                      hover:shadow-lg hover:border-primary/20 transition-all duration-300 group">
+          <a href="{% url 'logements:detail_chambre' chambre.pk %}"
+             class="flex flex-col bg-white rounded-2xl border border-gray-200/80 overflow-hidden
+                    hover:shadow-lg hover:border-primary/20 transition-all duration-300 group">
 
-            {# Photo Carousel #}
-            <div class="h-44 md:h-48 w-full overflow-hidden bg-gray-100 relative shrink-0 group/carousel">
-              {% with photos=chambre.photos.all %}
-                {% if photos %}
-                  <div class="relative w-full h-full">
-                    {# Images #}
-                    <div class="carousel-container relative w-full h-full" data-carousel-id="carousel-{{ chambre.pk }}">
-                      {% for photo in photos %}
-                        <img src="{{ photo.image.url }}"
-                             alt="{{ chambre }} - Photo {{ forloop.counter }}"
-                             class="carousel-image absolute w-full h-full object-cover transition-transform duration-500 opacity-0 group-hover:scale-105"
-                             data-index="{{ forloop.counter0 }}"
-                             style="{% if forloop.first %}opacity: 1;{% endif %}"/>
-                      {% endfor %}
-                    </div>
-                    
-                    {# Flèches de navigation #}
-                    {% if photos|length > 1 %}
-                      <button class="carousel-prev absolute left-2 top-1/2 -translate-y-1/2 z-10 p-1.5 rounded-full bg-white/80 hover:bg-white text-gray-700 shadow-md transition opacity-0 group-hover/carousel:opacity-100"
-                              onclick="carouselPrev('carousel-{{ chambre.pk }}')">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                        </svg>
-                      </button>
-                      
-                      <button class="carousel-next absolute right-2 top-1/2 -translate-y-1/2 z-10 p-1.5 rounded-full bg-white/80 hover:bg-white text-gray-700 shadow-md transition opacity-0 group-hover/carousel:opacity-100"
-                              onclick="carouselNext('carousel-{{ chambre.pk }}')">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                        </svg>
-                      </button>
-                      
-                      {# Indicateurs #}
-                      <div class="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 flex gap-1">
-                        {% for photo in photos %}
-                          <button class="carousel-indicator w-1.5 h-1.5 rounded-full transition"
-                                  data-index="{{ forloop.counter0 }}"
-                                  onclick="carouselGoto('carousel-{{ chambre.pk }}', {{ forloop.counter0 }})"
-                                  style="{% if forloop.first %}background-color: white;{% else %}background-color: rgba(255,255,255,0.5);{% endif %}"/>
-                        {% endfor %}
-                      </div>
-                    {% endif %}
-                  </div>
+            {# Photo #}
+            <div class="h-44 md:h-48 w-full overflow-hidden bg-gray-100 relative shrink-0">
+              {% with chambre.photo_principale as photo %}
+                {% if photo %}
+                  <img src="{{ photo.image.url }}"
+                       alt="{{ chambre }}"
+                       class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"/>
                 {% else %}
                   <div class="w-full h-full bg-gradient-to-br from-secondary/20 to-secondary/40 flex flex-col items-center justify-center gap-2">
                     <svg class="w-10 h-10 text-primary/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -255,18 +220,9 @@
                   {% endif %}
                 </div>
               </div>
-
-              {# Bouton Visiter la chambre #}
-              <div class="mt-4 pt-3 border-t border-gray-100">
-                <a href="{% url 'logements:detail_chambre' chambre.pk %}"
-                   class="block w-full text-center px-4 py-2.5 bg-primary text-secondary text-sm font-semibold rounded-xl
-                          hover:bg-primary/95 shadow-sm transition duration-200">
-                  Visiter la chambre
-                </a>
-              </div>
             </div>
 
-          </div>
+          </a>
         {% endfor %}
       </div>
 
@@ -288,46 +244,4 @@
 
   </div>
 </div>
-
-<script>
-  // Gestion du carousel d'images
-  function getCarouselState(carouselId) {
-    const container = document.querySelector(`[data-carousel-id="${carouselId}"]`);
-    const images = container.querySelectorAll('.carousel-image');
-    const currentIndex = Array.from(images).findIndex(img => img.style.opacity === '1');
-    return { container, images, currentIndex };
-  }
-
-  function updateCarouselDisplay(carouselId, newIndex) {
-    const { container, images } = getCarouselState(carouselId);
-    if (images.length === 0) return;
-    
-    const index = (newIndex + images.length) % images.length;
-    
-    // Mettre à jour les images
-    images.forEach((img, i) => {
-      img.style.opacity = i === index ? '1' : '0';
-    });
-    
-    // Mettre à jour les indicateurs
-    const indicators = container.parentElement.querySelectorAll('.carousel-indicator');
-    indicators.forEach((indicator, i) => {
-      indicator.style.backgroundColor = i === index ? 'white' : 'rgba(255,255,255,0.5)';
-    });
-  }
-
-  function carouselNext(carouselId) {
-    const { currentIndex, images } = getCarouselState(carouselId);
-    updateCarouselDisplay(carouselId, currentIndex + 1);
-  }
-
-  function carouselPrev(carouselId) {
-    const { currentIndex, images } = getCarouselState(carouselId);
-    updateCarouselDisplay(carouselId, currentIndex - 1);
-  }
-
-  function carouselGoto(carouselId, index) {
-    updateCarouselDisplay(carouselId, index);
-  }
-</script>
 {% endblock %}

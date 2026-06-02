@@ -1,101 +1,314 @@
-{% extends "base.html" %} 
-{% block content %}
-<div class="flex min-h-screen">
+{% extends "accounts/base_dashboard.html" %}
+{% block page_title %}Tableau de bord Admin{% endblock %}
+{% block page_subtitle %}Vue globale de la plateforme CampusNest IUT-FV{% endblock %}
+
+{% block sidebar %}
   {% include "components/sidebar_admin.html" %}
- 
-  <div class="flex-1 p-6 lg:p-8">
-    <h1 class="text-2xl font-medium text-gray-900 mb-1">Tableau de bord</h1>
-    <p class="text-sm text-gray-500 mb-6">Vue globale de la plateforme CampusNest IUT-FV</p>
- 
-    {% comment %} KPIs {% endcomment %}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-        <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Étudiants</p>
-        <p class="text-3xl font-medium text-gray-900">{{ stats.total_etudiants }}</p>
+{% endblock %}
+
+{% block content %}
+
+  {# Injection JSON native Django — aucun filtre custom requis #}
+  {{ stats.six_mois_labels|json_script:"adm-labels" }}
+  {{ stats.six_mois_inscriptions|json_script:"adm-inscriptions" }}
+  {{ stats.six_mois_reservations|json_script:"adm-reservations" }}
+  {{ stats.repartition_signalements|json_script:"adm-signalements" }}
+
+  {# ── Ligne 1 : KPIs principaux ── #}
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-[11px] text-gray-400 uppercase tracking-widest font-semibold">Étudiants</p>
+        <div class="w-8 h-8 bg-blue-50 rounded-xl flex items-center justify-center">
+          <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+          </svg>
+        </div>
       </div>
-      <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-        <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Propriétaires</p>
-        <p class="text-3xl font-medium text-gray-900">{{ stats.total_proprietaires }}</p>
-        {% if stats.proprietaires_attente %}
-          <p class="text-xs text-amber-600 mt-1">{{ stats.proprietaires_attente }} en attente</p>
-        {% endif %}
+      <p class="text-3xl font-black text-gray-900 tracking-tight">{{ stats.total_etudiants }}</p>
+      <p class="text-xs text-gray-400 mt-1">inscrits</p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-[11px] text-gray-400 uppercase tracking-widest font-semibold">Propriétaires</p>
+        <div class="w-8 h-8 bg-[#1A2517]/8 rounded-xl flex items-center justify-center">
+          <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </div>
       </div>
-      <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-        <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Chambres</p>
-        <p class="text-3xl font-medium text-gray-900">{{ stats.total_chambres }}</p>
-        <p class="text-xs text-green-600 mt-1">{{ stats.chambres_disponibles }} disponibles</p>
+      <p class="text-3xl font-black text-gray-900 tracking-tight">{{ stats.total_proprietaires }}</p>
+      {% if stats.proprietaires_attente %}
+        <p class="text-xs text-amber-600 font-semibold mt-1">{{ stats.proprietaires_attente }} en attente</p>
+      {% else %}
+        <p class="text-xs text-gray-400 mt-1">tous validés</p>
+      {% endif %}
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-[11px] text-gray-400 uppercase tracking-widest font-semibold">Chambres</p>
+        <div class="w-8 h-8 bg-green-50 rounded-xl flex items-center justify-center">
+          <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
+          </svg>
+        </div>
       </div>
-      <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-        <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Signalements</p>
-        <p class="text-3xl font-medium {% if stats.signalements_ouverts %}text-red-700{% else %}text-gray-900{% endif %}">
-          {{ stats.signalements_ouverts }}
-        </p>
-        <p class="text-xs text-gray-500 mt-1">ouverts</p>
+      <p class="text-3xl font-black text-gray-900 tracking-tight">{{ stats.total_chambres }}</p>
+      <p class="text-xs text-green-600 font-semibold mt-1">{{ stats.chambres_disponibles }} disponibles</p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-[11px] text-gray-400 uppercase tracking-widest font-semibold">Signalements</p>
+        <div class="w-8 h-8 {% if stats.signalements_ouverts %}bg-red-50{% else %}bg-gray-50{% endif %} rounded-xl flex items-center justify-center">
+          <svg class="w-4 h-4 {% if stats.signalements_ouverts %}text-red-500{% else %}text-gray-400{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+      </div>
+      <p class="text-3xl font-black {% if stats.signalements_ouverts %}text-red-600{% else %}text-gray-900{% endif %} tracking-tight">{{ stats.signalements_ouverts }}</p>
+      <a href="{% url 'signalements:liste' %}" class="text-xs text-primary hover:underline mt-1 inline-block font-medium">Traiter →</a>
+    </div>
+
+  </div>
+
+  {# ── Ligne 2 : Métriques secondaires ── #}
+  <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-5">
+
+    <div class="bg-gradient-to-br from-[#1A2517] to-[#2d3f28] rounded-2xl p-4 text-white shadow-md">
+      <p class="text-[10px] text-white/50 uppercase tracking-widest font-semibold mb-1">Nouveaux ce mois</p>
+      <p class="text-2xl font-black">{{ stats.nouveaux_ce_mois }}</p>
+      <p class="text-[10px] text-white/40 mt-1">utilisateurs inscrits</p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+      <p class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold mb-1">Réserv. ce mois</p>
+      <p class="text-2xl font-black text-gray-900">{{ stats.reservations_ce_mois }}</p>
+      <p class="text-[10px] text-gray-400 mt-1">demandes reçues</p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+      <p class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold mb-1">Taux occupation</p>
+      <p class="text-2xl font-black text-amber-600">{{ stats.taux_occupation }}%</p>
+      <div class="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+        <div class="h-full bg-amber-400 rounded-full" style="width: {{ stats.taux_occupation }}%"></div>
       </div>
     </div>
- 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
- 
-      {% comment %} Validation propriétaires {% endcomment %}
-      <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-        <div class="flex items-center justify-between mb-4">
-          <h2 class="text-sm font-medium text-gray-900">Propriétaires en attente</h2>
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
+      <p class="text-[10px] text-gray-400 uppercase tracking-widest font-semibold mb-1">Sig. en cours</p>
+      <p class="text-2xl font-black text-orange-500">{{ stats.signalements_en_cours }}</p>
+      <p class="text-[10px] text-gray-400 mt-1">{{ stats.signalements_clotures }} clôturés</p>
+    </div>
+
+  </div>
+
+  {# ── Ligne 3 : Graphiques activité ── #}
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-5">
+
+    <div class="xl:col-span-2 bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-bold text-gray-900">Activité — 6 derniers mois</h2>
+        <div class="flex items-center gap-4 text-xs text-gray-500">
+          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-primary inline-block"></span>Inscriptions</span>
+          <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span>Réservations</span>
         </div>
-        {% if proprietaires_en_attente %}
-          <div class="divide-y divide-gray-50">
-            {% for p in proprietaires_en_attente %}
-              <div class="flex items-center gap-3 py-3">
-                <div class="w-8 h-8 rounded-full bg-amber-50 text-amber-700 text-xs
-                            font-semibold flex items-center justify-center shrink-0">
-                  {{ p.prenom|first|upper }}{{ p.nom|first|upper }}
-                </div>
-                <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-gray-900">{{ p.get_full_name }}</p>
-                  <p class="text-xs text-gray-500">{{ p.email }} · {{ p.telephone }}</p>
-                </div>
-                <div class="flex gap-2 shrink-0">
-                  <form method="post" action="{% url 'accounts:valider_proprietaire' p.pk %}">
-                    {% csrf_token %}
-                    <button class="px-3 py-1 text-xs bg-green-50 text-green-700
-                                   border border-green-200 rounded-lg hover:bg-green-100 transition">
-                      Valider
-                    </button>
-                  </form>
-                  <form method="post" action="{% url 'accounts:suspendre_compte' p.pk %}">
-                    {% csrf_token %}
-                    <button class="px-3 py-1 text-xs bg-red-50 text-red-700
-                                   border border-red-200 rounded-lg hover:bg-red-100 transition">
-                      Rejeter
-                    </button>
-                  </form>
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-        {% else %}
-          <p class="text-sm text-gray-400 text-center py-6">Aucun compte en attente.</p>
+      </div>
+      <div class="flex items-end gap-3 h-28" id="chart-admin"></div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <h2 class="text-sm font-bold text-gray-900 mb-4">Motifs de signalement</h2>
+      <div id="chart-motifs">
+        <p class="text-xs text-gray-400 text-center py-6">Chargement…</p>
+      </div>
+    </div>
+
+  </div>
+
+  {# ── Ligne 4 : Statut réservations + Validation props ── #}
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <h2 class="text-sm font-bold text-gray-900 mb-4">Réservations globales</h2>
+      <p class="text-3xl font-black text-gray-900 tracking-tight mb-4">{{ stats.total_reservations }}</p>
+      <div class="space-y-2.5">
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-2 text-xs text-gray-600">
+            <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>En attente
+          </span>
+          <span class="text-xs font-bold text-gray-900">{{ stats.reservations_attente }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-2 text-xs text-gray-600">
+            <span class="w-2 h-2 rounded-full bg-green-500 shrink-0"></span>Confirmées
+          </span>
+          <span class="text-xs font-bold text-gray-900">{{ stats.reservations_confirmees }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-2 text-xs text-gray-600">
+            <span class="w-2 h-2 rounded-full bg-rose-400 shrink-0"></span>Annulées
+          </span>
+          <span class="text-xs font-bold text-gray-900">{{ stats.reservations_annulees }}</span>
+        </div>
+      </div>
+      {% if stats.total_reservations %}
+        <div class="mt-4 h-2 bg-gray-100 rounded-full overflow-hidden flex">
+          <div class="h-full bg-amber-400" style="width: {% widthratio stats.reservations_attente stats.total_reservations 100 %}%"></div>
+          <div class="h-full bg-green-500" style="width: {% widthratio stats.reservations_confirmees stats.total_reservations 100 %}%"></div>
+          <div class="h-full bg-rose-400" style="width: {% widthratio stats.reservations_annulees stats.total_reservations 100 %}%"></div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-bold text-gray-900">Propriétaires en attente</h2>
+        {% if stats.proprietaires_attente %}
+          <span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-bold border border-amber-200">
+            {{ stats.proprietaires_attente }} à valider
+          </span>
         {% endif %}
       </div>
- 
-      {% comment %} Journal d'activité {% endcomment %}
-      <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-        <h2 class="text-sm font-medium text-gray-900 mb-4">Journal récent</h2>
-        <div class="space-y-3">
-          {% for log in logs_recents %}
-            <div class="flex items-start gap-2">
-              <div class="w-1.5 h-1.5 rounded-full bg-secondary mt-1.5 shrink-0"></div>
-              <div>
-                <p class="text-xs text-gray-700 leading-snug">{{ log.action }}</p>
-                <p class="text-xs text-gray-400 mt-0.5">{{ log.date|date:"d/m H:i" }}</p>
+      {% if proprietaires_en_attente %}
+        <div class="divide-y divide-gray-50">
+          {% for p in proprietaires_en_attente %}
+            <div class="flex items-center gap-3 py-3">
+              <div class="w-8 h-8 rounded-full bg-amber-50 text-amber-700 text-xs font-bold flex items-center justify-center shrink-0">
+                {{ p.prenom|first|upper }}{{ p.nom|first|upper }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-gray-900">{{ p.get_full_name }}</p>
+                <p class="text-xs text-gray-500">{{ p.email }} · {{ p.telephone }}</p>
+              </div>
+              <div class="flex gap-2 shrink-0">
+                <form method="post" action="{% url 'accounts:valider_proprietaire' p.pk %}">
+                  {% csrf_token %}
+                  <button class="px-3 py-1 text-xs bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100 transition font-medium">Valider</button>
+                </form>
+                <form method="post" action="{% url 'accounts:suspendre_compte' p.pk %}">
+                  {% csrf_token %}
+                  <button class="px-3 py-1 text-xs bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 transition font-medium">Rejeter</button>
+                </form>
               </div>
             </div>
-          {% empty %}
-            <p class="text-xs text-gray-400">Aucun log.</p>
           {% endfor %}
         </div>
-      </div>
- 
+      {% else %}
+        <div class="text-center py-8">
+          <svg class="w-8 h-8 text-green-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <p class="text-sm text-gray-400">Aucun compte en attente.</p>
+        </div>
+      {% endif %}
     </div>
+
   </div>
-</div>
+
+  {# ── Ligne 5 : Top propriétaires + Journal ── #}
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <h2 class="text-sm font-bold text-gray-900 mb-4">Top propriétaires (par nb de chambres)</h2>
+      {% if top_proprietaires %}
+        <div class="space-y-2">
+          {% for p in top_proprietaires %}
+            <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition">
+              <div class="w-7 h-7 rounded-lg bg-primary/10 text-primary text-xs font-black flex items-center justify-center shrink-0">{{ forloop.counter }}</div>
+              <div class="w-8 h-8 rounded-full bg-[#1A2517]/10 text-primary text-xs font-bold flex items-center justify-center shrink-0">
+                {{ p.prenom|first|upper }}{{ p.nom|first|upper }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-semibold text-gray-900 truncate">{{ p.get_full_name }}</p>
+                <p class="text-xs text-gray-400 truncate">{{ p.email }}</p>
+              </div>
+              <div class="shrink-0 text-right">
+                <span class="text-xs font-black text-primary">{{ p.nb_chambres }}</span>
+                <p class="text-[10px] text-gray-400">chambre{{ p.nb_chambres|pluralize }}</p>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-sm text-gray-400 text-center py-6">Aucun propriétaire.</p>
+      {% endif %}
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <h2 class="text-sm font-bold text-gray-900 mb-4">Journal récent</h2>
+      <div class="space-y-3 overflow-y-auto max-h-64">
+        {% for log in logs_recents %}
+          <div class="flex items-start gap-2">
+            <div class="w-1.5 h-1.5 rounded-full bg-primary mt-1.5 shrink-0"></div>
+            <div>
+              <p class="text-xs text-gray-700 leading-snug">{{ log.action }}</p>
+              <p class="text-[10px] text-gray-400 mt-0.5">{{ log.date|date:"d/m H:i" }}</p>
+            </div>
+          </div>
+        {% empty %}
+          <p class="text-xs text-gray-400 text-center py-4">Aucun log.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const labels   = JSON.parse(document.getElementById("adm-labels").textContent);
+      const inscrits = JSON.parse(document.getElementById("adm-inscriptions").textContent);
+      const reservs  = JSON.parse(document.getElementById("adm-reservations").textContent);
+      const motifs   = JSON.parse(document.getElementById("adm-signalements").textContent);
+
+      // ── Graphique double barres ──
+      const maxInsc = Math.max(...inscrits, 1);
+      const maxRes  = Math.max(...reservs,  1);
+      const globalMax = Math.max(maxInsc, maxRes, 1);
+      const maxH = 80;
+      const chart = document.getElementById("chart-admin");
+
+      labels.forEach(function(label, i) {
+        const hI = Math.round((inscrits[i] / globalMax) * maxH) || 3;
+        const hR = Math.round((reservs[i]  / globalMax) * maxH) || 3;
+        const col = document.createElement("div");
+        col.className = "flex-1 flex flex-col items-center gap-1";
+        col.innerHTML =
+          '<div class="w-full flex items-end gap-0.5">' +
+            '<div class="flex-1 bg-primary/15 hover:bg-primary/30 rounded-t-md transition-all duration-500" style="height:' + hI + 'px"></div>' +
+            '<div class="flex-1 bg-amber-300/60 hover:bg-amber-400/70 rounded-t-md transition-all duration-500" style="height:' + hR + 'px"></div>' +
+          '</div>' +
+          '<span class="text-[10px] text-gray-400 font-medium">' + label + '</span>';
+        chart.appendChild(col);
+      });
+
+      // ── Motifs de signalements ──
+      const totalSig = motifs.reduce(function(s, m) { return s + m.nb; }, 0) || 1;
+      const chartMotifs = document.getElementById("chart-motifs");
+      chartMotifs.innerHTML = "";
+
+      if (motifs.length === 0) {
+        chartMotifs.innerHTML = '<p class="text-xs text-gray-400 text-center py-6">Aucun signalement.</p>';
+      } else {
+        motifs.forEach(function(item) {
+          const pct = Math.round(item.nb / totalSig * 100);
+          const row = document.createElement("div");
+          row.className = "mb-3";
+          row.innerHTML =
+            '<div class="flex items-center justify-between mb-1">' +
+              '<span class="text-xs text-gray-600 font-medium capitalize">' + item.motif + '</span>' +
+              '<span class="text-xs font-bold text-gray-900">' + item.nb + '</span>' +
+            '</div>' +
+            '<div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">' +
+              '<div class="h-full bg-rose-400 rounded-full transition-all duration-700" style="width:' + pct + '%"></div>' +
+            '</div>';
+          chartMotifs.appendChild(row);
+        });
+      }
+    });
+  </script>
+
 {% endblock %}

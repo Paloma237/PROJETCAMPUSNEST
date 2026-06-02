@@ -1,52 +1,85 @@
-{% extends "accounts/base_auth.html" %}{% block content %}
-<h1 class="mb-1 text-2xl font-medium text-gray-900">Bienvenue</h1>
-<p class="mb-6 text-sm text-gray-500">Connectez-vous à votre espace</p>
+{% extends "accounts/base_auth.html" %}
 
-<form method="post" novalidate>
+{% block content %}
+<div class="mb-8">
+  <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Bienvenue</h1>
+  <p class="text-sm text-gray-500 mt-1">Connectez-vous à votre espace</p>
+</div>
+
+<form method="post" novalidate class="space-y-5">
   {% csrf_token %}
   <input type="hidden" name="next" value="{{ request.GET.next }}" />
 
-  <div class="mb-4">
-    <label class="mb-1.5 block text-xs font-medium tracking-wide text-gray-500 uppercase">Email</label>
+  {# Champ Email #}
+  <div>
+    <label class="mb-1.5 block text-xs font-bold tracking-widest uppercase text-gray-400">Email</label>
     <input
       type="email"
       name="username"
       value="{{ form.username.value|default:'' }}"
       placeholder="votre@email.cm"
       autofocus
-      class="focus:ring-secondary/50 focus:border-secondary w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm transition focus:ring-2 focus:outline-none"
+      class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10 shadow-sm"
     />
     {% if form.username.errors %}
-    <p class="mt-1 text-xs text-red-600">{{ form.username.errors|first }}</p>
+      <p class="mt-1.5 text-xs text-red-600 font-medium">{{ form.username.errors|first }}</p>
     {% endif %}
   </div>
 
-  <div class="mb-2">
-    <label class="mb-1.5 block text-xs font-medium tracking-wide text-gray-500 uppercase">Mot de passe</label>
-    <input
-      type="password"
-      name="password"
-      placeholder="••••••••"
-      class="focus:ring-secondary/50 focus:border-secondary w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm transition focus:ring-2 focus:outline-none"
-    />
+  {# Champ Mot de passe avec fonction "Afficher" #}
+  <div>
+    <div class="flex justify-between items-center mb-1.5">
+      <label class="block text-xs font-bold tracking-widest uppercase text-gray-400">Mot de passe</label>
+      <a href="{% url 'users:mot_de_passe_oublie' %}" class="text-xs font-bold text-primary hover:underline">OUBLIÉ ?</a>
+    </div>
+    
+    <div class="relative">
+      <input
+        type="password"
+        id="id_password"
+        name="password"
+        placeholder="••••••••"
+        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm pr-12 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10 shadow-sm"
+      />
+      <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition p-2">
+        <svg id="eye-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path id="eye-path" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+        </svg>
+      </button>
+    </div>
     {% if form.password.errors %}
-    <p class="mt-1 text-xs text-red-600">{{ form.password.errors|first }}</p>
+      <p class="mt-1.5 text-xs text-red-600 font-medium">{{ form.password.errors|first }}</p>
     {% endif %}
-  </div>
-
-  <div class="mb-5 text-right">
-    <a href="{% url 'users:mot_de_passe_oublie' %}" class="text-primary text-xs hover:underline">Mot de passe oublié ?</a>
   </div>
 
   {% if form.non_field_errors %}
-  <div class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">{{ form.non_field_errors|first }}</div>
+    <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 font-medium">
+      {{ form.non_field_errors|first }}
+    </div>
   {% endif %}
 
-  <button type="submit" class="bg-primary text-secondary hover:bg-primary/90 w-full rounded-xl py-3 text-sm font-medium transition">Se connecter</button>
+  <button type="submit" class="w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-secondary shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98]">
+    Se connecter
+  </button>
 </form>
 
-<p class="mt-6 text-center text-sm text-gray-400">
+<p class="mt-8 text-center text-sm text-gray-400">
   Pas encore de compte ?
-  <a href="{% url 'users:inscription' %}" class="text-primary font-medium hover:underline">S'inscrire</a>
+  <a href="{% url 'users:inscription' %}" class="text-primary font-bold hover:underline">S'inscrire</a>
 </p>
+
+{# Script pour gérer l'affichage du mot de passe #}
+<script>
+function togglePassword() {
+    const p = document.getElementById('id_password');
+    const path = document.getElementById('eye-path');
+    if (p.type === "password") {
+        p.type = "text";
+        path.setAttribute('d', "M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18");
+    } else {
+        p.type = "password";
+        path.setAttribute('d', "M15 12a3 3 0 11-6 0 3 3 0 016 0z M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z");
+    }
+}
+</script>
 {% endblock %}

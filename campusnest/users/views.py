@@ -337,15 +337,30 @@ def client_dashboard_view(request):
     })
 
 
+"""
+Remplace les fonctions proprietaire_dashboard_view et admin_dashboard_view
+dans campusnest/users/views.py
+"""
+
+from django.utils import timezone
+from django.db.models import Count, Q, Sum
+import datetime
+
+
+# ─────────────────────────────────────────────
+#  Dashboard Propriétaire
+# ─────────────────────────────────────────────
+
 @proprietaire_valide_requis
 def proprietaire_dashboard_view(request):
     from campusnest.logements.models import Chambre, Cite
     from campusnest.reservations.models import Reservation
-    
-    q = request.GET.get("q", "").strip()
-    cites = Cite.objects.filter(proprietaire=request.user)
+
+    # ── Données de base ──
+    cites    = Cite.objects.filter(proprietaire=request.user)
     chambres = Chambre.objects.filter(cite__proprietaire=request.user)
 
+    q = request.GET.get("q", "").strip()
     if q:
         chambres = chambres.filter(
             Q(cite__nom__icontains=q) |
@@ -353,57 +368,204 @@ def proprietaire_dashboard_view(request):
             Q(description__icontains=q) |
             Q(type__icontains=q)
         )
-    
-    # 1. On ne met PAS de [:5] ici pour pouvoir filtrer et compter librement ensuite
-    toutes_les_reservations = Reservation.objects.filter(
+
+    toutes_reservations = Reservation.objects.filter(
         chambre__cite__proprietaire=request.user
-    ).select_related("client", "chambre")
-    
+    ).select_related("client", "chambre__cite")
+
+    # ── Statistiques ──
+    total_chambres       = chambres.count()
+    chambres_disponibles = chambres.filter(est_disponible=True).count()
+    chambres_occupees    = total_chambres - chambres_disponibles
+
+    # Taux d'occupation (%)
+    taux_occupation = round((chambres_occupees / total_chambres * 100) if total_chambres else 0)
+
+    # Revenus potentiels (toutes chambres disponibles × loyer)
+    revenus_potentiels = chambres.filter(est_disponible=False).aggregate(
+        total=Sum("loyer")
+    )["total"] or 0
+
+    # Revenus estimés ce mois (réservations confirmées actives ce mois)
+    aujourd_hui  = timezone.now().date()
+    debut_mois   = aujourd_hui.replace(day=1)
+    reservations_actives_mois = toutes_reservations.filter(
+        statut=Reservation.Statut.CONFIRMEE,
+        date_debut__lte=aujourd_hui,
+        date_fin__gte=debut_mois,
+    )
+    revenus_mois = sum(r.montant_total() for r in reservations_actives_mois)
+
+    # Réservations par statut
+    res_en_attente  = toutes_reservations.filter(statut="en_attente").count()
+    res_confirmees  = toutes_reservations.filter(statut="confirmee").count()
+    res_annulees    = toutes_reservations.filter(statut="annulee").count()
+
+    # Réservations des 6 derniers mois (pour mini-graphique)
+    six_mois = []
+    for i in range(5, -1, -1):
+        d = aujourd_hui - datetime.timedelta(days=30 * i)
+        mois_debut = d.replace(day=1)
+        mois_fin   = (mois_debut + datetime.timedelta(days=32)).replace(day=1)
+        count = toutes_reservations.filter(
+            date_demande__date__gte=mois_debut,
+            date_demande__date__lt=mois_fin,
+        ).count()
+        six_mois.append({
+            "mois":  mois_debut.strftime("%b"),
+            "count": count,
+        })
+
+    # Répartition par type de chambre
+    repartition_types = list(
+        chambres.values("type").annotate(nb=Count("id")).order_by("-nb")
+    )
+
+    # Top 3 chambres par nombre de réservations
+    top_chambres = list(
+        chambres.annotate(nb_res=Count("reservations"))
+                .order_by("-nb_res")[:3]
+    )
+
     return render(request, "accounts/proprietaire_dashboard.html", {
-        "cites": cites,
+        "cites":    cites,
         "chambres": chambres[:8],
-        "q": q,
-        # 2. On applique le découpage ici, juste pour l'affichage du tableau
-        "reservations_recentes": toutes_les_reservations[:5],
+        "q":        q,
+        "reservations_recentes": toutes_reservations[:5],
         "stats": {
-            "total_cites":          cites.count(),
-            "total_chambres":       chambres.count(),
-            "chambres_disponibles": chambres.filter(est_disponible=True).count(),
-            # 3. Fonctionne parfaitement maintenant car la requête de base n'est pas bridée
-            "reservations_attente": toutes_les_reservations.filter(statut="en_attente").count(),
+            "total_cites":           cites.count(),
+            "total_chambres":        total_chambres,
+            "chambres_disponibles":  chambres_disponibles,
+            "chambres_occupees":     chambres_occupees,
+            "taux_occupation":       taux_occupation,
+            "revenus_potentiels":    revenus_potentiels,
+            "revenus_mois":          revenus_mois,
+            "reservations_attente":  res_en_attente,
+            "reservations_confirmees": res_confirmees,
+            "reservations_annulees": res_annulees,
+            "six_mois_labels":       [m["mois"]  for m in six_mois],
+            "six_mois_data":         [m["count"] for m in six_mois],
+            "repartition_types":     repartition_types,
+            "top_chambres":          top_chambres,
         },
     })
 
+
+# ─────────────────────────────────────────────
+#  Dashboard Admin
+# ─────────────────────────────────────────────
 
 @admin_requis
 def admin_dashboard_view(request):
     from campusnest.logements.models import Chambre, Cite
+    from campusnest.reservations.models import Reservation
     from campusnest.signalements.models import Signalement
 
+    aujourd_hui = timezone.now().date()
+    debut_mois  = aujourd_hui.replace(day=1)
+
+    # ── Utilisateurs ──
     props_attente = Utilisateur.objects.filter(
         role=Utilisateur.Role.PROPRIETAIRE,
         profil_proprietaire__est_valide=False,
     )
-    
-    # Requête complète pour le comptage global
-    tous_les_signalements = Signalement.objects.filter(statut="ouvert")
+    total_clients       = Utilisateur.objects.filter(role="client").count()
+    total_proprietaires = Utilisateur.objects.filter(role="proprietaire").count()
+    nouveaux_ce_mois    = Utilisateur.objects.filter(
+        date_joined__date__gte=debut_mois
+    ).count()
+
+    # ── Logements ──
+    total_cites      = Cite.objects.count()
+    total_chambres   = Chambre.objects.count()
+    chambres_dispo   = Chambre.objects.filter(est_disponible=True).count()
+    chambres_occupees = total_chambres - chambres_dispo
+    taux_occupation  = round((chambres_occupees / total_chambres * 100) if total_chambres else 0)
+
+    # ── Réservations ──
+    toutes_res         = Reservation.objects.all()
+    res_en_attente     = toutes_res.filter(statut="en_attente").count()
+    res_confirmees     = toutes_res.filter(statut="confirmee").count()
+    res_annulees       = toutes_res.filter(statut="annulee").count()
+    res_ce_mois        = toutes_res.filter(date_demande__date__gte=debut_mois).count()
+
+    # ── Signalements ──
+    tous_signalements  = Signalement.objects.filter(statut="ouvert")
+    sig_en_cours       = Signalement.objects.filter(statut="en_cours").count()
+    sig_clotures       = Signalement.objects.filter(statut="cloture").count()
+
+    # ── Répartition signalements par motif ──
+    repartition_sig = list(
+        Signalement.objects.values("motif")
+                           .annotate(nb=Count("id"))
+                           .order_by("-nb")[:5]
+    )
+
+    # ── Activité des 6 derniers mois (inscriptions + réservations) ──
+    six_mois_inscriptions = []
+    six_mois_reservations = []
+    for i in range(5, -1, -1):
+        d          = aujourd_hui - datetime.timedelta(days=30 * i)
+        m_debut    = d.replace(day=1)
+        m_fin      = (m_debut + datetime.timedelta(days=32)).replace(day=1)
+        six_mois_inscriptions.append({
+            "mois":  m_debut.strftime("%b"),
+            "count": Utilisateur.objects.filter(
+                date_joined__date__gte=m_debut,
+                date_joined__date__lt=m_fin,
+            ).count(),
+        })
+        six_mois_reservations.append({
+            "mois":  m_debut.strftime("%b"),
+            "count": toutes_res.filter(
+                date_demande__date__gte=m_debut,
+                date_demande__date__lt=m_fin,
+            ).count(),
+        })
+
+    # ── Top 5 propriétaires par nombre de chambres ──
+    top_proprietaires = list(
+        Utilisateur.objects.filter(role="proprietaire")
+                           .annotate(nb_chambres=Count("cites__chambres"))
+                           .order_by("-nb_chambres")[:5]
+    )
+
     logs = LogActivite.objects.all()[:10]
 
     return render(request, "accounts/admin_dashboard.html", {
         "proprietaires_en_attente": props_attente,
-        "signalements_ouverts":     tous_les_signalements[:5], # Découpage pour l'affichage
+        "signalements_ouverts":     tous_signalements[:5],
         "logs_recents":             logs,
+        "top_proprietaires":        top_proprietaires,
         "stats": {
-            "total_etudiants":       Utilisateur.objects.filter(role="client").count(),
-            "total_proprietaires":   Utilisateur.objects.filter(role="proprietaire").count(),
-            "total_cites":           Cite.objects.count(),
-            "total_chambres":        Chambre.objects.count(),
-            "chambres_disponibles":  Chambre.objects.filter(est_disponible=True).count(),
-            "proprietaires_attente": props_attente.count(),
-            "signalements_ouverts":  tous_les_signalements.count(), # Compte réel de la BDD
+            # Utilisateurs
+            "total_etudiants":          total_clients,
+            "total_proprietaires":      total_proprietaires,
+            "nouveaux_ce_mois":         nouveaux_ce_mois,
+            "proprietaires_attente":    props_attente.count(),
+            # Logements
+            "total_cites":              total_cites,
+            "total_chambres":           total_chambres,
+            "chambres_disponibles":     chambres_dispo,
+            "chambres_occupees":        chambres_occupees,
+            "taux_occupation":          taux_occupation,
+            # Réservations
+            "total_reservations":       toutes_res.count(),
+            "reservations_attente":     res_en_attente,
+            "reservations_confirmees":  res_confirmees,
+            "reservations_annulees":    res_annulees,
+            "reservations_ce_mois":     res_ce_mois,
+            # Signalements
+            "signalements_ouverts":     tous_signalements.count(),
+            "signalements_en_cours":    sig_en_cours,
+            "signalements_clotures":    sig_clotures,
+            "repartition_signalements": repartition_sig,
+            # Graphiques
+            "six_mois_labels":          [m["mois"]  for m in six_mois_inscriptions],
+            "six_mois_inscriptions":    [m["count"] for m in six_mois_inscriptions],
+            "six_mois_reservations":    [m["count"] for m in six_mois_reservations],
         },
     })
-
 
 @admin_requis
 def valider_proprietaire_view(request, pk):

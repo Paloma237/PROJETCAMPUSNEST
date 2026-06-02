@@ -1,58 +1,54 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="h-full">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}CampusNest{% endblock %} IUT-FV</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}CampusNest{% endblock %} — Espace Connexion</title>
   {% load static %}
-  <link rel="stylesheet" href="{% static 'css/output.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/output.css' %}"/>
 </head>
 
-<body class="min-h-screen bg-secondary flex items-center justify-center p-4">
-  <div class="bg-white shadow-xl flex w-full max-w-5xl rounded-3xl overflow-hidden min-h-[600px]">
- 
-    {# ── Sidebar verte (maquette exacte) ── #}
-    <div class="hidden md:flex md:w-2/5 flex-col justify-between p-8 bg-cover bg-center bg-no-repeat relative" style="background-image: url('/static/images/IUT.jpg');">
-      {# Overlay optionnel si ton image de fond rend le texte illisible #}
-      <div class="absolute inset-0 bg-primary/20 pointer-events-none"></div>
+<body class="h-full bg-[#E5EBE5] flex items-center justify-center p-4 md:p-8">
 
+  {# Carte principale #}
+  <div class="w-full max-w-5xl bg-white shadow-2xl shadow-primary/10 rounded-3xl overflow-hidden flex min-h-[550px]">
+ 
+    {# ── SIDEBAR GAUCHE (Image + Citation) ── #}
+    <div class="hidden md:flex md:w-2/5 flex-col justify-between p-10 bg-cover bg-center bg-no-repeat relative">
+      <div class="absolute inset-0 bg-primary/90 z-0"></div> {# Logo en haut #}
       <div class="relative z-10">
-        <a href="/" class="flex items-center text-white gap-2 font-black text-lg">
-          <img src="/static/images/WhatsApp_Image_2026-05-25_at_17.43.41-removebg-preview.png" alt="CampusNest Logo" class="h-8 w-8 object-contain" />
+        <a href="/" class="flex items-center text-white gap-2 font-bold text-lg">
+          <img src="{% static 'images/WhatsApp_Image_2026-05-25_at_17.43.41-removebg-preview.png' %}" alt="CampusNest" class="h-9 w-9" />
           <span>CampusNest</span>
         </a>
-        <p class="text-white/80 text-xs mt-3 leading-relaxed font-medium">
-          IUT Fotso Victor — Bandjoun<br>
-          Plateforme de logements étudiants
-        </p>
       </div>
 
-      <blockquote class="text-white/90 text-sm italic leading-relaxed relative z-10 font-medium bg-black/10 p-4 rounded-xl backdrop-blur-xs">
-        {% block sidebar_quote %}
-        « Trouvez votre chambre avant même d'arriver au campus. »
-        {% endblock %}
-      </blockquote>
+      {# Citation en bas #}
+      <div class="relative z-10 text-white">
+        <p class="text-white/70 text-[11px] uppercase tracking-widest font-bold mb-3">CampusNest IUT-FV</p>
+        <blockquote class="text-lg italic font-medium leading-tight">
+          « Trouvez votre chambre avant même d'arriver au campus. »
+        </blockquote>
+      </div>
     </div>
  
-    {# ── Zone formulaire ── #}
-    <div class="flex-1 p-8 sm:p-12 flex flex-col justify-center bg-white">
- 
-      {# Flash messages #}
+    {# ── ZONE FORMULAIRE DROITE ── #}
+    <div class="flex-1 p-8 sm:p-16 flex flex-col justify-center bg-white">
+      
+      {# Messages d'alerte #}
       {% if messages %}
-        <div class="space-y-2 mb-4">
+        <div class="mb-6 space-y-2">
           {% for message in messages %}
-            <div class="px-4 py-3 rounded-xl text-sm font-bold shadow-xs border animate-fadeIn
-              {% if message.tags == 'success' %}bg-green-50 text-green-800 border-green-200
-              {% elif message.tags == 'error' %}bg-red-50 text-red-800 border-red-200
-              {% elif message.tags == 'warning' %}bg-amber-50 text-amber-800 border-amber-200
-              {% else %}bg-blue-50 text-blue-800 border-blue-200{% endif %}">
+            <div class="px-4 py-3 rounded-xl text-xs font-bold {% if message.tags == 'success' %}bg-green-50 text-green-700{% else %}bg-red-50 text-red-700{% endif %}">
               {{ message }}
             </div>
           {% endfor %}
         </div>
       {% endif %}
  
+      {# Injection du contenu (Connexion/Inscription) #}
       {% block content %}{% endblock %}
+      
     </div>
   </div>
 </body>

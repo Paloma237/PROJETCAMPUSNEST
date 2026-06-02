@@ -1,0 +1,73 @@
+<aside class="w-full h-full flex flex-col relative">
+
+  <button onclick="toggleSidebar()" 
+          class="lg:hidden absolute top-4 right-4 p-1.5 rounded-lg bg-white/5 text-secondary/60 hover:text-white hover:bg-white/10 transition z-50">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+    </svg>
+  </button>
+
+  {# ── Logo ── #}
+  <div class="px-6 py-5 border-b border-white/10 shrink-0">
+    <a href="{% url 'logements:home' %}" class="flex items-center gap-2 text-sm font-semibold text-white group">
+      <div class="bg-white/10 p-1 rounded-lg transition-transform group-hover:scale-105">
+        <img src="/static/images/WhatsApp_Image_2026-05-25_at_17.43.41-removebg-preview.png" alt="CampusNest Logo" class="h-8 w-8 object-contain" />
+      </div>
+      <span class="text-base font-black tracking-wide text-secondary">CampusNest</span>
+    </a>
+    <p class="text-secondary/40 text-xs mt-1 ml-10">Espace Étudiant</p>
+  </div>
+
+  {# ── Profil rapide ── #}
+  <div class="px-6 py-4 border-b border-white/10 flex items-center gap-3 shrink-0">
+    <div class="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-primary font-semibold text-sm shrink-0">
+      {{ user.prenom|first|upper }}{{ user.nom|first|upper }}
+    </div>
+    <div class="min-w-0">
+      <p class="text-white text-sm font-medium truncate">{{ user.get_full_name }}</p>
+      <p class="text-secondary/50 text-xs truncate">{{ user.email }}</p>
+    </div>
+  </div>
+
+  {# ── Navigation ── #}
+  <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto scrollbar-none">
+    <p class="text-secondary/30 text-xs uppercase tracking-widest px-3 mb-2">Principal</p>
+
+    <a href="{% url 'users:client_dashboard' %}"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition
+              {% if request.resolver_match.url_name == 'etudiant_dashboard' %}bg-secondary/20 text-secondary font-medium{% else %}text-secondary/60 hover:bg-white/5 hover:text-secondary{% endif %}">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      Tableau de bord
+    </a>
+
+    <a href="{% url 'logements:liste_cites' %}"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition text-secondary/60 hover:bg-white/5 hover:text-secondary">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/></svg>
+      Explorer les cités
+    </a>
+
+    <p class="text-secondary/30 text-xs uppercase tracking-widest px-3 mt-4 mb-2">Réservations</p>
+
+    <a href="{% url 'reservations:mes_reservations' %}"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition text-secondary/60 hover:bg-white/5 hover:text-secondary">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+      Mes réservations
+    </a>
+
+    <p class="text-secondary/30 text-xs uppercase tracking-widest px-3 mt-4 mb-2">Aide & Support</p>
+
+    <a href="{% url 'signalements:mes_signalements' %}"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition text-secondary/60 hover:bg-white/5 hover:text-secondary">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+      Mes signalements
+    </a>
+  </nav>
+
+  {# ── Déconnexion ── #}
+  <div class="px-3 py-4 border-t border-white/10 shrink-0">
+    <a href="{% url 'users:deconnexion' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-secondary/50 hover:bg-red-500/10 hover:text-red-400 transition">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+      Se déconnecter
+    </a>
+  </div>
+</aside>

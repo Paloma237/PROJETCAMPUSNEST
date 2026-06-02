@@ -18,108 +18,153 @@
 {% endblock %}
 
 {% block content %}
-  {# ── Statistiques ── #}
-  <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
 
-    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+  {# Injection JSON native Django — aucun filtre custom requis #}
+  {{ stats.six_mois_labels|json_script:"data-labels" }}
+  {{ stats.six_mois_data|json_script:"data-counts" }}
+  {{ stats.repartition_types|json_script:"data-types" }}
+
+  {# ── Ligne 1 : KPIs principaux ── #}
+  <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-5">
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow">
       <div class="flex items-center justify-between mb-3">
-        <p class="text-xs text-gray-500 uppercase tracking-wide">Cités</p>
-        <div class="w-8 h-8 bg-secondary/20 rounded-lg flex items-center justify-center">
+        <p class="text-[11px] text-gray-400 uppercase tracking-widest font-semibold">Cités</p>
+        <div class="w-8 h-8 bg-[#1A2517]/8 rounded-xl flex items-center justify-center">
           <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/>
           </svg>
         </div>
       </div>
-      <p class="text-3xl font-semibold text-gray-900">{{ stats.total_cites }}</p>
-      <a href="{% url 'logements:mes_cites' %}"
-         class="text-xs text-primary hover:underline mt-1 inline-block">
-        Gérer →
-      </a>
+      <p class="text-3xl font-black text-gray-900 tracking-tight">{{ stats.total_cites }}</p>
+      <a href="{% url 'logements:mes_cites' %}" class="text-xs text-primary hover:underline mt-1 inline-block font-medium">Gérer →</a>
     </div>
 
-    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow">
       <div class="flex items-center justify-between mb-3">
-        <p class="text-xs text-gray-500 uppercase tracking-wide">Chambres</p>
-        <div class="w-8 h-8 bg-secondary/20 rounded-lg flex items-center justify-center">
-          <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10
-                     a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4
-                     a1 1 0 001 1m-6 0h6"/>
+        <p class="text-[11px] text-gray-400 uppercase tracking-widest font-semibold">Chambres</p>
+        <div class="w-8 h-8 bg-blue-50 rounded-xl flex items-center justify-center">
+          <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
           </svg>
         </div>
       </div>
-      <p class="text-3xl font-semibold text-gray-900">{{ stats.total_chambres }}</p>
-      <p class="text-xs text-gray-400 mt-1">au total</p>
-    </div>
-
-    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-      <div class="flex items-center justify-between mb-3">
-        <p class="text-xs text-gray-500 uppercase tracking-wide">Disponibles</p>
-        <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
-          <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-        </div>
+      <p class="text-3xl font-black text-gray-900 tracking-tight">{{ stats.total_chambres }}</p>
+      <div class="flex items-center gap-2 mt-1">
+        <span class="text-xs text-green-600 font-semibold">{{ stats.chambres_disponibles }} libres</span>
+        <span class="text-xs text-gray-300">·</span>
+        <span class="text-xs text-rose-500 font-semibold">{{ stats.chambres_occupees }} occupées</span>
       </div>
-      <p class="text-3xl font-semibold text-green-600">{{ stats.chambres_disponibles }}</p>
-      <p class="text-xs text-gray-400 mt-1">
-        {% if stats.total_chambres %}
-          {{ stats.chambres_disponibles|floatformat:0 }}/{{ stats.total_chambres }} chambres libres
-        {% endif %}
-      </p>
     </div>
 
-    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow">
       <div class="flex items-center justify-between mb-3">
-        <p class="text-xs text-gray-500 uppercase tracking-wide">En attente</p>
-        <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+        <p class="text-[11px] text-gray-400 uppercase tracking-widest font-semibold">Occupation</p>
+        <div class="w-8 h-8 bg-amber-50 rounded-xl flex items-center justify-center">
           <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
           </svg>
         </div>
       </div>
-      <p class="text-3xl font-semibold text-amber-600">{{ stats.reservations_attente }}</p>
-      <a href="{% url 'reservations:recues' %}"
-         class="text-xs text-primary hover:underline mt-1 inline-block">
-        Voir les demandes →
-      </a>
+      <p class="text-3xl font-black text-amber-600 tracking-tight">{{ stats.taux_occupation }}%</p>
+      <div class="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+        <div class="h-full bg-amber-400 rounded-full transition-all duration-700"
+             style="width: {{ stats.taux_occupation }}%"></div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-[11px] text-gray-400 uppercase tracking-widest font-semibold">En attente</p>
+        <div class="w-8 h-8 {% if stats.reservations_attente %}bg-rose-50{% else %}bg-gray-50{% endif %} rounded-xl flex items-center justify-center">
+          <svg class="w-4 h-4 {% if stats.reservations_attente %}text-rose-500{% else %}text-gray-400{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+      </div>
+      <p class="text-3xl font-black {% if stats.reservations_attente %}text-rose-500{% else %}text-gray-900{% endif %} tracking-tight">{{ stats.reservations_attente }}</p>
+      <a href="{% url 'reservations:recues' %}" class="text-xs text-primary hover:underline mt-1 inline-block font-medium">Voir les demandes →</a>
     </div>
 
   </div>
 
-  {# ── Contenu principal : réservations + chambres ── #}
+  {# ── Ligne 2 : Revenus + Statut réservations ── #}
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+
+    <div class="bg-gradient-to-br from-[#1A2517] to-[#2d3f28] rounded-2xl p-5 text-white shadow-md">
+      <p class="text-xs text-white/50 uppercase tracking-widest font-semibold mb-1">Revenus estimés ce mois</p>
+      <p class="text-3xl font-black tracking-tight">
+        {% if stats.revenus_mois %}
+          {{ stats.revenus_mois|floatformat:0 }} <span class="text-lg font-semibold text-white/60">FCFA</span>
+        {% else %}
+          <span class="text-white/40 text-xl">—</span>
+        {% endif %}
+      </p>
+      <p class="text-xs text-white/40 mt-2">Basé sur les réservations confirmées actives</p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <p class="text-[11px] text-gray-400 uppercase tracking-widest font-semibold mb-3">Statut des réservations</p>
+      <div class="space-y-2.5">
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-2 text-xs text-gray-600">
+            <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>En attente
+          </span>
+          <span class="text-xs font-bold text-gray-900">{{ stats.reservations_attente }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-2 text-xs text-gray-600">
+            <span class="w-2 h-2 rounded-full bg-green-500 shrink-0"></span>Confirmées
+          </span>
+          <span class="text-xs font-bold text-gray-900">{{ stats.reservations_confirmees }}</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-2 text-xs text-gray-600">
+            <span class="w-2 h-2 rounded-full bg-rose-400 shrink-0"></span>Annulées
+          </span>
+          <span class="text-xs font-bold text-gray-900">{{ stats.reservations_annulees }}</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  {# ── Ligne 3 : Graphique barres + Répartition types ── #}
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-5 mb-5">
+
+    <div class="xl:col-span-2 bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <h2 class="text-sm font-bold text-gray-900 mb-4">Réservations — 6 derniers mois</h2>
+      <div class="flex items-end gap-2 h-28" id="chart-proprio"></div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <h2 class="text-sm font-bold text-gray-900 mb-4">Types de chambres</h2>
+      <div id="chart-types"></div>
+    </div>
+
+  </div>
+
+  {# ── Ligne 4 : Réservations récentes + Top chambres ── #}
   <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
 
-    {# Réservations récentes #}
     <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-      <div class="flex items-center justify-between mb-5">
-        <h2 class="text-sm font-semibold text-gray-900">Réservations récentes</h2>
-        <a href="{% url 'reservations:recues' %}"
-           class="text-xs text-primary hover:underline">Voir tout →</a>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-bold text-gray-900">Réservations récentes</h2>
+        <a href="{% url 'reservations:recues' %}" class="text-xs text-primary hover:underline font-medium">Voir tout →</a>
       </div>
-
       {% if reservations_recentes %}
         <div class="divide-y divide-gray-50">
           {% for r in reservations_recentes %}
             <div class="flex items-center gap-3 py-3">
-              <div class="w-8 h-8 rounded-full bg-secondary/20 text-primary text-xs
-                          font-semibold flex items-center justify-center shrink-0">
+              <div class="w-8 h-8 rounded-full bg-[#1A2517]/10 text-primary text-xs font-bold flex items-center justify-center shrink-0">
                 {{ r.client.prenom|first|upper }}{{ r.client.nom|first|upper }}
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-xs font-semibold text-gray-900 truncate">
-                  {{ r.client.get_full_name }}
-                </p>
-                <p class="text-xs text-gray-400 truncate">
-                  {{ r.chambre }} · {{ r.date_demande|date:"d M Y" }}
-                </p>
+                <p class="text-xs font-semibold text-gray-900 truncate">{{ r.client.get_full_name }}</p>
+                <p class="text-xs text-gray-400 truncate">{{ r.chambre }} · {{ r.date_demande|date:"d M Y" }}</p>
               </div>
               <div class="shrink-0 flex items-center gap-2">
-                <span class="text-xs px-2 py-0.5 rounded-full font-medium
+                <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold
                   {% if r.statut == 'en_attente'  %}bg-amber-50 text-amber-700
                   {% elif r.statut == 'confirmee' %}bg-green-50 text-green-700
                   {% else                         %}bg-red-50   text-red-600{% endif %}">
@@ -128,7 +173,7 @@
                 {% if r.statut == 'en_attente' %}
                   <form method="post" action="{% url 'reservations:confirmer' r.pk %}">
                     {% csrf_token %}
-                    <button class="text-xs text-green-600 hover:underline">Confirmer</button>
+                    <button class="text-xs text-green-600 hover:underline font-medium">Confirmer</button>
                   </form>
                 {% endif %}
               </div>
@@ -140,57 +185,80 @@
       {% endif %}
     </div>
 
-    {# Mes chambres #}
     <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-      <div class="flex items-center justify-between mb-5">
-        <h2 class="text-sm font-semibold text-gray-900">Mes chambres</h2>
-        <a href="{% url 'logements:mes_cites' %}"
-           class="text-xs text-primary hover:underline">Gérer →</a>
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-bold text-gray-900">Chambres les + demandées</h2>
+        <a href="{% url 'logements:mes_cites' %}" class="text-xs text-primary hover:underline font-medium">Gérer →</a>
       </div>
-
-      {% if chambres %}
-        <div class="space-y-2">
-          {% for chambre in chambres %}
+      {% if stats.top_chambres %}
+        <div class="space-y-3">
+          {% for chambre in stats.top_chambres %}
             <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition">
-              <div class="flex-1 min-w-0">
-                <p class="text-xs font-semibold text-gray-900 truncate">
-                  {{ chambre.get_type_display }} — {{ chambre.cite.nom }}
-                </p>
-                <p class="text-xs text-gray-400">
-                  {{ chambre.superficie }} m² · {{ chambre.loyer|floatformat:0 }} FCFA/mois
-                </p>
+              <div class="w-7 h-7 rounded-lg bg-primary/10 text-primary text-xs font-black flex items-center justify-center shrink-0">
+                {{ forloop.counter }}
               </div>
-              <div class="flex items-center gap-2 shrink-0">
-                <form method="post" action="{% url 'logements:toggle_disponibilite' chambre.pk %}">
-                  {% csrf_token %}
-                  <button type="submit"
-                          class="text-xs px-2.5 py-1 rounded-full border font-medium transition
-                            {% if chambre.est_disponible %}
-                              bg-green-50 text-green-700 border-green-200 hover:bg-green-100
-                            {% else %}
-                              bg-red-50 text-red-600 border-red-200 hover:bg-red-100
-                            {% endif %}">
-                    {% if chambre.est_disponible %}Libre{% else %}Occupée{% endif %}
-                  </button>
-                </form>
-                <a href="{% url 'logements:modifier_chambre' chambre.pk %}"
-                   class="text-xs text-gray-400 hover:text-primary transition">
-                  Modifier
-                </a>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-semibold text-gray-900 truncate">{{ chambre.get_type_display }} — {{ chambre.cite.nom }}</p>
+                <p class="text-xs text-gray-400">{{ chambre.loyer|floatformat:0 }} FCFA/mois · {{ chambre.superficie }} m²</p>
+              </div>
+              <div class="shrink-0 text-right">
+                <span class="text-xs font-black text-primary">{{ chambre.nb_res }}</span>
+                <p class="text-[10px] text-gray-400">demande{{ chambre.nb_res|pluralize }}</p>
               </div>
             </div>
           {% endfor %}
         </div>
       {% else %}
-        <div class="text-center py-8">
-          <p class="text-sm text-gray-400 mb-3">Aucune chambre pour l'instant.</p>
-          <a href="{% url 'logements:mes_cites' %}"
-             class="text-xs px-4 py-2 bg-primary text-secondary rounded-xl hover:bg-primary/90 transition">
-            Ajouter une cité
-          </a>
-        </div>
+        <p class="text-sm text-gray-400 text-center py-8">Aucune chambre pour l'instant.</p>
       {% endif %}
     </div>
 
   </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // ── Graphique barres réservations ──
+      const labels = JSON.parse(document.getElementById("data-labels").textContent);
+      const counts = JSON.parse(document.getElementById("data-counts").textContent);
+      const maxVal = Math.max(...counts, 1);
+      const maxH   = 88;
+      const container = document.getElementById("chart-proprio");
+
+      labels.forEach(function(label, i) {
+        const h = Math.round((counts[i] / maxVal) * maxH) || 4;
+        const col = document.createElement("div");
+        col.className = "flex-1 flex flex-col items-center gap-1 group";
+        col.innerHTML =
+          '<span class="text-[10px] font-bold text-gray-500 opacity-0 group-hover:opacity-100 transition">' + counts[i] + '</span>' +
+          '<div class="w-full bg-primary/10 hover:bg-primary/25 rounded-t-lg transition-all duration-500" style="height:' + h + 'px"></div>' +
+          '<span class="text-[10px] text-gray-400 font-medium">' + label + '</span>';
+        container.appendChild(col);
+      });
+
+      // ── Répartition types de chambres ──
+      const types     = JSON.parse(document.getElementById("data-types").textContent);
+      const totalCh   = parseInt("{{ stats.total_chambres|default:1 }}");
+      const chartTypes = document.getElementById("chart-types");
+
+      if (!types || types.length === 0) {
+        chartTypes.innerHTML = '<p class="text-xs text-gray-400 text-center py-6">Aucune chambre.</p>';
+      } else {
+        types.forEach(function(item) {
+          const pct = totalCh ? Math.round(item.nb / totalCh * 100) : 0;
+          const row = document.createElement("div");
+          row.className = "mb-3";
+          row.innerHTML =
+            '<div class="flex items-center justify-between mb-1">' +
+              '<span class="text-xs text-gray-600 font-medium capitalize">' + item.type + '</span>' +
+              '<span class="text-xs font-bold text-gray-900">' + item.nb + '</span>' +
+            '</div>' +
+            '<div class="h-1.5 bg-gray-100 rounded-full overflow-hidden">' +
+              '<div class="h-full bg-primary rounded-full transition-all duration-700" style="width:' + pct + '%"></div>' +
+            '</div>';
+          chartTypes.appendChild(row);
+        });
+      }
+    });
+  </script>
+
 {% endblock %}
