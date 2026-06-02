@@ -5,12 +5,11 @@ CSS = "w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 foc
 
 MOTIFS = [
     ("", "— Choisissez un motif —"),
-    ("photos_incorrectes",   "Photos incorrectes ou trompeuses"),
-    ("prix_trompeur",        "Prix affiché différent du prix réel"),
-    ("chambre_inexistante",  "Chambre inexistante ou indisponible"),
-    ("mauvais_etat",         "Chambre en mauvais état"),
-    ("proprietaire_abusif",  "Comportement abusif du propriétaire"),
-    ("autre",                "Autre"),
+    ("photos",        "Photos incorrectes ou trompeuses"),
+    ("prix",          "Prix affiché différent du prix réel"),
+    ("inexistante",   "Chambre inexistante ou indisponible"),
+    ("etat",          "Chambre en mauvais état"),
+    ("autre",         "Autre"),
 ]
 
 class SignalementForm(forms.ModelForm):

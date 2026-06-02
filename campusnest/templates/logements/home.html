@@ -1,252 +1,363 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Accueil{% endblock %}
-
 {% block content %}
 
+<section class="bg-[#FBFBFA] py-12 border-b border-gray-100">
+  <div class=" px-4 sm:px-6">
+    <div class="relative overflow-hidden  bg-white border border-gray-100 shadow-sm">
+      
+      <div id="hero-track" class="flex w-[200%] transition-transform duration-500 ease-out">
 
-<section style="background:#fff; overflow:hidden; padding-top: 64px;">
-
-  <div id="hero-track" style="display:flex; width:200%; transition:transform 0.55s ease;">
-
-    {# ══ SLIDE 1 ══ #}
-    <div style="width:50%; min-width:0; min-height:480px; display:flex; align-items:center; justify-content:center; padding:4rem 6rem 4rem 6rem; background:#fff; position:relative;">
-
-      <div style="flex:1; min-width:0; max-width:520px;">
-        <div style="display:inline-flex; align-items:center; gap:0.5rem; background:#1A2517; border-radius:0.625rem; padding:0.4rem 0.8rem; margin-bottom:1.5rem;">
-          <img src="{% static 'images/WhatsApp_Image_2026-05-25_at_17.43.41-removebg-preview.png' %}" alt="CampusNest" style="height:1.6rem; width:1.6rem; object-fit:contain;" />
-          <span style="color:#fff; font-size:0.85rem; font-weight:600; letter-spacing:-0.01em;">CampusNest</span>
-        </div>
-
-        <h1 style="color:#1A2517; font-size:2.8rem; font-weight:800; line-height:1.15; margin-bottom:1rem;">
-          Trouvez <span style="color:#7BA87A;">votre chambre.</span><br />
-          Installez-vous <span style="color:#7BA87A;">sereinement.</span>
-        </h1>
-        <p style="color:#4B5563; font-size:1rem; line-height:1.7; margin-bottom:2rem; max-width:30rem;">
-          CampusNest centralise les cités et chambres autour de l'IUT de Fotso Victor à Bandjoun.
-          Recherchez, comparez et réservez en quelques clics.
-        </p>
-        <a href="{% url 'logements:liste_cites' %}"
-           style="display:inline-flex; align-items:center; gap:0.5rem; background:#1A2517; color:#fff; border-radius:0.75rem; padding:0.8rem 1.6rem; font-size:0.95rem; font-weight:600; text-decoration:none; transition:opacity .2s;"
-           onmouseover="this.style.opacity='.82'" onmouseout="this.style.opacity='1'">
-          Commencer à chercher
-          <svg style="height:1rem;width:1rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-        </a>
-      </div>
-
-      {# Image droite slide 1 #}
-      <div style="flex-shrink:0; display:flex; align-items:center; justify-content:center; padding-left:3rem;">
-        <div style="position:relative;">
-          <div style="height:22rem; width:22rem; border-radius:50%; overflow:hidden; background:#F0F5EF; margin-left:170px;">
-            <img src="{% static 'images/IUT.jpg' %}" alt="IUT Fotso Victor" style="height:100%; width:100%; object-fit:cover;" />
-          </div>
-          {# Badge flottant #}
-          <div style="position:absolute; bottom:1.5rem; left:50%; transform:translateX(-50%); display:inline-flex; align-items:center; gap:0.4rem; background:#fff; border-radius:0.75rem; padding:0.5rem 0.9rem; box-shadow:0 4px 16px rgba(0,0,0,.12); white-space:nowrap; border:1px solid #f0f0f0;">
-            <div style="height:1.5rem;width:1.5rem;border-radius:50%;background:#ACC8A240;display:flex;align-items:center;justify-content:center;">
-              <svg style="height:.8rem;width:.8rem;" fill="none" viewBox="0 0 24 24" stroke="#1A2517" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-            </div>
-            <div>
-              <p style="color:#1A2517;font-size:.75rem;font-weight:600;margin:0;">Cités disponibles</p>
-              <p style="color:#6B7280;font-size:.65rem;margin:0;">autour de l'IUT-FV</p>
+       {# ══ SLIDE 1 : Étudiants ══ #}
+        <div class="w-1/2 min-h-[440px] relative flex flex-col md:flex-row items-center justify-between p-8 sm:p-12 md:p-16 gap-8">
+          {# Image de fond #}
+          <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('{% static 'images/fille.png' %}');"></div>
+          {# Dégradé pour la lisibilité #}
+          <div class="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent"></div>
+  
+          <div class="relative z-10 flex-1 text-center md:text-left flex flex-col items-center md:items-start">
+              <div class="inline-flex items-center gap-2 bg-[#1A2517] px-3 py-1.5 rounded-xl mb-6">
+                <img src="{% static 'images/WhatsApp_Image_2026-05-25_at_17.43.41-removebg-preview.png' %}" alt="CampusNest" class="h-5 w-5 object-contain" />
+                <span class="text-white text-xs font-semibold tracking-wide">CampusNest</span>
+              </div>
+            <h1 class="text-[#1A2517] text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight max-w-xl">
+              Trouvez <span class="text-[#7BA87A]">votre chambre.</span><br />
+              Installez-vous <span class="text-[#7BA87A]">sereinement.</span>
+            </h1>
+            <p class="text-gray-600 text-sm sm:text-base max-w-md mt-4 leading-relaxed font-medium">
+              CampusNest centralise les cités et chambres autour de l'IUT de Fotso Victor à Bandjoun. 
+              Recherchez, comparez et réservez en quelques clics.
+            </p>
+            <div class="mt-8">
+              <a href="{% url 'logements:liste_cites' %}" class="inline-flex items-center gap-2 bg-[#1A2517] text-white hover:bg-[#1A2517]/90 px-6 py-3 rounded-xl text-sm font-semibold shadow-sm transition">
+                Commencer à chercher
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+              </a>
             </div>
           </div>
-          {# Décor points verts #}
-          <div style="position:absolute;top:-1rem;right:-1.5rem;display:grid;grid-template-columns:repeat(5,1fr);gap:5px;opacity:.4;">
-            {% for i in "12345678910111213141516171819202122232425" %}
-            <div style="height:6px;width:6px;border-radius:50%;background:#7BA87A;"></div>
-            {% endfor %}
-          </div>
         </div>
-      </div>
+
+{# ══ SLIDE 2 : Propriétaires ══ #}
+<div class="w-1/2 min-h-[440px] relative flex flex-col md:flex-row items-center justify-between p-8 sm:p-12 md:p-16 gap-8">
+  {# Image de fond (Chambre) #}
+  <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('{% static 'images/chambre.jpg' %}');"></div>
+  {# Dégradé #}
+  <div class="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent"></div>
+
+  <div class="relative z-10 flex-1 text-center md:text-left flex flex-col items-center md:items-start">
+    <div class="inline-flex items-center gap-2 bg-[#1A2517] px-3 py-1.5 rounded-xl mb-6">
+      <img src="{% static 'images/WhatsApp_Image_2026-05-25_at_17.43.41-removebg-preview.png' %}" alt="CampusNest" class="h-5 w-5 object-contain" />
+      <span class="text-white text-xs font-semibold tracking-wide">CampusNest</span>
     </div>
-
-    {# ══ SLIDE 2 ══ #}
-    <div style="width:50%; min-width:0; min-height:480px; display:flex; align-items:center; justify-content:center; padding:4rem 6rem 4rem 6rem; background:#F8FAF7; position:relative;">
-
-      <div style="flex:1; min-width:0; max-width:520px;">
-        <div style="display:inline-flex; align-items:center; gap:0.5rem; background:#1A2517; border-radius:0.625rem; padding:0.4rem 0.8rem; margin-bottom:1.5rem;">
-          <img src="{% static 'images/WhatsApp_Image_2026-05-25_at_17.43.41-removebg-preview.png' %}" alt="CampusNest" style="height:1.6rem; width:1.6rem; object-fit:contain;" />
-          <span style="color:#fff; font-size:0.85rem; font-weight:600; letter-spacing:-0.01em;">CampusNest</span>
-        </div>
-
-        <h1 style="color:#1A2517; font-size:2.8rem; font-weight:800; line-height:1.15; margin-bottom:1rem;">
-          De la recherche à<br />
-          <span style="color:#7BA87A;">l'impact réel</span>
-        </h1>
-        <p style="color:#4B5563; font-size:1rem; line-height:1.7; margin-bottom:2rem; max-width:30rem;">
-          Développez votre patrimoine locatif, gérez vos cités et chambres facilement,
-          et connectez-vous directement avec des étudiants sérieux.
-        </p>
-        <div style="display:flex; flex-wrap:wrap; gap:0.75rem;">
-          <a href="{% url 'logements:liste_cites' %}"
-             style="display:inline-flex;align-items:center;gap:.5rem;background:#1A2517;color:#fff;border-radius:.75rem;padding:.8rem 1.6rem;font-size:.95rem;font-weight:600;text-decoration:none "
-             onmouseover="this.style.opacity='.82'" onmouseout="this.style.opacity='1'">
-            Explorer les logements
-          </a>
-          <a href="{% url 'users:devenir_proprietaire' %}"
-             style="display:inline-flex;align-items:center;gap:.5rem;border:2px solid #1A251730;color:#1A2517;border-radius:.75rem;padding:.8rem 1.6rem;font-size:.95rem;font-weight:600;text-decoration:none;"
-             onmouseover="this.style.background='#EEF4ED'" onmouseout="this.style.background='transparent'">
-            Devenir propriétaire
-          </a>
-        </div>
-      </div>
-
-      {# Image droite slide 2 #}
-      <div style="flex-shrink:0; display:flex; align-items:center; justify-content:center; padding-left:3rem;">
-        <div style="position:relative;">
-          <div style="height:22rem; width:22rem; border-radius:50%; background:#E8F0E7; display:flex; align-items:center; justify-content:center; overflow:hidden; margin-left:150px;">
-            <svg style="height:10rem;width:10rem;opacity:.18;" fill="none" viewBox="0 0 24 24" stroke="#1A2517" stroke-width="0.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-            </svg>
-          </div>
-          {# Badge flottant #}
-          <div style="position:absolute; bottom:1.5rem; right:-2rem; display:inline-flex; align-items:center; gap:0.4rem; background:#fff; border-radius:0.75rem; padding:0.5rem 0.9rem; box-shadow:0 4px 16px rgba(0,0,0,.12); white-space:nowrap; border:1px solid #f0f0f0;">
-            <div style="height:2rem;width:2rem;border-radius:50%;background:#ACC8A240;display:flex;align-items:center;justify-content:center;">
-              <svg style="height:.9rem;width:.9rem;" fill="none" viewBox="0 0 24 24" stroke="#1A2517" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/></svg>
-            </div>
-            <div>
-              <p style="color:#1A2517;font-size:.75rem;font-weight:600;margin:0;">Propriétaires actifs</p>
-              <p style="color:#6B7280;font-size:.65rem;margin:0;">sur CampusNest</p>
-            </div>
-          </div>
-          {# Décor triangle vert #}
-          <div style="position:absolute;bottom:3rem;left:-2rem;width:0;height:0;border-left:20px solid transparent;border-right:20px solid transparent;border-bottom:35px solid #7BA87A;opacity:.5;"></div>
-          <div style="position:absolute;top:2rem;right:-1rem;width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-bottom:20px solid #ACC8A2;opacity:.4;"></div>
-        </div>
-      </div>
+    <h2 class="text-[#1A2517] text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight max-w-xl">
+      De la recherche à <span class="text-[#7BA87A]">l'impact réel</span>
+    </h2>
+    <p class="text-gray-600 text-sm sm:text-base max-w-md mt-4 leading-relaxed font-medium">
+      Développez votre patrimoine locatif, gérez vos cités et connectez-vous directement avec des étudiants sérieux de l'institut.
+    </p>
+    <div class="mt-8 flex flex-wrap gap-3 justify-center md:justify-start">
+      <a href="{% url 'logements:liste_cites' %}" class="bg-[#1A2517] text-white hover:bg-[#1A2517]/90 px-5 py-3 rounded-xl text-sm font-semibold shadow-sm transition">
+        Explorer les logements
+      </a>
+      <a href="{% url 'users:devenir_proprietaire' %}" class="border border-[#1A2517]/20 text-[#1A2517] hover:bg-[#1A2517]/5 px-5 py-3 rounded-xl text-sm font-semibold transition">
+        Devenir propriétaire
+      </a>
     </div>
-
-  </div>{# /track #}
-
-  {# Flèches #}
-  <button onclick="heroSlide(-1)" aria-label="Précédent"
-          style="position:absolute;left:15rem;top:50%;transform:translateY(-50%);height:2.75rem;width:2.75rem;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#fff;border:1px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,.1);cursor:pointer;z-index:5;">
-    <svg style="height:1rem;width:1rem;" fill="none" viewBox="0 0 24 24" stroke="#1A2517" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
-  </button>
-  <button onclick="heroSlide(1)" aria-label="Suivant"
-          style="position:absolute;right:15rem;top:50%;transform:translateY(-50%);height:2.75rem;width:2.75rem;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#fff;border:1px solid #e5e7eb;box-shadow:0 2px 8px rgba(0,0,0,.1);cursor:pointer;z-index:5;">
-    <svg style="height:1rem;width:1rem;" fill="none" viewBox="0 0 24 24" stroke="#1A2517" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
-  </button>
-
-  {# Dots #}
-  <div style="position:absolute;bottom:25rem;left:50%;transform:translateX(-50%);display:flex;gap:.5rem;align-items:center;">
-    <button onclick="heroGoTo(0)" id="dot-0" aria-label="Slide 1"
-            style="height:.45rem;width:1.5rem;border-radius:9999px;background:#1A2517;border:none;cursor:pointer;transition:all .3s;padding:0;"></button>
-    <button onclick="heroGoTo(1)" id="dot-1" aria-label="Slide 2"
-            style="height:.45rem;width:.45rem;border-radius:9999px;background:#1A251740;border:none;cursor:pointer;transition:all .3s;padding:0;"></button>
   </div>
+</div>
 
+      </div>
+
+      <button onclick="heroSlide(-1)" aria-label="Précédent" class="absolute left-4 top-1/2 -translate-y-1/2 h-9 w-9 flex items-center justify-center rounded-full bg-white/90 shadow border border-gray-100 text-[#1A2517] hover:bg-white transition z-10">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button onclick="heroSlide(1)" aria-label="Suivant" class="absolute right-4 top-1/2 -translate-y-1/2 h-9 w-9 flex items-center justify-center rounded-full bg-white/90 shadow border border-gray-100 text-[#1A2517] hover:bg-white transition z-10">
+        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+
+      <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5 items-center z-10">
+        <button onclick="heroGoTo(0)" id="dot-0" aria-label="Slide 1" class="h-1.5 w-6 rounded-full bg-[#1A2517] transition-all duration-300"></button>
+        <button onclick="heroGoTo(1)" id="dot-1" aria-label="Slide 2" class="h-1.5 w-2 rounded-full bg-[#1A2517]/30 transition-all duration-300"></button>
+      </div>
+
+    </div>
+  </div>
 </section>
 
-<script>
-(function(){
-  var cur=0,total=2,timer;
-  function update(){
-    document.getElementById('hero-track').style.transform='translateX(-'+(cur*50)+'%)';
-    for(var i=0;i<total;i++){
-      var d=document.getElementById('dot-'+i);
-      if(i===cur){d.style.width='1.5rem';d.style.background='#1A2517';}
-      else{d.style.width='.45rem';d.style.background='#1A251740';}
-    }
-  }
-  window.heroSlide=function(dir){cur=(cur+dir+total)%total;update();reset();};
-  window.heroGoTo=function(i){cur=i;update();reset();};
-  function reset(){clearInterval(timer);timer=setInterval(function(){heroSlide(1);},5000);}
-  reset();
-})();
-</script>
-
-
-{% comment %} <div class="bg-white px-5 py-6">
-  <form method="get" class="flex flex-wrap gap-2">
-    <input type="text" name="q" value="{{ q }}"
-           placeholder="Rechercher une cité, une chambre..."
-           class="focus:border-secondary/60 min-w-48 flex-1 rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-sm text-primary placeholder-white/40 focus:outline-none" />
-    {% comment %} <select name="type" class="rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-sm text-white/80 focus:outline-none">
-      <option value="">Tous types</option>
-      <option value="simple"  {% if request.GET.type == "simple"  %}selected{% endif %}>Simple</option>
-      <option value="double"  {% if request.GET.type == "double"  %}selected{% endif %}>Double</option>
-      <option value="studio"  {% if request.GET.type == "studio"  %}selected{% endif %}>Studio</option>
-    </select> 
-    <input type="number" name="prix_max" value="{{ request.GET.prix_max }}"
-           placeholder="Prix max (FCFA)"
-           class="focus:border-secondary/60 w-40 rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-white/40 focus:outline-none" />
-    <button type="submit" class="bg-secondary text-primary hover:bg-secondary/90 rounded-xl px-5 py-2 text-sm font-medium transition">Rechercher</button>
-  </form>
-  <div class="mt-3 flex flex-wrap gap-2">
-    <a href="?meublee=1"  class="border-secondary/30 text-secondary/80 hover:border-secondary hover:text-secondary {% if request.GET.meublee %}bg-secondary/20{% endif %} rounded-full border px-3 py-1 text-xs transition">Meublée</a>
-    <a href="?wc=1"       class="border-secondary/30 text-secondary/80 hover:border-secondary hover:text-secondary {% if request.GET.wc %}bg-secondary/20{% endif %} rounded-full border px-3 py-1 text-xs transition">WC intérieur</a>
-    <a href="?cuisine=1"  class="border-secondary/30 text-secondary/80 hover:border-secondary hover:text-secondary {% if request.GET.cuisine %}bg-secondary/20{% endif %} rounded-full border px-3 py-1 text-xs transition">Cuisine</a>
-    <a href="?"           class="rounded-full border border-white/20 px-3 py-1 text-xs text-white/50 transition hover:text-white">Réinitialiser</a>
+<div class="mx-auto max-w-7xl px-4 sm:px-6 py-10">
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <h2 class="text-base font-bold text-gray-900">Les cités les plus recommandées <span class="font-normal text-gray-400">({{ cites|length }})</span></h2>
+    </div>
+    <div class="flex items-center gap-1.5">
+      <button onclick="scrollCites(-1)" class="h-8 w-8 flex items-center justify-center rounded-lg bg-white border border-gray-200 shadow-sm text-[#1A2517] hover:bg-gray-50 transition">
+        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <button onclick="scrollCites(1)" class="h-8 w-8 flex items-center justify-center rounded-lg bg-white border border-gray-200 shadow-sm text-[#1A2517] hover:bg-gray-50 transition">
+        <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
   </div>
-</div> {% endcomment %}
 
-<div class="mx-auto max-w-7xl px-4 py-6">
-  <div class="mb-3 flex items-center justify-between">
-    <h1 class="text-sm font-medium text-gray-900">Les plus recommandées <span class="font-normal text-gray-400">({{ cites|length }})</span></h1>
-    <a href="{% url 'logements:liste_cites' %}" class="text-primary text-xs hover:underline">Voir tout →</a>
-  </div>
-  <div class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+  <div id="cites-container" class="flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-none pb-2">
     {% for cite in cites %}
-    <a href="{% url 'logements:detail_cite' cite.pk %}" class="block flex h-full flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:shadow-md">
-      <div class="relative h-32 w-full flex-shrink-0 overflow-hidden bg-gray-100">
-        {% if cite.image_principale_url %}
-        <img src="{{ cite.image_principale_url }}" alt="{{ cite.nom }}" class="h-full w-full object-cover" />
-        {% else %}
-        <div class="bg-secondary/20 flex h-full w-full items-center justify-center text-sm font-medium text-gray-400">{{ cite.nom|slice:":1"|upper }}</div>
-        {% endif %}
-      </div>
-      <div class="flex flex-1 flex-col justify-between p-4">
-        <div>
-          <div class="mb-0.5 text-sm font-medium text-gray-900">{{ cite.nom }}</div>
-          <div class="mb-2 text-xs text-gray-500">{{ cite.adresse }}</div>
-        </div>
-        <div class="flex items-center justify-between border-t border-gray-50 pt-2">
-          <span class="text-xs text-gray-400">{{ cite.chambres.count }} chambre{{ cite.chambres.count|pluralize }}</span>
-          <span class="rounded-full bg-green-50 px-2 py-0.5 text-xs text-green-700">{{ cite.chambres_disponibles.count }} disponible{{ cite.chambres_disponibles.count|pluralize }}</span>
-        </div>
-      </div>
-    </a>
-    {% empty %}
-    <p class="col-span-3 py-8 text-center text-sm text-gray-400">Aucune cité pour le moment.</p>
-    {% endfor %}
-  </div>
+    <div class="w-full sm:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-3rem)/4)] shrink-0 snap-start">
+      <div class="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition relative">
+        
+        <div class="relative h-36 w-full overflow-hidden bg-gray-50" id="carousel-cite-{{ cite.pk }}">
+          <div class="flex h-full w-full transition-transform duration-300 img-track">
+            {% if cite.photos_cite.all %}
+              {% for photo_obj in cite.photos_cite.all %}
+              <img src="{{ photo_obj.image.url }}" alt="{{ cite.nom }}" class="h-full w-full object-cover shrink-0" />
+              {% endfor %}
+            {% elif cite.image_principale_url %}
+              <img src="{{ cite.image_principale_url }}" alt="{{ cite.nom }}" class="h-full w-full object-cover shrink-0" />
+            {% else %}
+              <div class="bg-[#7BA87A]/10 flex h-full w-full shrink-0 items-center justify-center text-sm font-semibold text-[#1A2517]/40">{{ cite.nom|slice:":1"|upper }}</div>
+            {% endif %}
+          </div>
 
-  <div class="mb-3 flex items-center justify-between">
-    <h2 class="text-sm font-medium text-gray-900">Chambres disponibles <span class="font-normal text-gray-400">({{ chambres|length }})</span></h2>
-  </div>
-  <div class="grid grid-cols-4 gap-4 sm:grid-cols-2">
-    {% for chambre in chambres %}
-    <a href="{% url 'logements:detail_chambre' chambre.pk %}" class="flex overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:shadow-md">
-      {% with chambre.photo_principale as photo %}
-      {% if photo %}
-      <img src="{{ photo.image.url }}" alt="{{ chambre.description }}" class="h-full w-24 flex-shrink-0 object-cover" />
-      {% else %}
-      <div class="bg-secondary/20 text-primary/30 flex w-24 flex-shrink-0 items-center justify-center text-xs">Photo</div>
-      {% endif %}
-      {% endwith %}
-      <div class="flex-1 p-4">
-        <div class="mb-0.5 text-sm font-medium text-gray-900">{{ chambre.get_type_display }}</div>
-        <div class="mb-2 text-xs text-gray-500">{{ chambre.cite.nom }}</div>
-        <div class="mb-3 flex flex-wrap gap-1">
-          <span class="rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs text-gray-500">{{ chambre.superficie }} m²</span>
-          {% if chambre.meublee %}<span class="rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs text-gray-500">Meublée</span>{% endif %}
-          {% if chambre.wc_interieur %}<span class="rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs text-gray-500">WC</span>{% endif %}
-          {% if chambre.internet %}<span class="rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-xs text-gray-500">Internet</span>{% endif %}
+          {% if cite.photos_cite.all.count > 1 %}
+          <button onclick="slideCard('cite', '{{ cite.pk }}', -1)" class="absolute left-1.5 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full bg-white/90 shadow flex items-center justify-center text-[#1A2517] hover:bg-white transition z-10">
+            <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <button onclick="slideCard('cite', '{{ cite.pk }}', 1)" class="absolute right-1.5 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full bg-white/90 shadow flex items-center justify-center text-[#1A2517] hover:bg-white transition z-10">
+            <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+          {% endif %}
         </div>
-        <div class="flex items-center justify-between">
-          <span class="text-primary text-sm font-medium">
-            {{ chambre.loyer|floatformat:0 }}
-            <span class="text-xs font-normal text-gray-400">FCFA/mois</span>
-          </span>
-          <span class="bg-primary text-secondary rounded-lg px-3 py-1 text-xs font-medium">Voir</span>
-        </div>
+
+        <a href="{% url 'logements:detail_cite' cite.pk %}" class="p-4 block flex-1">
+          <div class="text-sm font-bold text-gray-900 group-hover:text-[#7BA87A] transition truncate">{{ cite.nom }}</div>
+          <div class="text-sm text-gray-400 truncate mt-0.5">{{ cite.adresse }}</div>
+          <div class="mt-3 pt-2.5 border-t border-gray-50 flex items-center justify-between text-sm">
+            <span class="text-gray-400">{{ cite.chambres.count }} chambre{{ cite.chambres.count|pluralize }}</span>
+            <span class="rounded-full bg-green-50 px-2 py-0.5 font-medium text-green-700">{{ cite.chambres_disponibles.count }} disponible{{ cite.chambres_disponibles.count|pluralize }}</span>
+          </div>
+        </a>
       </div>
-    </a>
+    </div>
     {% empty %}
-    <p class="col-span-2 py-8 text-center text-sm text-gray-400">Aucune chambre disponible.</p>
+    <p class="w-full py-6 text-center text-base text-gray-400 bg-white border border-dashed border-gray-200 rounded-2xl">Aucune cité pour le moment.</p>
     {% endfor %}
   </div>
 </div>
+
+<div class="mx-auto max-w-7xl px-4 sm:px-6 py-6 border-t border-gray-100">
+  <div class="mb-4">
+    <h2 class="text-base font-bold text-gray-900">Chambres disponibles <span class="font-normal text-gray-400">({{ chambres|length }})</span></h2>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+    {% for chambre in chambres|slice:":10" %}
+    <div class="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm hover:shadow-md transition relative">
+      
+      <div class="relative h-40 w-full overflow-hidden bg-gray-50" id="carousel-chambre-{{ chambre.pk }}">
+        
+        <div class="flex h-full w-full transition-transform duration-300 img-track">
+          {% if chambre.photos.all %}
+            {% for photo_obj in chambre.photos.all %}
+            <img src="{{ photo_obj.image.url }}" alt="Photo de la chambre" class="h-full w-full object-cover shrink-0" />
+            {% endfor %}
+          {% else %}
+            <div class="bg-[#7BA87A]/10 text-[#1A2517]/40 flex h-full w-full shrink-0 items-center justify-center text-xs font-semibold">Aucune image</div>
+          {% endif %}
+        </div>
+
+        {% if chambre.photos.all.count > 1 %}
+        <button onclick="slideCard('chambre', '{{ chambre.pk }}', -1)" class="absolute left-1.5 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full bg-white/90 shadow flex items-center justify-center text-[#1A2517] hover:bg-white transition z-10">
+          <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <button onclick="slideCard('chambre', '{{ chambre.pk }}', 1)" class="absolute right-1.5 top-1/2 -translate-y-1/2 h-6 w-6 rounded-full bg-white/90 shadow flex items-center justify-center text-[#1A2517] hover:bg-white transition z-10">
+          <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+        {% endif %}
+      </div>
+
+      <a href="{% url 'logements:detail_chambre' chambre.pk %}" class="p-3 flex-1 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between gap-1 mb-1.5">
+            <span class="text-sm font-bold text-gray-900 truncate">{{ chambre.get_type_display }}</span>
+            <span class="text-xs font-extrabold text-[#1A2517] bg-[#7BA87A]/10 px-1.5 py-0.5 rounded shrink-0">
+              {{ chambre.loyer|floatformat:0 }} F
+            </span>
+          </div>
+          <p class="text-sm text-gray-400 font-medium truncate mb-1">🏠 {{ chambre.cite.nom }}</p>
+          
+          <p class="text-sm text-gray-500 line-clamp-1 mb-2.5 h-4 leading-normal">
+            {{ chambre.description|default:"Aucune description détaillée fournie pour ce logement." }}
+          </p>
+          
+          <div class="flex flex-wrap gap-1">
+            <span class="bg-gray-100 text-gray-500 text-xs px-1.5 py-0.5 rounded font-medium">{{ chambre.superficie }} m²</span>
+            {% if chambre.meublee %}<span class="bg-emerald-50 text-emerald-700 border border-emerald-100 text-xs px-1.5 py-0.5 rounded">Meublée</span>{% endif %}
+            {% if chambre.wc_interieur %}<span class="bg-stone-50 text-stone-700 border border-stone-200 text-xs px-1.5 py-0.5 rounded">WC Int.</span>{% endif %}
+            {% if chambre.internet %}<span class="bg-emerald-50 text-emerald-700 border border-emerald-100 text-xs px-1.5 py-0.5 rounded">Wifi</span>{% endif %}
+          </div>
+        </div>
+
+        <div class="mt-3.5 pt-2 border-t border-gray-50 flex items-center justify-between text-sm font-semibold text-[#7BA87A]">
+          <span>Consulter la fiche</span>
+          <svg class="h-3 w-3 transform group-hover:translate-x-0.5 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        </div>
+      </a>
+
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="mt-8 flex justify-center">
+    <a href="{% url 'logements:liste_chambres' %}" class="inline-flex items-center gap-1.5 border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 font-bold text-xs px-5 py-2.5 rounded-xl shadow-sm transition group">
+      Voir plus de chambres
+      <svg class="w-3.5 h-3.5 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+      </svg>
+    </a>
+  </div>
+</div>
+<section class="py-16 bg-[#FBFBFA]">
+      <div class="mx-auto max-w-3xl text-center">
+        <h2 class="text-3xl font-extrabold text-[#1A2517]">Pourquoi choisir CampusNest ?</h2>
+        <p class="mt-4 text-gray-600">Une plateforme conçue pour les étudiants et les propriétaires de l'IUT de Fotso Victor, offrant une expérience de logement universitaire inégalée.</p>
+      </div>
+
+      <div class="mt-12 grid md:grid-cols-3 mx-20 gap-8">
+        <div class="flex flex-col items-center text-center p-6 bg-white rounded-xl shadow-sm border border-gray-200">
+          <svg class="h-10 w-10 mb-4 text-[#7BA87A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <h3 class="text-lg font-bold text-gray-900 mb-2">Fiabilité garantie</h3>
+          <p class="text-gray-500 text-sm">Chaque cité et chambre est vérifiée pour assurer une expérience sécurisée et de qualité.</p>
+        </div>
+        <div class="flex flex-col items-center text-center p-6 bg-white rounded-xl shadow-sm border border-gray-200">
+          <svg class="h-10 w-10 mb-4 text-[#7BA87A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+          <h3 class="text-lg font-bold text-gray-900 mb-2">Gestion simplifiée</h3>
+          <p class="text-gray-500 text-sm">Des outils intuitifs pour gérer vos réservations, disponibilités et communications en un seul endroit.</p>
+        </div>
+        <div class="flex flex-col items-center text-center p-6 bg-white rounded-xl shadow-sm border border-gray-200">
+          <svg class="h-10 w-10 mb-4 text-[#7BA87A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          <h3 class="text-lg font-bold text-gray-900 mb-2">Communauté engagée</h3>
+          <p class="text-gray-500 text-sm">Rejoignez une communauté active d'étudiants et de propriétaires partageant les mêmes valeurs de confiance et de respect.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="relative py-16 overflow-hidden">
+    
+    <!-- Image de fond -->
+    <div
+        class="absolute inset-0 bg-cover bg-center blur-sm scale-110"
+        style="background-image: url('{% static "images/chambre2.jpg" %}');">
+    </div>
+
+    <!-- Voile pour améliorer la lisibilité -->
+    <div class="absolute inset-0 bg-white/80"></div>
+
+    <!-- Contenu -->
+    <div class="relative z-10">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    
+    {# Section Titre : Harmonisée #}
+    <div class="text-center mb-12">
+      <h2 class="text-3xl font-extrabold text-[#1A2517]">Rejoignez l'écosystème CampusNest</h2>
+      <p class="text-gray-500 mt-3">Une plateforme dédiée à la communauté de l'IUT Fotso Victor.</p>
+    </div>
+
+    {# Grille des deux cartes : Couleur de ta marque #}
+    <div class="grid md:grid-cols-2 gap-8 mb-16">
+      
+      {# Carte Étudiant : Dégradé Vert/Noir #}
+      <div class="relative overflow-hidden rounded-3xl p-8 text-white bg-gradient-to-br from-[#1A2517] to-[#2D3A29] shadow-xl">
+        <div class="absolute inset-0 opacity-10 bg-[url('{% static 'images/chambre.jpg' %}')] bg-cover bg-center"></div>
+        <div class="relative z-10 flex flex-col items-center text-center">
+          <div class="h-14 w-14 mb-6 rounded-full bg-[#7BA87A]/20 flex items-center justify-center">
+            <svg class="h-7 w-7 text-[#7BA87A]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          </div>
+          <h3 class="text-2xl font-bold mb-4">Rejoindre en tant qu'étudiant</h3>
+          <p class="text-gray-300 mb-8">Trouvez votre logement, comparez les cités et réservez sereinement près du campus.</p>
+          <a href="{% url 'logements:liste_cites' %}" class="px-8 py-3 bg-[#7BA87A] text-white rounded-xl font-bold hover:bg-[#6a9769] transition">Commencer à chercher →</a>
+        </div>
+      </div>
+
+      {# Carte Propriétaire : Dégradé Inverse #}
+      <div class="relative overflow-hidden rounded-3xl p-8 text-[#1A2517] bg-gradient-to-br from-[#F5F5F4] to-[#E5E7EB] shadow-xl border border-gray-200">
+        <div class="absolute inset-0 opacity-5 bg-[url('{% static 'images/iut.jpg' %}')] bg-cover bg-center"></div>
+        <div class="relative z-10 flex flex-col items-center text-center">
+          <div class="h-14 w-14 mb-6 rounded-full bg-[#1A2517]/10 flex items-center justify-center">
+            <svg class="h-7 w-7 text-[#1A2517]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+          </div>
+          <h3 class="text-2xl font-bold mb-4">Gérer mes cités</h3>
+          <p class="text-gray-600 mb-8">Valorisez votre patrimoine, gérez vos disponibilités et connectez-vous avec vos futurs locataires.</p>
+          <a href="{% url 'users:devenir_proprietaire' %}" class="px-8 py-3 bg-[#1A2517] text-white rounded-xl font-bold hover:bg-[#1A2517]/90 transition">Devenir propriétaire →</a>
+        </div>
+      </div>
+    </div>
+
+    {# Barre de contact : Stylisée CampusNest #}
+    <div class="text-center pt-8 border-t border-gray-200">
+      <p class="text-gray-600 mb-6 font-medium">Une question sur CampusNest ? Nous sommes là pour vous.</p>
+      <div class="flex flex-wrap justify-center gap-8">
+        <a href="tel:+2376XXXXXXXX" class="group flex items-center gap-2 text-[#1A2517] font-semibold transition">
+          <div class="p-2 bg-gray-100 rounded-full group-hover:bg-[#7BA87A]/20 transition"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg></div>
+          Appel
+        </a>
+        <a href="mailto:contact@campusnest.cm" class="group flex items-center gap-2 text-[#1A2517] font-semibold transition">
+          <div class="p-2 bg-gray-100 rounded-full group-hover:bg-[#7BA87A]/20 transition"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>
+          E-mail
+        </a>
+        <a href="https://wa.me/2375998032" target="_blank" class="group flex items-center gap-2 text-[#1A2517] font-semibold transition">
+          <div class="p-2 bg-gray-100 rounded-full group-hover:bg-[#7BA87A]/20 transition"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle-icon lucide-message-circle"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/></svg></div>
+          WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Slider Section Hero
+  (function(){
+    var cur=0, total=2, timer;
+    function update(){
+      var track = document.getElementById('hero-track');
+      if(track) track.style.transform='translateX(-'+(cur*50)+'%)';
+      for(var i=0; i<total; i++){
+        var d=document.getElementById('dot-'+i);
+        if(d){
+          if(i===cur){ d.className='h-1.5 w-6 rounded-full bg-[#1A2517] transition-all duration-300'; }
+          else { d.className='h-1.5 w-2 rounded-full bg-[#1A2517]/30 transition-all duration-300'; }
+        }
+      }
+    }
+    window.heroSlide=function(dir){ cur=(cur+dir+total)%total; update(); reset(); };
+    window.heroGoTo=function(i){ cur=i; update(); reset(); };
+    function reset(){ clearInterval(timer); timer=setInterval(function(){ heroSlide(1); }, 6000); }
+    reset();
+  })();
+
+  // Navigation Slider Cités
+  function scrollCites(direction) {
+    const container = document.getElementById('cites-container');
+    if (container) {
+      const cardWidth = container.clientWidth * 0.8;
+      container.scrollBy({ left: direction * cardWidth, behavior: 'smooth' });
+    }
+  }
+
+  // Fonction unifiée pour faire défiler les images (Cités ou Chambres)
+  const cardIndexes = {};
+  function slideCard(type, id, direction) {
+    const key = type + '-' + id;
+    const container = document.getElementById('carousel-' + key);
+    if (!container) return;
+    const track = container.querySelector('.img-track');
+    const elements = track.children;
+    const totalElements = elements.length;
+    if (totalElements <= 1) return;
+
+    if (!(key in cardIndexes)) { cardIndexes[key] = 0; }
+    
+    cardIndexes[key] = (cardIndexes[key] + direction + totalElements) % totalElements;
+    track.style.transform = 'translateX(-' + (cardIndexes[key] * 100) + '%)';
+  }
+</script>
 
 {% endblock %}

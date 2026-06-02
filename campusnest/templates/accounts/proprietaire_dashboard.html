@@ -1,59 +1,107 @@
-{% extends "base.html" %}
-{% block title %}Tableau de bord{% endblock %}
- 
+{% extends "accounts/base_dashboard.html" %}
+{% block page_title %}Tableau de bord{% endblock %}
+{% block page_subtitle %}Bienvenue, {{ user.prenom|default:user.email }}{% endblock %}
+
+{% block sidebar %}
+  {% include "components/sidebar_proprietaire.html" %}
+{% endblock %}
+
+{% block topbar_actions %}
+  <a href="{% url 'logements:ajouter_cite' %}"
+     class="flex items-center gap-1.5 px-4 py-2 bg-primary text-secondary
+            text-xs font-medium rounded-xl hover:bg-primary/90 transition">
+    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+    </svg>
+    Nouvelle cité
+  </a>
+{% endblock %}
+
 {% block content %}
-<div class="flex min-h-screen">
- 
-  {% comment %} Sidebar {% endcomment %}
-  {% comment %} {% include "components/sidebar_proprietaire.html" %} {% endcomment %}
- 
-  <div class="flex-1 p-6 lg:p-8">
-    <div class="flex items-center justify-between mb-6">
-      <div>
-        <h1 class="text-2xl font-medium text-gray-900">Tableau de bord</h1>
-        <p class="text-sm text-gray-500 mt-1">
-          Bienvenue, {{ user.get_full_name }}
-        </p>
+  {# ── Statistiques ── #}
+  <div class="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-xs text-gray-500 uppercase tracking-wide">Cités</p>
+        <div class="w-8 h-8 bg-secondary/20 rounded-lg flex items-center justify-center">
+          <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/>
+          </svg>
+        </div>
       </div>
-      <a href="{% url 'logements:ajouter_cite' %}"
-         class="flex items-center gap-2 px-4 py-2 bg-primary text-secondary
-                text-sm font-medium rounded-xl hover:bg-primary/90 transition">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-        </svg>
-        Ajouter une cité
+      <p class="text-3xl font-semibold text-gray-900">{{ stats.total_cites }}</p>
+      <a href="{% url 'logements:mes_cites' %}"
+         class="text-xs text-primary hover:underline mt-1 inline-block">
+        Gérer →
       </a>
     </div>
- 
-    {% comment %} KPIs {% endcomment %}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-        <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Cités</p>
-        <p class="text-3xl font-medium text-gray-900">{{ stats.total_cites }}</p>
-      </div>
-      <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-        <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Chambres</p>
-        <p class="text-3xl font-medium text-gray-900">{{ stats.total_chambres }}</p>
-      </div>
-      <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-        <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Disponibles</p>
-        <p class="text-3xl font-medium text-green-700">{{ stats.chambres_disponibles }}</p>
-      </div>
-      <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
-        <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">En attente</p>
-        <p class="text-3xl font-medium text-amber-700">{{ stats.reservations_attente }}</p>
-      </div>
-    </div>
- 
-    {% comment %} Réservations récentes {% endcomment %}
+
     <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-sm font-medium text-gray-900">Réservations récentes</h2>
-        <a href="{% url 'reservations:recues' %}" class="text-xs text-primary hover:underline">
-          Voir tout →
-        </a>
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-xs text-gray-500 uppercase tracking-wide">Chambres</p>
+        <div class="w-8 h-8 bg-secondary/20 rounded-lg flex items-center justify-center">
+          <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10
+                     a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4
+                     a1 1 0 001 1m-6 0h6"/>
+          </svg>
+        </div>
       </div>
- 
+      <p class="text-3xl font-semibold text-gray-900">{{ stats.total_chambres }}</p>
+      <p class="text-xs text-gray-400 mt-1">au total</p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-xs text-gray-500 uppercase tracking-wide">Disponibles</p>
+        <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
+          <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+      </div>
+      <p class="text-3xl font-semibold text-green-600">{{ stats.chambres_disponibles }}</p>
+      <p class="text-xs text-gray-400 mt-1">
+        {% if stats.total_chambres %}
+          {{ stats.chambres_disponibles|floatformat:0 }}/{{ stats.total_chambres }} chambres libres
+        {% endif %}
+      </p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-xs text-gray-500 uppercase tracking-wide">En attente</p>
+        <div class="w-8 h-8 bg-amber-50 rounded-lg flex items-center justify-center">
+          <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+      </div>
+      <p class="text-3xl font-semibold text-amber-600">{{ stats.reservations_attente }}</p>
+      <a href="{% url 'reservations:recues' %}"
+         class="text-xs text-primary hover:underline mt-1 inline-block">
+        Voir les demandes →
+      </a>
+    </div>
+
+  </div>
+
+  {# ── Contenu principal : réservations + chambres ── #}
+  <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
+
+    {# Réservations récentes #}
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-sm font-semibold text-gray-900">Réservations récentes</h2>
+        <a href="{% url 'reservations:recues' %}"
+           class="text-xs text-primary hover:underline">Voir tout →</a>
+      </div>
+
       {% if reservations_recentes %}
         <div class="divide-y divide-gray-50">
           {% for r in reservations_recentes %}
@@ -63,26 +111,86 @@
                 {{ r.client.prenom|first|upper }}{{ r.client.nom|first|upper }}
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-900 truncate">
+                <p class="text-xs font-semibold text-gray-900 truncate">
                   {{ r.client.get_full_name }}
                 </p>
-                <p class="text-xs text-gray-500 truncate">
+                <p class="text-xs text-gray-400 truncate">
                   {{ r.chambre }} · {{ r.date_demande|date:"d M Y" }}
                 </p>
               </div>
-              <span class="shrink-0 px-2 py-0.5 text-xs rounded-full font-medium
-                {% if r.statut == 'en_attente' %}bg-amber-50 text-amber-700
-                {% elif r.statut == 'confirmee' %}bg-green-50 text-green-700
-                {% else %}bg-red-50 text-red-700{% endif %}">
-                {{ r.get_statut_display }}
-              </span>
+              <div class="shrink-0 flex items-center gap-2">
+                <span class="text-xs px-2 py-0.5 rounded-full font-medium
+                  {% if r.statut == 'en_attente'  %}bg-amber-50 text-amber-700
+                  {% elif r.statut == 'confirmee' %}bg-green-50 text-green-700
+                  {% else                         %}bg-red-50   text-red-600{% endif %}">
+                  {{ r.get_statut_display }}
+                </span>
+                {% if r.statut == 'en_attente' %}
+                  <form method="post" action="{% url 'reservations:confirmer' r.pk %}">
+                    {% csrf_token %}
+                    <button class="text-xs text-green-600 hover:underline">Confirmer</button>
+                  </form>
+                {% endif %}
+              </div>
             </div>
           {% endfor %}
         </div>
       {% else %}
-        <p class="text-sm text-gray-400 text-center py-6">Aucune réservation pour l'instant.</p>
+        <p class="text-sm text-gray-400 text-center py-8">Aucune réservation.</p>
       {% endif %}
     </div>
+
+    {# Mes chambres #}
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-sm font-semibold text-gray-900">Mes chambres</h2>
+        <a href="{% url 'logements:mes_cites' %}"
+           class="text-xs text-primary hover:underline">Gérer →</a>
+      </div>
+
+      {% if chambres %}
+        <div class="space-y-2">
+          {% for chambre in chambres %}
+            <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition">
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-semibold text-gray-900 truncate">
+                  {{ chambre.get_type_display }} — {{ chambre.cite.nom }}
+                </p>
+                <p class="text-xs text-gray-400">
+                  {{ chambre.superficie }} m² · {{ chambre.loyer|floatformat:0 }} FCFA/mois
+                </p>
+              </div>
+              <div class="flex items-center gap-2 shrink-0">
+                <form method="post" action="{% url 'logements:toggle_disponibilite' chambre.pk %}">
+                  {% csrf_token %}
+                  <button type="submit"
+                          class="text-xs px-2.5 py-1 rounded-full border font-medium transition
+                            {% if chambre.est_disponible %}
+                              bg-green-50 text-green-700 border-green-200 hover:bg-green-100
+                            {% else %}
+                              bg-red-50 text-red-600 border-red-200 hover:bg-red-100
+                            {% endif %}">
+                    {% if chambre.est_disponible %}Libre{% else %}Occupée{% endif %}
+                  </button>
+                </form>
+                <a href="{% url 'logements:modifier_chambre' chambre.pk %}"
+                   class="text-xs text-gray-400 hover:text-primary transition">
+                  Modifier
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center py-8">
+          <p class="text-sm text-gray-400 mb-3">Aucune chambre pour l'instant.</p>
+          <a href="{% url 'logements:mes_cites' %}"
+             class="text-xs px-4 py-2 bg-primary text-secondary rounded-xl hover:bg-primary/90 transition">
+            Ajouter une cité
+          </a>
+        </div>
+      {% endif %}
+    </div>
+
   </div>
-</div>
 {% endblock %}

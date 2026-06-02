@@ -1,95 +1,158 @@
 {% extends "base.html" %}
-{% block title %}Toutes les cités — CampusNest{% endblock %}
-
+{% load static %}
 {% block content %}
-<div class="max-w-6xl mx-auto px-4 py-8">
+<div class="mx-auto max-w-7xl px-4 sm:px-6 py-8">
 
-  {# ── En-tête ── #}
-  <div class="flex items-center justify-between mb-6">
-    <div>
-      <h1 class="text-2xl font-medium text-gray-900">Cités disponibles</h1>
-      <p class="text-sm text-gray-500 mt-1">{{ cites|length }} cité{{ cites|length|pluralize }} enregistrée{{ cites|length|pluralize }}</p>
-    </div>
+  {# ── BREADCRUMB REVISITÉ ── #}
+  <nav class="flex items-center gap-2 text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-6">
+    <a href="{% url 'logements:home' %}" class="hover:text-[#7BA87A] transition">Accueil</a>
+    <span class="text-gray-300 font-normal">/</span>
+    <a href="{% url 'logements:liste_cites' %}" class="hover:text-[#7BA87A] transition">Cités</a>
+    <span class="text-gray-300 font-normal">/</span>
+    <span class="text-gray-600 truncate">{{ cite.nom }}</span>
+  </nav>
 
-    {# Barre de recherche rapide #}
-    <form method="get" class="flex gap-2">
-      <input type="text" name="q" value="{{ request.GET.q }}"
-             placeholder="Rechercher une cité..."
-             class="px-4 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50
-                    focus:outline-none focus:ring-2 focus:ring-secondary/50 w-56"/>
-      <button type="submit"
-              class="px-4 py-2 bg-primary text-secondary text-sm rounded-xl
-                     hover:bg-primary/90 transition">
-        Rechercher
-      </button>
-    </form>
-  </div>
-
-  {# ── Grille des cités ── #}
-  {% if cites %}
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-      {% for cite in cites %}
-        <a href="{% url 'logements:detail_cite' cite.pk %}"
-           class="bg-white rounded-2xl border border-gray-100 overflow-hidden
-                  hover:shadow-md hover:border-secondary/40 transition group">
-
-          {# Illustration #}
-          <div class="h-32 bg-gradient-to-br from-secondary/20 to-secondary/50
-                      flex items-center justify-center">
-            <svg class="w-12 h-12 text-primary/30 group-hover:text-primary/50 transition"
-                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2
-                       0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5
-                       10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-            </svg>
-          </div>
-
-          {# Infos #}
-          <div class="p-4">
-            <h2 class="text-sm font-semibold text-gray-900 group-hover:text-primary transition truncate">
-              {{ cite.nom }}
-            </h2>
-            <p class="text-xs text-gray-500 mt-0.5 truncate">
-              {{ cite.adresse }}
-            </p>
-
-            {% if cite.description %}
-              <p class="text-xs text-gray-400 mt-2 line-clamp-2">{{ cite.description }}</p>
-            {% endif %}
-
-            <div class="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
-              <span class="text-xs text-gray-500">
-                {{ cite.chambres.count }} chambre{{ cite.chambres.count|pluralize }}
-              </span>
-              <span class="text-xs px-2 py-0.5 rounded-full font-medium
-                {% if cite.chambres_disponibles.count > 0 %}
-                  bg-green-50 text-green-700
-                {% else %}
-                  bg-red-50 text-red-600
-                {% endif %}">
-                {{ cite.chambres_disponibles.count }} disponible{{ cite.chambres_disponibles.count|pluralize }}
-              </span>
-            </div>
-          </div>
-        </a>
+  {# ── BANNIÈRE / GALERIE DE LA CITÉ ── #}
+  {% if photos_cite %}
+    <div class="mb-8 grid h-48 sm:h-64 md:h-72 grid-cols-1 sm:grid-cols-3 gap-2 overflow-hidden rounded-3xl border border-gray-100 shadow-sm">
+      {% for photo in photos_cite|slice:":3" %}
+        <div class="{% if forloop.first %}sm:col-span-2 sm:row-span-2{% endif %} h-full w-full overflow-hidden bg-gray-50">
+          <img src="{{ photo.image.url }}" alt="{{ cite.nom }}" class="h-full w-full object-cover transition-transform duration-500 hover:scale-105" />
+        </div>
       {% endfor %}
     </div>
-
   {% else %}
-    <div class="bg-white rounded-2xl border border-gray-100 p-16 text-center shadow-sm">
-      <svg class="w-12 h-12 text-gray-200 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/>
-      </svg>
-      <p class="text-gray-400 text-sm">Aucune cité disponible pour l'instant.</p>
-      <a href="{% url 'logements:home' %}"
-         class="inline-block mt-4 px-5 py-2 bg-primary text-secondary text-sm
-                rounded-xl hover:bg-primary/90 transition">
-        Retour à l'accueil
-      </a>
+    <div class="mb-8 h-36 sm:h-48 rounded-3xl bg-gradient-to-br from-[#1A2517] to-[#7BA87A]/80 flex flex-col justify-end p-6 relative overflow-hidden shadow-sm">
+      <div class="absolute right-0 bottom-0 opacity-10 translate-x-10 translate-y-10">
+        <svg class="w-64 h-64 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/></svg>
+      </div>
+      <span class="text-white/60 text-[10px] uppercase font-bold tracking-widest mb-1">Résidence Universitaire</span>
+      <h2 class="text-white text-xl sm:text-2xl font-black">{{ cite.nom }}</h2>
     </div>
   {% endif %}
 
+  {# ── ARCHITECTURE EN GRILLE DEUX COLONNES RESPONSIVE ── #}
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-3 items-start">
+    
+    {# ═══ GAUCHE : INFOS DE LA CITÉ ═══ #}
+    <div class="space-y-6 lg:col-span-1">
+      <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+        <h1 class="text-xl font-black text-gray-900 leading-tight">{{ cite.nom }}</h1>
+        
+        <p class="text-xs text-gray-500 mt-2 flex items-center gap-1.5 leading-normal">
+          <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          {{ cite.adresse }}
+        </p>
+
+        {% if cite.description %}
+          <div class="mt-4 pt-4 border-t border-gray-50">
+            <h3 class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">À propos</h3>
+            <p class="text-xs text-gray-600 leading-relaxed whitespace-pre-line">{{ cite.description }}</p>
+          </div>
+        {% endif %}
+
+        {# Tableau des statistiques internes #}
+        <div class="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-gray-50">
+          <div class="bg-gray-50/70 border border-gray-100 rounded-xl p-3 text-center">
+            <p class="text-xl font-black text-[#1A2517]">{{ cite.chambres.count }}</p>
+            <p class="text-[10px] font-bold text-gray-400 uppercase mt-0.5">Chambres</p>
+          </div>
+          <div class="bg-green-50/40 border border-green-100/30 rounded-xl p-3 text-center">
+            <p class="text-xl font-black text-green-600">{{ cite.chambres_disponibles.count }}</p>
+            <p class="text-[10px] font-bold text-green-700 uppercase mt-0.5">Dispo{{ cite.chambres_disponibles.count|pluralize }}</p>
+          </div>
+        </div>
+
+        {# Informations du Bailleur #}
+        <div class="mt-5 pt-4 border-t border-gray-50 flex items-center gap-3">
+          <div class="w-8 h-8 rounded-full bg-[#1A2517] text-white text-xs font-bold flex items-center justify-center shadow-sm select-none">
+            {{ cite.proprietaire.prenom|first|upper }}{{ cite.proprietaire.nom|first|upper }}
+          </div>
+          <div class="min-w-0">
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Gestionnaire</p>
+            <p class="text-xs font-bold text-gray-700 truncate">{{ cite.proprietaire.get_full_name }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ═══ DROITE : LISTE DES CHAMBRES HABILLÉES EN CARTES ═══ #}
+    <div class="lg:col-span-2 space-y-4">
+      <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+        <h2 class="text-sm font-extrabold text-gray-900 uppercase tracking-wider">
+          Logements à disposition <span class="text-[#7BA87A] font-black ml-1">({{ chambres|length }})</span>
+        </h2>
+      </div>
+
+      {% if chambres %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {% for chambre in chambres %}
+            <a href="{% url 'logements:detail_chambre' chambre.pk %}"
+               class="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md hover:border-[#7BA87A]/30 transition group flex flex-col sm:flex-row relative">
+              
+              {# Miniature Photo Équilibrée #}
+              <div class="w-full sm:w-32 h-36 sm:h-auto shrink-0 bg-gray-50 overflow-hidden relative">
+                {% with photo=chambre.photo_principale %}
+                  {% if photo %}
+                    <img src="{{ photo.image.url }}" alt="{{ chambre.get_type_display }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"/>
+                  {% else %}
+                    <div class="h-full w-full flex items-center justify-center bg-[#7BA87A]/5 text-[#1A2517]/30">
+                      <svg class="w-7 h-7" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.505-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>
+                    </div>
+                  {% endif %}
+                {% endwith %}
+                
+                {# État du logement posé sur la miniature #}
+                <span class="absolute top-2 left-2 bg-[#1A2517] text-white font-semibold text-[9px] px-2 py-0.5 rounded-md backdrop-blur-sm shadow-sm">{{ chambre.get_etat_display }}</span>
+              </div>
+
+              {# Corps d'informations #}
+              <div class="p-4 flex-1 flex flex-col justify-between min-w-0">
+                <div>
+                  <div class="flex items-start justify-between gap-2">
+                    <h3 class="text-sm font-bold text-gray-900 group-hover:text-[#7BA87A] transition truncate">
+                      {{ chambre.get_type_display }}
+                    </h3>
+                    {% if chambre.note_moyenne %}
+                      <span class="inline-flex items-center gap-0.5 rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 shrink-0">★ {{ chambre.note_moyenne }}</span>
+                    {% endif %}
+                  </div>
+                  <p class="text-[11px] text-gray-400 font-medium mt-0.5">Dimension : {{ chambre.superficie }} m²</p>
+
+                  {# Badges Technologiques & Commodités #}
+                  <div class="flex flex-wrap gap-1 mt-3">
+                    {% if chambre.meublee %}<span class="text-[9px] px-1.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded">Meublé</span>{% endif %}
+                    {% if chambre.wc_interieur %}<span class="text-[9px] px-1.5 py-0.5 bg-blue-50 text-blue-700 border border-blue-100 rounded">WC Int.</span>{% endif %}
+                    {% if chambre.cuisine %}<span class="text-[9px] px-1.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-100 rounded">Cuisine</span>{% endif %}
+                    {% if chambre.internet %}<span class="text-[9px] px-1.5 py-0.5 bg-purple-50 text-purple-700 border border-purple-100 rounded">Wifi</span>{% endif %}
+                  </div>
+                </div>
+
+                {# Footer Interne de la Carte #}
+                <div class="flex items-center justify-between mt-4 pt-2.5 border-t border-gray-50">
+                  <span class="text-sm font-black text-[#1A2517]">
+                    {{ chambre.loyer|floatformat:0 }}
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-normal">F / mois</span>
+                  </span>
+                  <div class="text-[10px] font-bold text-[#7BA87A] flex items-center gap-0.5 group-hover:translate-x-0.5 transition">
+                    <span>Visiter</span>
+                    <svg class="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                  </div>
+                </div>
+              </div>
+
+            </a>
+          {% endfor %}
+        </div>
+      {% else %}
+        {# Bloc vide qualitatif #}
+        <div class="bg-white border border-dashed border-gray-200 rounded-2xl p-12 text-center shadow-sm">
+          <svg class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 012.008 1.24l.885 1.77a2.25 2.25 0 002.007 1.24h1.98a2.25 2.25 0 002.007-1.24l.885-1.77a2.25 2.25 0 012.007-1.24h3.86m-18 0h18M2.25 13.5l1.114-6.126A2.25 2.25 0 015.584 5.25h12.832a2.25 2.25 0 012.22 1.81l1.114 6.126M2.25 13.5V19.5A2.25 2.25 0 004.5 21.75h15a2.25 2.25 0 002.25-2.25V13.5"/></svg>
+          <p class="text-gray-400 text-xs font-medium">Toutes les chambres de cette résidence ont déjà été réservées ou ne sont pas configurées.</p>
+        </div>
+      {% endif %}
+    </div>
+
+  </div>
 </div>
 {% endblock %}

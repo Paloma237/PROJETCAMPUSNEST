@@ -1,0 +1,43 @@
+{% comment %}reservations/programmer_visite.html{% endcomment %}
+{% comment %}FICHIER SÉPARÉ{% endcomment %}
+{#
+{% extends "base.html" %}
+{% block content %}
+<div class="max-w-md mx-auto px-4 py-8">
+  <h1 class="text-2xl font-semibold text-gray-900 mb-1">Programmer une visite</h1>
+  <p class="text-sm text-gray-500 mb-6">
+    {{ reservation.client.get_full_name }} · {{ reservation.chambre }}
+  </p>
+
+  <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="mb-6">
+        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+          Date de visite
+        </label>
+        <input type="date" name="date_visite"
+               value="{{ form.date_visite.value|default:'' }}"
+               class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50
+                      focus:outline-none focus:ring-2 focus:ring-secondary/50 transition"/>
+        {% if form.date_visite.errors %}
+          <p class="text-red-500 text-xs mt-1">{{ form.date_visite.errors|first }}</p>
+        {% endif %}
+      </div>
+      <div class="flex gap-3">
+        <button type="submit"
+                class="px-6 py-2.5 bg-primary text-secondary text-sm font-medium
+                       rounded-xl hover:bg-primary/90 transition">
+          Enregistrer la date
+        </button>
+        <a href="{% url 'reservations:recues' %}"
+           class="px-6 py-2.5 border border-gray-200 text-gray-600 text-sm
+                  rounded-xl hover:bg-gray-50 transition">
+          Annuler
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+#}

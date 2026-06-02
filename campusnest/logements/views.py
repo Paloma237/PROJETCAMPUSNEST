@@ -16,7 +16,7 @@ from .forms import ChambreForm, CiteForm
 
 def home_view(request):
     chambres = Chambre.objects.filter(est_disponible=True).select_related("cite")
-    cites    = Cite.objects.prefetch_related("chambres").all()
+    cites    = Cite.objects.prefetch_related("chambres", "photos_cite").all()
 
     q = request.GET.get("q", "").strip()
     if q:
@@ -47,11 +47,55 @@ def home_view(request):
         "types_chambre": Chambre.Type.choices,
     })
 
-
 def liste_cites_view(request):
-    cites = Cite.objects.prefetch_related("chambres").all()
-    return render(request, "logements/liste_cites.html", {"cites": cites})
+    cites = Cite.objects.prefetch_related("chambres", "photos_cite").all()
+    
+    # Récupérer le mot-clé de recherche 'q'
+    q = request.GET.get("q", "").strip()
+    if q:
+        # Recherche intelligente multicritère (par nom de la cité ou quartier/adresse)
+        cites = cites.filter(
+            Q(nom__icontains=q) | 
+            Q(adresse__icontains=q) |
+            Q(chambres__description__icontains=q)
+        ).distinct()
 
+    return render(request, "logements/liste_cites.html", {
+        "cites": cites,
+        "q": q
+    })
+    
+def liste_chambres_view(request):
+    chambres = Chambre.objects.filter(est_disponible=True, est_actif=True)\
+                .select_related("cite")\
+                .prefetch_related("photos")
+
+    q = request.GET.get("q", "").strip()
+    if q:
+        chambres = chambres.filter(
+            Q(description__icontains=q) | Q(cite__nom__icontains=q)
+        )
+
+    type_chambre = request.GET.get("type", "")
+    if type_chambre:
+        chambres = chambres.filter(type=type_chambre)
+
+    prix_max = request.GET.get("prix_max", "")
+    if prix_max.isdigit():
+        chambres = chambres.filter(loyer__lte=int(prix_max))
+
+    if request.GET.get("meublee"):
+        chambres = chambres.filter(meublee=True)
+    if request.GET.get("wc"):
+        chambres = chambres.filter(wc_interieur=True)
+    if request.GET.get("cuisine"):
+        chambres = chambres.filter(cuisine=True)
+
+    return render(request, "logements/liste_chambres.html", {
+        "chambres":      chambres,
+        "q":             q,
+        "types_chambre": Chambre.Type.choices,
+    })
 
 def detail_cite_view(request, pk):
     cite     = get_object_or_404(Cite, pk=pk)

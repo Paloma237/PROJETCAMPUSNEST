@@ -222,7 +222,7 @@ def historique_reservations_view(request):
         ],
     ).select_related("client", "chambre__cite").order_by("-date_demande")
 
-    return render(request, "reservations/historique.html", {
+    return render(request, "reservations/historique_reservations.html", {
         "reservations": reservations,
     })
 

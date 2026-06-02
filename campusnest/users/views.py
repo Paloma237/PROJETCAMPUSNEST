@@ -1,14 +1,8 @@
-# campusnest/users/views.py
-# VERSION CORRIGÉE COMPLÈTE
-# Corrections apportées :
-#   1. _redirection_par_role → user.proprietaire → ProfilProprietaire.objects.filter()
-#   2. admin_dashboard_view  → proprietaire__est_valide → profil_proprietaire__est_valide
-#   3. valider_proprietaire_view → Proprietaire → ProfilProprietaire
-
 from django.contrib import messages
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
+from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
@@ -348,8 +342,17 @@ def proprietaire_dashboard_view(request):
     from campusnest.logements.models import Chambre, Cite
     from campusnest.reservations.models import Reservation
     
-    cites    = Cite.objects.filter(proprietaire=request.user)
+    q = request.GET.get("q", "").strip()
+    cites = Cite.objects.filter(proprietaire=request.user)
     chambres = Chambre.objects.filter(cite__proprietaire=request.user)
+
+    if q:
+        chambres = chambres.filter(
+            Q(cite__nom__icontains=q) |
+            Q(cite__adresse__icontains=q) |
+            Q(description__icontains=q) |
+            Q(type__icontains=q)
+        )
     
     # 1. On ne met PAS de [:5] ici pour pouvoir filtrer et compter librement ensuite
     toutes_les_reservations = Reservation.objects.filter(
@@ -359,6 +362,7 @@ def proprietaire_dashboard_view(request):
     return render(request, "accounts/proprietaire_dashboard.html", {
         "cites": cites,
         "chambres": chambres[:8],
+        "q": q,
         # 2. On applique le découpage ici, juste pour l'affichage du tableau
         "reservations_recentes": toutes_les_reservations[:5],
         "stats": {

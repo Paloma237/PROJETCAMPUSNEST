@@ -1,0 +1,333 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="flex flex-col min-h-[75vh] px-4 py-8 md:py-12">
+  <div class="max-w-7xl w-full mx-auto flex-grow">
+
+    {# ── En-tête ── #}
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+      <div>
+        <h1 class="text-3xl font-semibold tracking-tight text-gray-900">Toutes les chambres</h1>
+        <p class="text-sm text-gray-500 mt-1">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-primary/10 text-primary">
+            {{ chambres|length }} chambre{{ chambres|length|pluralize }} disponible{{ chambres|length|pluralize }}
+          </span>
+        </p>
+      </div>
+
+      {# Barre de recherche rapide #}
+      <form method="get" class="form-professional flex gap-2 w-full md:w-auto">
+        <div class="relative flex-grow md:flex-grow-0">
+          <input type="text" name="q" value="{{ q }}"
+                 placeholder="Rechercher une chambre, une cité..."
+                 class="w-full md:w-64 pl-4 pr-4 py-2.5"/>
+        </div>
+        {# Conserver les autres filtres actifs lors de la recherche #}
+        {% if request.GET.type %}<input type="hidden" name="type" value="{{ request.GET.type }}">{% endif %}
+        {% if request.GET.prix_max %}<input type="hidden" name="prix_max" value="{{ request.GET.prix_max }}">{% endif %}
+        {% if request.GET.meublee %}<input type="hidden" name="meublee" value="1">{% endif %}
+        {% if request.GET.wc %}<input type="hidden" name="wc" value="1">{% endif %}
+        {% if request.GET.cuisine %}<input type="hidden" name="cuisine" value="1">{% endif %}
+        <button type="submit"
+                class="px-5 py-2.5 bg-primary text-secondary text-sm font-medium rounded-xl
+                       hover:bg-primary/95 shadow-sm transition shrink-0">
+          Rechercher
+        </button>
+      </form>
+    </div>
+
+    {# ── Panneau de filtres ── #}
+    <details class="mb-6 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden group">
+      <summary class="flex items-center justify-between px-5 py-3.5 cursor-pointer list-none select-none">
+        <span class="text-sm font-medium text-gray-700 flex items-center gap-2">
+          <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+          </svg>
+          Filtres avancés
+        </span>
+        <svg class="w-4 h-4 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </summary>
+
+      <form method="get" class="px-5 pb-5 pt-2 border-t border-gray-100">
+        {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-3">
+
+          {# Type #}
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Type</label>
+            <select name="type"
+                    class="text-sm border border-gray-200 rounded-xl px-3 py-2.5 bg-white focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition">
+              <option value="">Tous les types</option>
+              {% for val, label in types_chambre %}
+                <option value="{{ val }}" {% if request.GET.type == val %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          {# Prix max #}
+          <div class="flex flex-col gap-1">
+            <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Prix max (FCFA)</label>
+            <input type="number" name="prix_max" value="{{ request.GET.prix_max }}"
+                   placeholder="Ex : 50000" min="0"
+                   class="text-sm border border-gray-200 rounded-xl px-3 py-2.5 bg-white focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition"/>
+          </div>
+
+          {# Équipements #}
+          <div class="flex flex-col gap-2 sm:col-span-2 lg:col-span-2">
+            <label class="text-xs font-medium text-gray-500 uppercase tracking-wider">Équipements</label>
+            <div class="flex flex-wrap gap-3">
+              <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                <input type="checkbox" name="meublee" value="1" {% if request.GET.meublee %}checked{% endif %}
+                       class="rounded border-gray-300 text-primary focus:ring-primary"/>
+                Meublée
+              </label>
+              <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                <input type="checkbox" name="wc" value="1" {% if request.GET.wc %}checked{% endif %}
+                       class="rounded border-gray-300 text-primary focus:ring-primary"/>
+                WC intérieur
+              </label>
+              <label class="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                <input type="checkbox" name="cuisine" value="1" {% if request.GET.cuisine %}checked{% endif %}
+                       class="rounded border-gray-300 text-primary focus:ring-primary"/>
+                Cuisine
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-3 mt-5">
+          <button type="submit"
+                  class="px-5 py-2.5 bg-primary text-secondary text-sm font-medium rounded-xl hover:bg-primary/95 shadow-sm transition">
+            Appliquer les filtres
+          </button>
+          <a href="{% url 'logements:liste_chambres' %}"
+             class="px-5 py-2.5 border border-gray-200 text-gray-600 text-sm font-medium rounded-xl hover:bg-gray-50 transition">
+            Réinitialiser
+          </a>
+        </div>
+      </form>
+    </details>
+
+    {# ── Grille des chambres ── #}
+    {% if chambres %}
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {% for chambre in chambres %}
+          <div class="flex flex-col bg-white rounded-2xl border border-gray-200/80 overflow-hidden
+                      hover:shadow-lg hover:border-primary/20 transition-all duration-300 group">
+
+            {# Photo Carousel #}
+            <div class="h-44 md:h-48 w-full overflow-hidden bg-gray-100 relative shrink-0 group/carousel">
+              {% with photos=chambre.photos.all %}
+                {% if photos %}
+                  <div class="relative w-full h-full">
+                    {# Images #}
+                    <div class="carousel-container relative w-full h-full" data-carousel-id="carousel-{{ chambre.pk }}">
+                      {% for photo in photos %}
+                        <img src="{{ photo.image.url }}"
+                             alt="{{ chambre }} - Photo {{ forloop.counter }}"
+                             class="carousel-image absolute w-full h-full object-cover transition-transform duration-500 opacity-0 group-hover:scale-105"
+                             data-index="{{ forloop.counter0 }}"
+                             style="{% if forloop.first %}opacity: 1;{% endif %}"/>
+                      {% endfor %}
+                    </div>
+                    
+                    {# Flèches de navigation #}
+                    {% if photos|length > 1 %}
+                      <button class="carousel-prev absolute left-2 top-1/2 -translate-y-1/2 z-10 p-1.5 rounded-full bg-white/80 hover:bg-white text-gray-700 shadow-md transition opacity-0 group-hover/carousel:opacity-100"
+                              onclick="carouselPrev('carousel-{{ chambre.pk }}')">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                      </button>
+                      
+                      <button class="carousel-next absolute right-2 top-1/2 -translate-y-1/2 z-10 p-1.5 rounded-full bg-white/80 hover:bg-white text-gray-700 shadow-md transition opacity-0 group-hover/carousel:opacity-100"
+                              onclick="carouselNext('carousel-{{ chambre.pk }}')">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                      </button>
+                      
+                      {# Indicateurs #}
+                      <div class="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 flex gap-1">
+                        {% for photo in photos %}
+                          <button class="carousel-indicator w-1.5 h-1.5 rounded-full transition"
+                                  data-index="{{ forloop.counter0 }}"
+                                  onclick="carouselGoto('carousel-{{ chambre.pk }}', {{ forloop.counter0 }})"
+                                  style="{% if forloop.first %}background-color: white;{% else %}background-color: rgba(255,255,255,0.5);{% endif %}"/>
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+                {% else %}
+                  <div class="w-full h-full bg-gradient-to-br from-secondary/20 to-secondary/40 flex flex-col items-center justify-center gap-2">
+                    <svg class="w-10 h-10 text-primary/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <span class="text-[10px] uppercase tracking-wider text-primary/50 font-medium">Aucune photo</span>
+                  </div>
+                {% endif %}
+              {% endwith %}
+
+              {# Badge type #}
+              <div class="absolute top-3 left-3">
+                <span class="text-[10px] px-2 py-1 rounded-lg font-semibold backdrop-blur-md border bg-white/80 text-gray-700 border-gray-200/50 uppercase tracking-wide">
+                  {{ chambre.get_type_display }}
+                </span>
+              </div>
+
+              {# Badge loyer #}
+              <div class="absolute bottom-3 right-3">
+                <span class="text-xs px-2.5 py-1 rounded-lg font-bold shadow backdrop-blur-md bg-primary text-secondary">
+                  {{ chambre.loyer|floatformat:0 }} FCFA/mois
+                </span>
+              </div>
+            </div>
+
+            {# Infos #}
+            <div class="p-4 flex flex-col flex-grow">
+              <div class="flex-grow">
+
+                {# Nom de la cité #}
+                <p class="text-[11px] text-primary font-semibold uppercase tracking-wider mb-0.5">
+                  {{ chambre.cite.nom }}
+                </p>
+
+                {# Description #}
+                <p class="text-sm font-medium text-gray-800 line-clamp-2 leading-snug">
+                  {{ chambre.description }}
+                </p>
+
+                {# Adresse #}
+                <p class="text-xs text-gray-500 mt-1.5 flex items-center gap-1 truncate">
+                  <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  </svg>
+                  {{ chambre.cite.adresse }}
+                </p>
+
+                {# Note moyenne #}
+                {% with chambre.note_moyenne as note %}
+                  {% if note %}
+                    <div class="flex items-center gap-1 mt-2">
+                      <svg class="w-3.5 h-3.5 text-amber-400 fill-amber-400" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                      </svg>
+                      <span class="text-xs font-semibold text-gray-700">{{ note }}</span>
+                    </div>
+                  {% endif %}
+                {% endwith %}
+              </div>
+
+              {# Équipements + superficie #}
+              <div class="mt-3 pt-3 border-t border-gray-100">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs text-gray-500">Superficie</span>
+                  <span class="text-xs font-semibold text-gray-800">{{ chambre.superficie }} m²</span>
+                </div>
+
+                <div class="flex flex-wrap gap-1.5">
+                  {% if chambre.meublee %}
+                    <span class="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-medium border border-blue-100">
+                      <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                      Meublée
+                    </span>
+                  {% endif %}
+                  {% if chambre.wc_interieur %}
+                    <span class="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 font-medium border border-teal-100">
+                      <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                      WC
+                    </span>
+                  {% endif %}
+                  {% if chambre.cuisine %}
+                    <span class="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-orange-50 text-orange-700 font-medium border border-orange-100">
+                      <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                      Cuisine
+                    </span>
+                  {% endif %}
+                  {% if chambre.internet %}
+                    <span class="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 font-medium border border-purple-100">
+                      <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                      Internet
+                    </span>
+                  {% endif %}
+                </div>
+              </div>
+
+              {# Bouton Visiter la chambre #}
+              <div class="mt-4 pt-3 border-t border-gray-100">
+                <a href="{% url 'logements:detail_chambre' chambre.pk %}"
+                   class="block w-full text-center px-4 py-2.5 bg-primary text-secondary text-sm font-semibold rounded-xl
+                          hover:bg-primary/95 shadow-sm transition duration-200">
+                  Visiter la chambre
+                </a>
+              </div>
+            </div>
+
+          </div>
+        {% endfor %}
+      </div>
+
+    {% else %}
+      {# État vide #}
+      <div class="bg-white rounded-2xl border border-gray-200 p-16 text-center shadow-sm max-w-sm mx-auto mt-12">
+        <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+        <h3 class="text-base font-semibold text-gray-900 mb-1">Aucune chambre trouvée</h3>
+        <p class="text-gray-400 text-sm">Aucune chambre ne correspond à vos critères pour l'instant.</p>
+        <a href="{% url 'logements:liste_chambres' %}"
+           class="inline-flex items-center justify-center mt-6 px-5 py-2.5 bg-primary text-secondary text-sm font-medium
+                  rounded-xl hover:bg-primary/95 shadow-sm transition">
+          Réinitialiser les filtres
+        </a>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<script>
+  // Gestion du carousel d'images
+  function getCarouselState(carouselId) {
+    const container = document.querySelector(`[data-carousel-id="${carouselId}"]`);
+    const images = container.querySelectorAll('.carousel-image');
+    const currentIndex = Array.from(images).findIndex(img => img.style.opacity === '1');
+    return { container, images, currentIndex };
+  }
+
+  function updateCarouselDisplay(carouselId, newIndex) {
+    const { container, images } = getCarouselState(carouselId);
+    if (images.length === 0) return;
+    
+    const index = (newIndex + images.length) % images.length;
+    
+    // Mettre à jour les images
+    images.forEach((img, i) => {
+      img.style.opacity = i === index ? '1' : '0';
+    });
+    
+    // Mettre à jour les indicateurs
+    const indicators = container.parentElement.querySelectorAll('.carousel-indicator');
+    indicators.forEach((indicator, i) => {
+      indicator.style.backgroundColor = i === index ? 'white' : 'rgba(255,255,255,0.5)';
+    });
+  }
+
+  function carouselNext(carouselId) {
+    const { currentIndex, images } = getCarouselState(carouselId);
+    updateCarouselDisplay(carouselId, currentIndex + 1);
+  }
+
+  function carouselPrev(carouselId) {
+    const { currentIndex, images } = getCarouselState(carouselId);
+    updateCarouselDisplay(carouselId, currentIndex - 1);
+  }
+
+  function carouselGoto(carouselId, index) {
+    updateCarouselDisplay(carouselId, index);
+  }
+</script>
+{% endblock %}

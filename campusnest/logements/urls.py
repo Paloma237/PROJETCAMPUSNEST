@@ -25,7 +25,7 @@ urlpatterns = [
     path("chambres/<int:pk>/modifier/",               views.modifier_chambre_view,     name="modifier_chambre"),
     path("chambres/<int:pk>/supprimer/",              views.supprimer_chambre_view,    name="supprimer_photo_chambre"),
     path("chambres/<int:pk>/disponibilite/",          views.toggle_disponibilite_view, name="toggle_disponibilite"),
-
+    path("chambres/",                                 views.liste_chambres_view,       name="liste_chambres"),
     # ── Propriétaire — Photos ───────────────────────────────
     #path("photos/<int:pk>/supprimer/",       views.supprimer_photo_view,  name="supprimer_photo"),
 

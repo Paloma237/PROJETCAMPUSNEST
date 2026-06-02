@@ -38,6 +38,22 @@ class Utilisateur(AbstractUser):
             return f"{self.prenom} {self.nom}"
         return super().get_full_name() or self.email
 
+    def get_initials(self):
+        """
+        Retourne les initiales selon la logique:
+        - Si prénom ET nom: 1ère lettre du prénom (maj) + 1ère lettre du nom (maj)
+        - Si seulement nom: 1ère lettre du nom (maj) + 2ème lettre du nom (min)
+        - Sinon: 1ère lettre de l'email (maj)
+        """
+        if self.prenom and self.nom:
+            return f"{self.prenom[0].upper()}{self.nom[0].upper()}"
+        elif self.nom:
+            name = self.nom.strip()
+            if len(name) >= 2:
+                return f"{name[0].upper()}{name[1].lower()}"
+            return name[0].upper()
+        return self.email[0].upper() if self.email else "?"
+
     def get_absolute_url(self):
         return reverse("users:detail", kwargs={"pk": self.pk})
 

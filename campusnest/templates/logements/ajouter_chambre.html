@@ -1,97 +1,233 @@
-{% extends "base.html" %} {% block title %}{% if chambre %}Modifier{% else %}Ajouter{% endif %} une chambre{% endblock %} {% block content %}
-<div class="mx-auto max-w-2xl px-4 py-8">
-  <h1 class="mb-2 text-2xl font-medium text-gray-900">{% if chambre %}Modifier la chambre{% else %}Nouvelle chambre{% endif %}</h1>
-  {% if cite %}
-  <p class="mb-6 text-sm text-gray-500">Cité : {{ cite.nom }}</p>
-  {% endif %}
+{% extends "accounts/base_dashboard.html" %} 
+{% block content %}
+<div class="mx-auto max-w-2xl px-4 py-8 animate-fadeIn">
+  
+  {# EN-TÊTE #}
+  <div class="mb-6">
+    <h1 class="text-2xl font-black text-primary tracking-tight">
+      {% if chambre %}Modifier la chambre{% else %}Nouvelle chambre{% endif %}
+    </h1>
+    {% if cite %}
+      <p class="mt-2 text-xs font-bold text-white bg-primary px-3 py-1.5 rounded-xl inline-block shadow-sm">
+        Cité : <span class="text-secondary font-black">{{ cite.nom }}</span>
+      </p>
+    {% endif %}
+  </div>
 
-  <div class="space-y-4 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-    <form method="post" enctype="multipart/form-data" novalidate class="form-professional space-y-4">
+  {# FORMULAIRE PRINCIPAL #}
+  <div class="rounded-3xl border-2 border-primary/20 bg-white p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+    {# Ligne décorative supérieure aux couleurs vives de l'application #}
+    <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-primary via-secondary to-primary"></div>
+
+    <form method="post" enctype="multipart/form-data" novalidate class="space-y-6">
       {% csrf_token %}
 
-      <div>
-        <label class="mb-1.5 block text-xs font-medium tracking-wide text-gray-500 uppercase">Description</label>
-        {{ form.description }}
-      </div>
-
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="mb-1.5 block text-xs font-medium tracking-wide text-gray-500 uppercase">Superficie (m²)</label>
-          {{ form.superficie }}
-        </div>
-        <div>
-          <label class="mb-1.5 block text-xs font-medium tracking-wide text-gray-500 uppercase">Loyer (FCFA/mois)</label>
-          {{ form.loyer }}
+      {# Description #}
+      <div class="space-y-1.5">
+        <label class="block text-xs font-black tracking-wider text-primary uppercase">Description du logement</label>
+        <div class="focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 rounded-2xl border-2 border-gray-300 bg-gray-50 p-1 transition duration-200">
+          {{ form.description }}
         </div>
       </div>
 
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="mb-1.5 block text-xs font-medium tracking-wide text-gray-500 uppercase">Type</label>
-          {{ form.type }}
+      {# Superficie & Loyer #}
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div class="space-y-1.5">
+          <label class="block text-xs font-black tracking-wider text-primary uppercase">Superficie (m²)</label>
+          <div class="relative flex items-center group">
+            {# Style forcé via Tailwind sur l'input imbriqué si nécessaire ou géré globalement #}
+            <div class="w-full focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 rounded-2xl border-2 border-gray-300 bg-gray-50 transition duration-200 overflow-hidden">
+              {{ form.superficie }}
+            </div>
+            <span class="absolute right-4 text-xs font-black text-primary bg-gray-200 px-2 py-1 rounded-md">m²</span>
+          </div>
         </div>
-        <div>
-          <label class="mb-1.5 block text-xs font-medium tracking-wide text-gray-500 uppercase">État</label>
-          {{ form.etat }}
+        <div class="space-y-1.5">
+          <label class="block text-xs font-black tracking-wider text-primary uppercase">Loyer mensuel (FCFA)</label>
+          <div class="relative flex items-center">
+            <div class="w-full focus-within:border-secondary focus-within:ring-2 focus-within:ring-secondary/20 rounded-2xl border-2 border-gray-300 bg-gray-50 transition duration-200 overflow-hidden">
+              {{ form.loyer }}
+            </div>
+            <span class="absolute right-4 text-xs font-black text-primary bg-secondary px-2 py-1 rounded-md shadow-sm">FCFA</span>
+          </div>
         </div>
       </div>
 
-      {% comment %} Équipements {% endcomment %}
-      <div>
-        <p class="mb-3 text-xs font-medium tracking-wide text-gray-500 uppercase">Équipements</p>
+      {# Type & État #}
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div class="space-y-1.5">
+          <label class="block text-xs font-black tracking-wider text-primary uppercase">Type de chambre</label>
+          <div class="focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 rounded-2xl border-2 border-gray-300 bg-gray-50 transition duration-200 overflow-hidden">
+            {{ form.type }}
+          </div>
+        </div>
+        <div class="space-y-1.5">
+          <label class="block text-xs font-black tracking-wider text-primary uppercase">État général</label>
+          <div class="focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 rounded-2xl border-2 border-gray-300 bg-gray-50 transition duration-200 overflow-hidden">
+            {{ form.etat }}
+          </div>
+        </div>
+      </div>
+
+      {# Équipements #}
+      <div class="space-y-3 bg-primary/[0.03] rounded-2xl p-5 border-2 border-primary/10">
+        <p class="text-xs font-black tracking-wider text-primary uppercase">Équipements & Commodités</p>
         <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {% for field in form %} {% if field.field.widget.input_type == 'checkbox' %}
-          <label class="flex cursor-pointer items-center gap-2">
-            {{ field }}
-            <span class="text-sm text-gray-700">{{ field.label }}</span>
-          </label>
-          {% endif %} {% endfor %}
+          {% for field in form %} 
+            {% if field.field.widget.input_type == 'checkbox' %}
+              <label class="flex cursor-pointer items-center gap-3 p-3 bg-white rounded-xl border-2 border-gray-200 shadow-sm hover:border-secondary hover:bg-secondary/[0.02] transition group">
+                <div class="relative flex items-center">
+                  {{ field }}
+                </div>
+                <span class="text-xs font-bold text-gray-700 group-hover:text-primary transition">{{ field.label }}</span>
+              </label>
+            {% endif %} 
+          {% endfor %}
         </div>
       </div>
 
-      {% comment %} Photos {% endcomment %}
-      <div>
-        <label class="mb-1.5 block text-xs font-medium tracking-wide text-gray-500 uppercase">
-          Photos
-          <span class="text-gray-400 normal-case">(plusieurs fichiers possibles)</span>
-        </label>
-        <input
-          type="file"
-          name="photos"
-          multiple
-          accept="image/*"
-          class="file:bg-secondary/20 file:text-primary w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:px-3 file:py-1 file:text-xs"
-        />
+      {# GESTION MULTI-PHOTOS (Max 4 images) #}
+      <div class="space-y-3">
+        <div class="flex justify-between items-end">
+          <label class="block text-xs font-black tracking-wider text-primary uppercase">
+            Photos de la chambre <span class="text-secondary font-black normal-case">(4 images max)</span>
+          </label>
+          <span id="photo-counter" class="text-xs font-black text-white bg-primary px-2.5 py-1 rounded-lg shadow-sm">0 / 4 sélectionnée(s)</span>
+        </div>
+
+        {# Les 4 inputs HTML réels cachés #}
+        <div class="hidden">
+          <input type="file" name="photos" id="input-photo-1" accept="image/*" onchange="previewImage(this, 1)">
+          <input type="file" name="photos" id="input-photo-2" accept="image/*" onchange="previewImage(this, 2)">
+          <input type="file" name="photos" id="input-photo-3" accept="image/*" onchange="previewImage(this, 3)">
+          <input type="file" name="photos" id="input-photo-4" accept="image/*" onchange="previewImage(this, 4)">
+        </div>
+
+        {# Grille de 4 boutons "+" réactifs #}
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {% for i in "1234" %}
+          <div id="box-{{ i }}" onclick="triggerInput({{ i }})" class="relative h-32 flex flex-col items-center justify-center border-2 border-dashed border-primary/40 hover:border-secondary bg-primary/[0.02] hover:bg-secondary/[0.05] rounded-2xl cursor-pointer transition-all duration-200 group overflow-hidden shadow-sm">
+            
+            {# État vide : Le bouton "+" coloré #}
+            <div id="empty-{{ i }}" class="flex flex-col items-center justify-center text-primary group-hover:text-secondary transition duration-200 pointer-events-none">
+              <div class="bg-primary/10 group-hover:bg-secondary/20 p-2 rounded-full mb-1 transition duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+              </div>
+              <span class="text-[10px] font-black uppercase tracking-wider">Ajouter {{ i }}</span>
+            </div>
+
+            {# Aperçu de l'image #}
+            <img id="img-{{ i }}" class="hidden w-full h-full object-cover">
+
+            {# Bouton Supprimer l'aperçu #}
+            <button type="button" id="btn-del-{{ i }}" onclick="removeImage(event, {{ i }})" class="hidden absolute top-2 right-2 bg-red-600 text-white rounded-xl p-1.5 shadow-lg hover:bg-red-700 hover:scale-110 transition duration-200 z-30">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+          </div>
+          {% endfor %}
+        </div>
       </div>
 
-      {% comment %} Photos existantes (si modification) {% endcomment %} {% if photos %}
-      <div>
-        <p class="mb-2 text-xs font-medium tracking-wide text-gray-500 uppercase">Photos actuelles</p>
-        <div class="flex flex-wrap gap-2">
+      {# Photos existantes (Mode édition) #} 
+      {% if photos %}
+      <div class="space-y-2 pt-4 border-t-2 border-gray-100">
+        <p class="block text-xs font-black tracking-wider text-primary uppercase">Photos déjà en ligne</p>
+        <div class="flex flex-wrap gap-3">
           {% for photo in photos %}
-          <div class="group relative h-20 w-20 overflow-hidden rounded-xl">
-            <img src="{{ photo.url.url }}" class="h-full w-full object-cover" />
-            <form
-              method="post"
-              action="{% url 'logements:supprimer_photo' photo.pk %}"
-              class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition group-hover:opacity-100"
-            >
-              {% csrf_token %}
-              <button class="text-xs text-white">Supprimer</button>
-            </form>
+          <div class="group relative h-20 w-20 overflow-hidden rounded-2xl border-2 border-primary/20 shadow-md">
+            <img src="{{ photo.image.url }}" class="h-full w-full object-cover" />
+            <div class="absolute inset-0 flex items-center justify-center bg-primary/80 opacity-0 transition duration-200 group-hover:opacity-100 z-20">
+              <button type="submit" formaction="{% url 'logements:supprimer_photo' photo.pk %}" class="text-[10px] font-black text-primary bg-secondary px-2.5 py-1.5 rounded-xl hover:scale-105 transition shadow-md uppercase">
+                Supprimer
+              </button>
+            </div>
           </div>
           {% endfor %}
         </div>
       </div>
       {% endif %}
 
-      <div class="flex gap-3 pt-2">
-        <button type="submit" class="bg-primary text-secondary hover:bg-primary/90 rounded-xl px-6 py-2.5 text-sm font-medium transition">
-          {% if chambre %}Enregistrer{% else %}Ajouter la chambre{% endif %}
+      {# Boutons d'action #}
+      <div class="flex items-center gap-4 pt-4 border-t-2 border-gray-100">
+        <button type="submit" class="bg-primary text-secondary hover:bg-primary/95 hover:scale-[1.01] font-black rounded-2xl px-6 py-3.5 text-xs tracking-wider uppercase transition shadow-lg shadow-primary/20 flex-1 sm:flex-initial">
+          {% if chambre %}Enregistrer les modifications{% else %}Créer la chambre{% endif %}
         </button>
-        <a href="{% url 'logements:mes_cites' %}" class="rounded-xl border border-gray-200 px-6 py-2.5 text-sm text-gray-600 transition hover:bg-gray-50">Annuler</a>
+        <a href="{% url 'logements:mes_cites' %}" class="rounded-2xl border-2 border-gray-300 px-6 py-3.5 text-xs font-black text-gray-500 uppercase tracking-wider transition hover:bg-gray-100 hover:text-gray-700 text-center flex-1 sm:flex-initial">
+          Annuler
+        </a>
       </div>
     </form>
   </div>
 </div>
+
+{# JAVASCRIPT RE-CORRIGÉ POUR LE CLIC DU BOUTON "+" #}
+<script>
+  function triggerInput(index) {
+    const input = document.getElementById(`input-photo-${index}`);
+    if (input) {
+      input.click();
+    }
+  }
+
+  function previewImage(input, index) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const previewImg = document.getElementById(`img-${index}`);
+        const deleteBtn = document.getElementById(`btn-del-${index}`);
+        const emptyState = document.getElementById(`empty-${index}`);
+        const container = document.getElementById(`box-${index}`);
+
+        if (previewImg && deleteBtn && emptyState && container) {
+          previewImg.src = e.target.result;
+          previewImg.classList.remove('hidden');
+          deleteBtn.classList.remove('hidden');
+          emptyState.classList.add('hidden');
+          
+          // Style de bordure ferme quand l'image est chargée
+          container.classList.remove('border-dashed', 'border-primary/40');
+          container.classList.add('border-solid', 'border-secondary');
+        }
+        updatePhotoCounter();
+      }
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  function removeImage(event, index) {
+    // TRÈS IMPORTANT : empêche l'événement de remonter et de ré-ouvrir l'explorateur au clic sur supprimer
+    event.stopPropagation(); 
+    
+    const input = document.getElementById(`input-photo-${index}`);
+    if (input) input.value = ""; 
+    
+    const previewImg = document.getElementById(`img-${index}`);
+    const deleteBtn = document.getElementById(`btn-del-${index}`);
+    const emptyState = document.getElementById(`empty-${index}`);
+    const container = document.getElementById(`box-${index}`);
+
+    if (previewImg && deleteBtn && emptyState && container) {
+      previewImg.src = "";
+      previewImg.classList.add('hidden');
+      deleteBtn.classList.add('hidden');
+      emptyState.classList.remove('hidden');
+      
+      container.classList.add('border-dashed', 'border-primary/40');
+      container.classList.remove('border-solid', 'border-secondary');
+    }
+    updatePhotoCounter();
+  }
+
+  function updatePhotoCounter() {
+    let count = 0;
+    for (let i = 1; i <= 4; i++) {
+      const input = document.getElementById(`input-photo-${i}`);
+      if (input && input.files && input.files.length > 0) count++;
+    }
+    const counterEl = document.getElementById('photo-counter');
+    if (counterEl) {
+      counterEl.innerText = `${count} / 4 sélectionnée(s)`;
+    }
+  }
+</script>
 {% endblock %}

@@ -13,8 +13,6 @@ class Cite(models.Model):
     nom           = models.CharField("Nom", max_length=150)
     adresse       = models.CharField("Adresse", max_length=255)
     description   = models.TextField("Description", blank=True)
-    latitude      = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    longitude     = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     est_actif = models.BooleanField("Visible sur le site", default=True)
     motif_suppression = models.TextField("Raison de la suppression/rejet", blank=True)
     date_creation = models.DateTimeField(default=timezone.now)
@@ -47,7 +45,7 @@ class Chambre(models.Model):
 
     class Type(models.TextChoices):
         SIMPLE      = "simple",      "Simple"
-        DOUBLE      = "double",      "Double"
+        MODERNE     = "moderne",     "Moderne"
         STUDIO      = "studio",      "Studio"
         APPARTEMENT = "appartement", "Appartement"
 
@@ -74,6 +72,7 @@ class Chambre(models.Model):
     internet     = models.BooleanField("Internet", default=False)
     eau_courante = models.BooleanField("Eau courante", default=True)
     electricite  = models.BooleanField("Électricité", default=True)
+    armoire       = models.BooleanField("Armoire", default=False)
     
 
     class Meta:
@@ -83,7 +82,6 @@ class Chambre(models.Model):
 
     def __str__(self):
         return f"{self.cite.nom} — {self.get_type_display()} {self.superficie}m²"
-
     def note_moyenne(self):
         avis = self.avis.filter(est_visible=True)
         if not avis.exists():
@@ -112,7 +110,7 @@ class PhotoChambre(models.Model):
 
 class PhotoCity(models.Model):
     city= models.ForeignKey(Cite, on_delete=models.CASCADE, related_name="photos_cite", verbose_name="Cite")
-    image         = models.ImageField("Image", upload_to="cites/%Y/%m/") # Changé en cites/ pour ne pas mélanger avec les chambres
+    image         = models.ImageField("Image", upload_to="cites/%Y/%m/")
     legende       = models.CharField("Légende", max_length=200, blank=True)
     est_principale = models.BooleanField("Photo principale", default=False)
     date_upload   = models.DateTimeField(auto_now_add=True)
@@ -120,7 +118,7 @@ class PhotoCity(models.Model):
     class Meta:
         verbose_name        = "Photo Cité"
         verbose_name_plural = "Photos Cités"
-        ordering            = ["-est_principale", "date_upload"] # ✅ Nettoyé : Plus de related_name ici !
+        ordering            = ["-est_principale", "date_upload"]
 
     def __str__(self):
         return f"Photo {'principale' if self.est_principale else 'secondaire'} — {self.city}"

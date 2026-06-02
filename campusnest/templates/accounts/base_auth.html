@@ -1,30 +1,33 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}CampusNest{% endblock %} — IUT-FV</title>
+  <title>{% block title %}CampusNest{% endblock %} IUT-FV</title>
   {% load static %}
   <link rel="stylesheet" href="{% static 'css/output.css' %}" />
 </head>
 
 <body class="min-h-screen bg-secondary flex items-center justify-center p-4">
-  <div class="bg-white shadow-xl flex ">
+  <div class="bg-white shadow-xl flex w-full max-w-5xl rounded-3xl overflow-hidden min-h-[600px]">
  
     {# ── Sidebar verte (maquette exacte) ── #}
-    <div class="hidden md:flex md:w-2/5 flex-col justify-between p-40 bg-cover bg-center bg-no-repeat" style="background-image: url('/static/images/IUT.jpg');">
-      <div>
-        <a href="/" class="flex items-center text-white gap-2 text-whiteM">
+    <div class="hidden md:flex md:w-2/5 flex-col justify-between p-8 bg-cover bg-center bg-no-repeat relative" style="background-image: url('/static/images/IUT.jpg');">
+      {# Overlay optionnel si ton image de fond rend le texte illisible #}
+      <div class="absolute inset-0 bg-primary/20 pointer-events-none"></div>
+
+      <div class="relative z-10">
+        <a href="/" class="flex items-center text-white gap-2 font-black text-lg">
           <img src="/static/images/WhatsApp_Image_2026-05-25_at_17.43.41-removebg-preview.png" alt="CampusNest Logo" class="h-8 w-8 object-contain" />
-          <span class="hidden sm:block">CampusNest</span>
+          <span>CampusNest</span>
         </a>
-        <p class="text-secondary/60 text-sm mt-3 leading-relaxed">
-          IUT de Fotso Victor — Bandjoun<br>
+        <p class="text-white/80 text-xs mt-3 leading-relaxed font-medium">
+          IUT Fotso Victor — Bandjoun<br>
           Plateforme de logements étudiants
         </p>
       </div>
-      <blockquote class="text-white/70 text-sm italic leading-7">
+
+      <blockquote class="text-white/90 text-sm italic leading-relaxed relative z-10 font-medium bg-black/10 p-4 rounded-xl backdrop-blur-xs">
         {% block sidebar_quote %}
         « Trouvez votre chambre avant même d'arriver au campus. »
         {% endblock %}
@@ -32,23 +35,25 @@
     </div>
  
     {# ── Zone formulaire ── #}
-    <div class="flex-1 p-8 flex flex-col justify-center">
+    <div class="flex-1 p-8 sm:p-12 flex flex-col justify-center bg-white">
  
       {# Flash messages #}
       {% if messages %}
-        {% for message in messages %}
-          <div class="mb-4 px-4 py-3 rounded-xl text-sm
-            {% if message.tags == 'success' %}bg-green-50 text-green-800 border border-green-200
-            {% elif message.tags == 'error' %}bg-red-50 text-red-800 border border-red-200
-            {% elif message.tags == 'warning' %}bg-amber-50 text-amber-800 border border-amber-200
-            {% else %}bg-blue-50 text-blue-800 border border-blue-200{% endif %}">
-            {{ message }}
-          </div>
-        {% endfor %}
+        <div class="space-y-2 mb-4">
+          {% for message in messages %}
+            <div class="px-4 py-3 rounded-xl text-sm font-bold shadow-xs border animate-fadeIn
+              {% if message.tags == 'success' %}bg-green-50 text-green-800 border-green-200
+              {% elif message.tags == 'error' %}bg-red-50 text-red-800 border-red-200
+              {% elif message.tags == 'warning' %}bg-amber-50 text-amber-800 border-amber-200
+              {% else %}bg-blue-50 text-blue-800 border-blue-200{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
       {% endif %}
  
       {% block content %}{% endblock %}
     </div>
   </div>
-</>
+</body>
 </html>

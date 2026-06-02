@@ -1,114 +1,167 @@
-{% extends "base.html" %} {% block title %}{{ chambre }}{% endblock %} {% block content %}
-<div class="mx-auto max-w-4xl px-4 py-8">
-  {% comment %} Galerie photos {% endcomment %} {% if photos %}
-  <div class="mb-6 grid h-56 grid-cols-3 gap-2 overflow-hidden rounded-2xl">
-    {% for photo in photos|slice:":3" %}
-    <img src="{{ photo.url.url }}" alt="{{ photo.legende|default:chambre }}" class="{% if forloop.first %}col-span-2 row-span-2{% endif %} h-full w-full object-cover" />
-    {% endfor %}
-  </div>
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="mx-auto max-w-5xl px-4 sm:px-6 py-8">
+
+  {# ═══ GALERIE PHOTOS MODERNISÉE ═══ #}
+  {% if photos %}
+    <div class="mb-8 grid h-64 sm:h-80 md:h-[380px] grid-cols-1 sm:grid-cols-3 gap-3 overflow-hidden rounded-2xl">
+      {% for photo in photos|slice:":3" %}
+        <div class="{% if forloop.first %}sm:col-span-2 sm:row-span-2{% endif %} h-full w-full overflow-hidden bg-gray-100 relative">
+          <img src="{{ photo.image.url }}" alt="{{ photo.legende|default:chambre.get_type_display }}" class="h-full w-full object-cover transition-transform duration-500 hover:scale-105" />
+          {% if photo.legende %}
+            <span class="absolute bottom-3 left-3 bg-black/60 text-white text-[10px] px-2 py-1 rounded backdrop-blur-sm">{{ photo.legende }}</span>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
   {% else %}
-  <div class="bg-secondary/20 mb-6 flex h-48 items-center justify-center rounded-2xl">
-    <p class="text-sm text-gray-400">Aucune photo disponible</p>
-  </div>
+    <div class="bg-[#7BA87A]/5 border border-dashed border-[#7BA87A]/20 mb-8 flex h-52 flex-col items-center justify-center rounded-2xl gap-2">
+      <svg class="h-8 w-8 text-[#1A2517]/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+      <p class="text-xs font-medium text-gray-400">Aucune photo disponible pour ce logement</p>
+    </div>
   {% endif %}
 
-  <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-    {% comment %} Infos principales {% endcomment %}
-    <div class="space-y-5 lg:col-span-2">
-      <div>
-        <h1 class="text-2xl font-medium text-gray-900">{{ chambre.get_type_display }} — {{ chambre.cite.nom }}</h1>
-        <p class="mt-1 text-sm text-gray-500">{{ chambre.cite.adresse }}</p>
-      </div>
-
-      <div class="flex flex-wrap gap-3">
-        <div class="rounded-xl bg-gray-50 px-3 py-2 text-sm text-gray-700">
-          <span class="font-medium">{{ chambre.superficie }} m²</span>
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-3 items-start">
+    
+    {# ═══ COLONNE PRINCIPALE : INFOS & AVIS ═══ #}
+    <div class="space-y-6 lg:col-span-2">
+      
+      <div class="border-b border-gray-100 pb-5">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="inline-flex items-center gap-1 text-xs font-semibold text-[#7BA87A] bg-[#7BA87A]/10 px-2.5 py-1 rounded-full">
+            🏠 {{ chambre.cite.nom }}
+          </span>
+          <span class="text-xs text-gray-400 font-medium">Ajouté le {{ chambre.date_ajout|date:"d M Y" }}</span>
         </div>
-        <div class="rounded-xl bg-gray-50 px-3 py-2 text-sm text-gray-700">{{ chambre.get_etat_display }}</div>
-        {% if chambre.meublee %}
-        <div class="bg-secondary/10 text-primary rounded-xl px-3 py-2 text-sm">Meublée</div>
-        {% endif %} {% if chambre.wc_interieur %}
-        <div class="bg-secondary/10 text-primary rounded-xl px-3 py-2 text-sm">WC intérieur</div>
-        {% endif %} {% if chambre.cuisine %}
-        <div class="bg-secondary/10 text-primary rounded-xl px-3 py-2 text-sm">Cuisine</div>
-        {% endif %} {% if chambre.internet %}
-        <div class="bg-secondary/10 text-primary rounded-xl px-3 py-2 text-sm">Internet</div>
-        {% endif %}
+        <h1 class="text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl">
+          {{ chambre.get_type_display }} <span class="font-normal text-gray-400">({{ chambre.superficie }} m²)</span>
+        </h1>
+        <p class="mt-1.5 text-xs text-gray-500 flex items-center gap-1">
+          <svg class="h-3.5 w-3.5 text-gray-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          {{ chambre.cite.adresse }}
+        </p>
       </div>
 
       <div>
-        <h2 class="mb-2 text-sm font-medium text-gray-900">Description</h2>
-        <p class="text-sm leading-relaxed text-gray-600">{{ chambre.description }}</p>
+        <h2 class="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">Caractéristiques du logement</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+          <div class="flex items-center gap-2 rounded-xl bg-gray-50 border border-gray-100 p-3 text-xs text-gray-700">
+            <span class="font-bold text-gray-900">{{ chambre.superficie }} m²</span> <span class="text-gray-400">Espace</span>
+          </div>
+          <div class="flex items-center gap-2 rounded-xl bg-gray-50 border border-gray-100 p-3 text-xs text-gray-700">
+            <span class="font-bold text-[#1A2517]">{{ chambre.get_etat_display }}</span>
+          </div>
+          {% if chambre.meublee %}
+          <div class="flex items-center gap-2 rounded-xl bg-emerald-50/40 border border-emerald-100/50 p-3 text-xs text-emerald-800 font-medium">✨ Meublée</div>
+          {% endif %}
+          {% if chambre.wc_interieur %}
+          <div class="flex items-center gap-2 rounded-xl bg-blue-50/40 border border-blue-100/50 p-3 text-xs text-blue-800 font-medium">🚿 WC Intérieur</div>
+          {% endif %}
+          {% if chambre.cuisine %}
+          <div class="flex items-center gap-2 rounded-xl bg-amber-50/40 border border-amber-100/50 p-3 text-xs text-amber-800 font-medium">🍳 Cuisine</div>
+          {% endif %}
+          {% if chambre.internet %}
+          <div class="flex items-center gap-2 rounded-xl bg-purple-50/40 border border-purple-100/50 p-3 text-xs text-purple-800 font-medium">⚡ Wifi Gratuit</div>
+          {% endif %}
+        </div>
       </div>
 
-      {% comment %} Avis {% endcomment %}
-      <div>
-        <div class="mb-3 flex items-center justify-between">
-          <h2 class="text-sm font-medium text-gray-900">
-            Avis {% if note_moy %}
-            <span class="ml-2 text-amber-500">★ {{ note_moy }}</span>
-            <span class="font-normal text-gray-400">({{ avis|length }})</span>
+      <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
+        <h2 class="mb-2 text-sm font-bold text-gray-900">Description détaillée</h2>
+        <p class="text-xs leading-relaxed text-gray-600 whitespace-pre-line">{{ chambre.description }}</p>
+      </div>
+
+      <div class="border-t border-gray-100 pt-6">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+            Avis clients 
+            {% if note_moy %}
+            <span class="inline-flex items-center rounded-md bg-amber-50 px-1.5 py-0.5 text-xs font-bold text-amber-700">★ {{ note_moy }}</span>
+            <span class="text-xs font-normal text-gray-400">({{ avis|length }})</span>
             {% endif %}
           </h2>
           {% if user.is_authenticated and user.role == 'client' %}
-          <a href="{% url 'avis:laisser' chambre.pk %}" class="text-primary text-xs hover:underline">Laisser un avis</a>
+          <a href="{% url 'avis:laisser' chambre.pk %}" class="text-[#7BA87A] text-xs font-bold hover:underline">Laisser un avis</a>
           {% endif %}
         </div>
-        {% for a in avis %}
-        <div class="border-b border-gray-50 py-3">
-          <div class="mb-1 flex items-center gap-2">
-            <span class="text-xs font-medium text-gray-900">{{ a.client.get_full_name }}</span>
-            <span class="text-xs text-amber-500">{% for i in "12345" %}{% if forloop.counter <= a.note %}★{% else %}☆{% endif %}{% endfor %}</span>
-            <span class="text-xs text-gray-400">{{ a.date_creation|date:"d M Y" }}</span>
+
+        <div class="space-y-3">
+          {% for a in avis %}
+          <div class="bg-gray-50/50 border border-gray-100 rounded-xl p-3.5">
+            <div class="mb-1.5 flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-gray-900">{{ a.client.get_full_name }}</span>
+                <span class="text-[11px] text-amber-400 tracking-tighter">
+                  {% for i in "12345" %}{% if forloop.counter <= a.note %}★{% else %}☆{% endif %}{% endfor %}
+                </span>
+              </div>
+              <span class="text-[10px] text-gray-400 font-medium">{{ a.date_creation|date:"d M Y" }}</span>
+            </div>
+            <p class="text-xs text-gray-600 leading-normal">{{ a.commentaire }}</p>
           </div>
-          <p class="text-xs text-gray-600">{{ a.commentaire }}</p>
-        </div>
-        {% empty %}
-        <p class="text-sm text-gray-400">Aucun avis pour l'instant.</p>
-        {% endfor %}
-      </div>
-    </div>
-
-    {% comment %} Panneau de réservation {% endcomment %}
-    <div class="lg:col-span-1">
-      <div class="sticky top-4 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-        <p class="text-primary mb-0.5 text-2xl font-medium">
-          {{ chambre.loyer|floatformat:0 }}
-          <span class="text-sm font-normal text-gray-500">FCFA/mois</span>
-        </p>
-        <p class="mb-4 text-xs text-gray-400">Propriétaire : {{ chambre.cite.proprietaire.get_full_name }}</p>
-
-        {% if chambre.est_disponible %} {% if user.is_authenticated and user.role == 'client' %}
-        <a href="{% url 'reservations:reserver' chambre.pk %}" class="bg-primary text-secondary hover:bg-primary/90 mb-3 block w-full rounded-xl py-3 text-center text-sm font-medium transition">
-          Réserver cette chambre
-        </a>
-        {% elif not user.is_authenticated %}
-        <a
-          href="{% url 'users:connexion' %}?next={{ request.path }}"
-          class="bg-primary text-secondary hover:bg-primary/90 mb-3 block w-full rounded-xl py-3 text-center text-sm font-medium transition"
-        >
-          Connectez-vous pour réserver
-        </a>
-        {% endif %}
-
-        <a href="{% url 'signalements:signaler' chambre.pk %}" class="block w-full rounded-xl border border-gray-200 py-2.5 text-center text-sm text-gray-600 transition hover:bg-gray-50">
-          Signaler ce logement
-        </a>
-        {% else %}
-        <div class="mb-3 w-full rounded-xl bg-gray-100 py-3 text-center text-sm font-medium text-gray-400">Chambre non disponible</div>
-        {% endif %} {% comment %} Chambres similaires {% endcomment %} {% if similaires %}
-        <div class="mt-5 border-t border-gray-50 pt-5">
-          <h3 class="mb-3 text-xs font-medium tracking-wide text-gray-500 uppercase">Similaires dans cette cité</h3>
-          {% for s in similaires %}
-          <a href="{% url 'logements:detail_chambre' s.pk %}" class="flex items-center gap-2 rounded-lg px-1 py-2 transition hover:bg-gray-50">
-            <span class="flex-1 text-xs text-gray-700">{{ s.get_type_display }}</span>
-            <span class="text-primary text-xs font-medium">{{ s.loyer|floatformat:0 }} FCFA</span>
-          </a>
+          {% empty %}
+          <p class="text-xs text-gray-400 italic py-2">Aucun avis n'a été publié pour ce logement pour le moment.</p>
           {% endfor %}
         </div>
-        {% endif %}
       </div>
     </div>
+
+    {# ═══ PANNEAU LATÉRAL DE RÉSERVATION ═══ #}
+    <div class="lg:col-span-1 lg:sticky lg:top-6">
+      <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+        <div class="mb-4">
+          <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Loyer Mensuel</span>
+          <p class="text-[#1A2517] text-3xl font-black mt-0.5">
+            {{ chambre.loyer|floatformat:0 }} 
+            <span class="text-xs font-bold text-gray-400 uppercase tracking-normal">FCFA / mois</span>
+          </p>
+          <div class="mt-3 flex items-center gap-2 rounded-lg bg-gray-50 border border-gray-100 px-3 py-2 text-[11px] text-gray-500">
+            <div class="h-2 w-2 rounded-full {% if chambre.est_disponible %}bg-emerald-500{% else %}bg-gray-400{% endif %}"></div>
+            <span>Bailleur : <strong>{{ chambre.cite.proprietaire.get_full_name }}</strong></span>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          {% if chambre.est_disponible %}
+            {% if user.is_authenticated and user.role == 'client' %}
+            <a href="{% url 'reservations:reserver' chambre.pk %}" class="bg-[#1A2517] text-white hover:bg-[#1A2517]/90 flex w-full items-center justify-center rounded-xl py-3 text-center text-xs font-bold shadow-sm transition">
+              Réserver cette chambre
+            </a>
+            {% elif not user.is_authenticated %}
+            <a href="{% url 'users:connexion' %}?next={{ request.path }}" class="bg-[#1A2517] text-white hover:bg-[#1A2517]/90 flex w-full items-center justify-center rounded-xl py-3 text-center text-xs font-bold shadow-sm transition">
+              Connectez-vous pour réserver
+            </a>
+            {% endif %}
+
+            <a href="{% url 'signalements:signaler' chambre.pk %}" class="flex w-full items-center justify-center rounded-xl border border-gray-200 py-2.5 text-center text-xs font-medium text-gray-500 transition hover:bg-red-50 hover:text-red-600 hover:border-red-100">
+              🚨 Signaler une anomalie
+            </a>
+          {% else %}
+            <div class="w-full rounded-xl bg-gray-100 py-3 text-center text-xs font-bold text-gray-400 uppercase tracking-wider cursor-not-allowed">
+              🔒 Logement Indisponible
+            </div>
+          {% endif %}
+        </div>
+
+        {# ═══ COMPOSANT CHAMBRES SIMILAIRES ═══ #}
+        {% if similaires %}
+        <div class="mt-6 border-t border-gray-100 pt-5">
+          <h3 class="mb-3 text-[10px] font-bold tracking-wider text-gray-400 uppercase">Autres chambres de cette cité</h3>
+          <div class="space-y-1.5">
+            {% for s in similaires %}
+            <a href="{% url 'logements:detail_chambre' s.pk %}" class="flex items-center justify-between gap-2 rounded-xl border border-transparent bg-gray-50/50 hover:bg-white hover:border-gray-100 p-2.5 transition group">
+              <span class="text-xs font-medium text-gray-700 group-hover:text-[#7BA87A] transition truncate">{{ s.get_type_display }} ({{ s.superficie }}m²)</span>
+              <span class="text-[#1A2517] text-xs font-bold shrink-0">{{ s.loyer|floatformat:0 }} F</span>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+
   </div>
 </div>
 {% endblock %}

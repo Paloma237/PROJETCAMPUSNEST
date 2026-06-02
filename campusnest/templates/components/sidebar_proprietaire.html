@@ -1,0 +1,147 @@
+<aside class="w-full h-full flex flex-col relative">
+
+  <button onclick="toggleSidebar()" 
+          class="lg:hidden absolute top-4 right-4 p-1.5 rounded-lg bg-white/5 text-secondary/60 hover:text-white hover:bg-white/10 transition z-50">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+    </svg>
+  </button>
+
+  {# ── Logo ── #}
+  <div class="px-6 py-5 border-b border-white/10 shrink-0">
+    <div class="flex items-center gap-2 shrink-0">
+    <a href="{% url 'logements:home' %}" class="flex items-center gap-2 text-sm font-semibold text-white group">
+      <div class="bg-white/10 p-1 rounded-lg transition-transform group-hover:scale-105">
+        <img src="/static/images/WhatsApp_Image_2026-05-25_at_17.43.41-removebg-preview.png" alt="CampusNest Logo" class="h-8 w-8 object-contain" />
+      </div>
+      <span class="hidden xs:block sm:block text-base font-black tracking-wide text-secondary">CampusNest</span>
+    </a>
+  </div>
+    <p class="text-secondary/40 text-xs mt-1 ml-10">Espace propriétaire</p>
+  </div>
+
+  {# ── Profil rapide ── #}
+  <div class="px-6 py-4 border-b border-white/10 flex items-center gap-3 shrink-0">
+    <div class="w-9 h-9 rounded-full bg-secondary flex items-center justify-center
+                text-primary font-semibold text-sm shrink-0">
+      {{ user.prenom|first|upper }}{{ user.nom|first|upper }}
+    </div>
+    <div class="min-w-0">
+      <p class="text-white text-sm font-medium truncate">{{ user.get_full_name }}</p>
+      <p class="text-secondary/50 text-xs truncate">{{ user.email }}</p>
+    </div>
+  </div>
+
+  {# ── Navigation (Défilement propre sans scrollbar visible) ── #}
+  <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto scrollbar-none">
+
+    <p class="text-secondary/30 text-xs uppercase tracking-widest px-3 mb-2">Principal</p>
+
+    <a href="{% url 'users:proprietaire_dashboard' %}"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition
+              {% if request.resolver_match.url_name == 'proprietaire_dashboard' %}
+                bg-secondary/20 text-secondary font-medium
+              {% else %}
+                text-secondary/60 hover:bg-white/5 hover:text-secondary
+              {% endif %}">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10
+                 a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4
+                 a1 1 0 001 1m-6 0h6"/>
+      </svg>
+      Tableau de bord
+    </a>
+
+    <a href="{% url 'logements:mes_cites' %}"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition
+              {% if 'mes_cites' in request.resolver_match.url_name or 'cite' in request.resolver_match.url_name %}
+                bg-secondary/20 text-secondary font-medium
+              {% else %}
+                text-secondary/60 hover:bg-white/5 hover:text-secondary
+              {% endif %}">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5
+                 m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2
+                 a1 1 0 011 1v5m-4 0h4"/>
+      </svg>
+      Mes cités
+    </a>
+
+    <p class="text-secondary/30 text-xs uppercase tracking-widest px-3 mt-4 mb-2">Réservations</p>
+
+    <a href="{% url 'reservations:recues' %}"
+       class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition
+              {% if 'recues' in request.resolver_match.url_name %}
+                bg-secondary/20 text-secondary font-medium
+              {% else %}
+                text-secondary/60 hover:bg-white/5 hover:text-secondary
+              {% endif %}">
+      <span class="flex items-center gap-3">
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5
+                   a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+        Réservations reçues
+      </span>
+      {% if stats.reservations_attente %}
+        <span class="bg-amber-500 text-white text-xs px-1.5 py-0.5 rounded-full font-medium">
+          {{ stats.reservations_attente }}
+        </span>
+      {% endif %}
+    </a>
+
+    <a href="{% url 'reservations:historique' %}"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition
+              text-secondary/60 hover:bg-white/5 hover:text-secondary">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      Historique
+    </a>
+
+    <p class="text-secondary/30 text-xs uppercase tracking-widest px-3 mt-4 mb-2">Communication</p>
+
+    <a href="{% url 'contact:mes_messages' %}"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition
+              text-secondary/60 hover:bg-white/5 hover:text-secondary">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7
+                 a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+      </svg>
+      Messages
+    </a>
+
+    <p class="text-secondary/30 text-xs uppercase tracking-widest px-3 mt-4 mb-2">Compte</p>
+
+    <a href="{% url 'users:profil' %}"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition
+              text-secondary/60 hover:bg-white/5 hover:text-secondary">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+      </svg>
+      Mon profil
+    </a>
+
+  </nav>
+
+  {# ── Déconnexion ── #}
+  <div class="px-3 py-4 border-t border-white/10 shrink-0">
+    <a href="{% url 'users:deconnexion' %}"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm
+              text-secondary/50 hover:bg-red-500/10 hover:text-red-400 transition">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7
+                 a3 3 0 013-3h4a3 3 0 013 3v1"/>
+      </svg>
+      Se déconnecter
+    </a>
+  </div>
+
+</aside>

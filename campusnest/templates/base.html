@@ -3,72 +3,70 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>{% block title %}CampusNest IUT-FV{% endblock %}</title>
-
     {% load static %}
-
-    <!-- Tailwind CSS -->
     <link rel="stylesheet" href="{% static 'css/output.css' %}" />
-
     {% block extra_head %}{% endblock %}
   </head>
 
-  <body class="flex min-h-screen flex-col bg-gray-50 text-gray-900">
-    <!-- Navbar -->
-    {% include "components/navbar.html" %}
+  <body class="flex min-h-screen flex-col bg-gray-50 text-gray-900 antialiased">
+    <div id="back-button-container" class="fixed top-20 left-4 z-50 hidden">
+      <button
+        onclick="window.history.back()"
+        class="flex items-center gap-1 rounded-xl border border-gray-200 bg-white/90 px-3 py-2 text-xs font-bold text-gray-600 shadow-lg backdrop-blur transition-all hover:scale-105 hover:text-[#1A2517]"
+      >
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7" /></svg>
+        Retour
+      </button>
+    </div>
 
-    <!-- Messages Django -->
-    {% if messages %}
-    <div class="mx-auto w-full max-w-7xl px-4 pt-4">
+    <script>
+      // Affiche le bouton uniquement si on n'est pas sur la page d'accueil
+      if (window.location.pathname !== '/') {
+        document.getElementById('back-button-container').classList.remove('hidden');
+      }
+    </script>
+    {% include "components/navbar.html" %} {% if messages %}
+    <div class="z-40 mx-auto w-full max-w-7xl px-4 pt-24">
       {% for message in messages %}
       <div
-        class="{% if message.tags == 'success' %} {% elif message.tags == 'error' %} {% elif message.tags == 'warning' %} {% else %} {% endif %} mb-2 flex items-center justify-between gap-4 rounded-xl border border-amber-200 border-blue-200 border-green-200 border-red-200 bg-amber-50 bg-blue-50 bg-green-50 bg-red-50 px-4 py-3 text-base text-amber-800 text-blue-800 text-green-800 text-red-800"
+        class="{% if message.tags == 'success' %}bg-green-50 {% elif message.tags == 'error' %}bg-red-50 {% elif message.tags == 'warning' %}bg-amber-50 {% else %}bg-blue-50 border-blue-200{% endif %} mb-2 flex items-center justify-between gap-4 rounded-xl border border-amber-200 border-green-200 border-red-200 px-4 py-3 text-sm text-amber-800 text-blue-800 text-green-800 text-red-800 shadow-sm sm:text-base"
       >
         <span>{{ message }}</span>
-
         <button onclick="this.parentElement.remove()" class="ml-auto text-lg leading-none opacity-50 hover:opacity-100">&times;</button>
       </div>
       {% endfor %}
     </div>
     {% endif %}
 
-    <!-- Contenu principal -->
-    <main class="flex-1 mt-20">{% block content %}{% endblock %}</main>
+    <main class="{% if not messages %}mt-20{% endif %} flex-1">{% block content %}{% endblock %}</main>
 
-    <!-- FOOTER -->
-    <footer class="bg-primary mt-auto text-white min-h-105 flex items-center">
-      <div class="mx-auto max-w-7xl px-6 pt-10 pb-20 lg:px-8 lg:pr-10">
-        <!-- Top Footer -->
-        <div class=" grid grid-cols-1 gap-x-20 gap-y-14 md:grid-cols-2 lg:grid-cols-4">
-          <!-- Brand -->
-          <div>
-            <h3 class="mb-6 text-xl font-semibold">Découvrez CampusNest</h3>
-
-            <p class="max-w-md text-xs text-white/ leading-8 text-white/70">
-              campusNest est la plateforme de référence pour les étudiants à la recherche d'un logement universitaire. Nous connectons les étudiants avec des résidences de qualité proposées par des
+    <footer class="bg-primary mt-auto text-white">
+      <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+          <div class="space-y-4">
+            <h3 class="text-secondary text-lg font-semibold">Découvrez CampusNest</h3>
+            <p class="max-w-sm text-sm leading-6 text-white/70">
+              CampusNest est la plateforme de référence pour les étudiants à la recherche d'un logement universitaire. Nous connectons les étudiants avec des résidences de qualité proposées par des
               propriétaires fiables, offrant une expérience de vie étudiante exceptionnelle.
             </p>
-
-            <div class="mt-6 flex items-center gap-4">
-              <a href="#" class="hover:text-primary flex h-10 w-10 items-center justify-center rounded-full border border-white/20 transition duration-300 hover:bg-white">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-5 w-5">
+            <div class="flex items-center gap-3 pt-2">
+              <a href="#" class="hover:text-primary flex h-9 w-9 items-center justify-center rounded-full border border-white/10 transition duration-300 hover:bg-white">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-4.5 w-4.5">
                   <path
                     d="M22 12a10 10 0 10-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.5-3.88 3.77-3.88 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.25 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0022 12z"
                   />
                 </svg>
               </a>
-
-              <a href="#" class="hover:text-primary flex h-10 w-10 items-center justify-center rounded-full border border-white/20 transition duration-300 hover:bg-white">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-5 w-5">
+              <a href="#" class="hover:text-primary flex h-9 w-9 items-center justify-center rounded-full border border-white/10 transition duration-300 hover:bg-white">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-4.5 w-4.5">
                   <path
                     d="M7.75 2C4.57 2 2 4.57 2 7.75v8.5C2 19.43 4.57 22 7.75 22h8.5C19.43 22 22 19.43 22 16.25v-8.5C22 4.57 19.43 2 16.25 2h-8.5zm0 1.8h8.5a3.95 3.95 0 013.95 3.95v8.5a3.95 3.95 0 01-3.95 3.95h-8.5a3.95 3.95 0 01-3.95-3.95v-8.5A3.95 3.95 0 017.75 3.8zm8.85 1.4a.9.9 0 100 1.8.9.9 0 000-1.8zm-4.35 1.2A5.55 5.55 0 106 11.95 5.56 5.56 0 0012.25 6.4zm0 1.8a3.75 3.75 0 11-3.75 3.75 3.75 3.75 0 013.75-3.75z"
                   />
                 </svg>
               </a>
-
-              <a href="#" class="hover:text-primary flex h-10 w-10 items-center justify-center rounded-full border border-white/20 transition duration-300 hover:bg-white">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-5 w-5">
+              <a href="#" class="hover:text-primary flex h-9 w-9 items-center justify-center rounded-full border border-white/10 transition duration-300 hover:bg-white">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" class="h-4.5 w-4.5">
                   <path
                     d="M20.45 3.55A11.94 11.94 0 0112 6.07a5.48 5.48 0 00-9.34 5V12A13.09 13.09 0 013 3.89a5.48 5.48 0 001.7 7.31A5.39 5.39 0 012.8 10.7v.07a5.48 5.48 0 004.4 5.37 5.5 5.5 0 01-2.47.1 5.49 5.49 0 005.12 3.8A11 11 0 012 19.54 15.52 15.52 0 0010.29 22c9.14 0 14.14-7.72 14.14-14.41 0-.22 0-.43-.02-.64A10.18 10.18 0 0022 4.59a9.94 9.94 0 01-2.55.71z"
                   />
@@ -77,84 +75,55 @@
             </div>
           </div>
 
-          <!-- Navigation -->
-          <div>
-            <h3 class="mb-6 text-xl font-semibold">Navigation</h3>
-
-            <ul class="space-y-4 text-base text-white/70">
-              <li>
-                <a href="/" class="transition hover:text-white">Accueil</a>
-              </li>
-
-              <li>
-                <a href="#" class="transition hover:text-white">Résidences</a>
-              </li>
-
-              <li>
-                <a href="#" class="transition hover:text-white">Chambres disponibles</a>
-              </li>
-
-              <li>
-                <a href="#" class="transition hover:text-white">Réservations</a>
-              </li>
+          <div class="space-y-4">
+            <h3 class="text-secondary text-lg font-semibold">Navigation</h3>
+            <ul class="space-y-2.5 text-sm text-white/70">
+              <li><a href="/" class="transition hover:text-white">Accueil</a></li>
+              <li><a href="{% url 'logements:liste_cites' %}" class="transition hover:text-white">Résidences</a></li>
+              <li><a href="{% url 'contact:contact' %}" class="transition hover:text-white">Contactez-nous</a></li>
             </ul>
           </div>
 
-          <!-- Services -->
-          <div>
-            <h3 class="mb-6 text-xl font-semibold">Nos services</h3>
-
-            <ul class="space-y-4 text-base text-white/70">
+          <div class="space-y-4">
+            <h3 class="text-secondary text-lg font-semibold">Nos services</h3>
+            <ul class="space-y-2.5 text-sm text-white/70">
               <li>Recherche rapide de logement</li>
-
               <li>Gestion des résidences</li>
-
-              <li>Réservation en ligne</li>
-
-              <li>Assistance étudiants</li>
-
-              <li>Support administratif</li>
+              <li>Réservation sécurisée en ligne</li>
+              <li>Assistance étudiants IUT-FV</li>
             </ul>
           </div>
 
-          <!-- Contact -->
-          <div>
-            <h3 class="mb-6 text-xl font-semibold">Contact</h3>
-
-            <ul class="space-y-4 text-base text-white/70">
-              <li>IUT Fotso Victor de Bandjoun</li>
-
-              <li><a href="mailto:palomamotso@gmail.com" class="transition hover:text-white">écrivez-nous</a></li>
-              <li><a href="/contact/" class="transition hover:text-white">contactez-nous</a></li>
-
-              <li><a href="tel:+237675998032" class="transition hover:text-white">tel</a></li>
-
-              <li>Disponible 24h/24 et 7j/7</li>
+          <div class="space-y-4">
+            <h3 class="text-secondary text-lg font-semibold">Contact</h3>
+            <ul class="space-y-2.5 text-sm text-white/70">
+              <li>📍 Campus Universitaire de l'IUT-FV, Bandjoun</li>
+              <li>
+                ✉️
+                <a href="mailto:palomamotso@gmail.com" class="hover:text-white hover:underline">palomamotso@gmail.com</a>
+              </li>
+              <li>
+                📞
+                <a href="tel:+237675998032" class="hover:text-white hover:underline">+237 675 998 032</a>
+              </li>
             </ul>
 
-            <!-- Newsletter -->
-            <div class="mt-8">
-              <h4 class="mb-3 text-base font-semibold text-white">Recevoir les nouveautés</h4>
-
-              <form class="flex items-center overflow-hidden rounded-xl bg-white">
-                <input type="email" placeholder="Votre email" class="w-full px-4 py-3 text-base text-gray-700 outline-none" />
-
-                <button type="submit" class="bg-secondary text-primary px-5 py-3 font-medium transition hover:opacity-90">OK</button>
+            <div class="pt-2">
+              <h4 class="mb-2 text-xs font-semibold text-white/90">Recevoir les nouveautés</h4>
+              <form class="focus-within:border-secondary/50 flex items-center overflow-hidden rounded-lg border border-white/10 bg-white/10 transition">
+                <input type="email" placeholder="Votre email" class="w-full bg-transparent px-3 py-2 text-xs text-white placeholder-white/40 outline-none" required />
+                <button type="submit" class="bg-secondary text-primary hover:bg-secondary/90 px-3 py-2 text-xs font-bold transition">OK</button>
               </form>
             </div>
           </div>
         </div>
 
-        <!-- Bottom Footer -->
-        <div class="mt-14 border-t border-white/10 pt-6">
-          <div class="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <p class="text-center text-base text-white/60 md:text-left">© 2026 CampusNest IUT-FV — Tous droits réservés.</p>
-
-            <div class="flex items-center gap-6 text-base text-white/60">
-              <a href="#" class="transition hover:text-white">Politique de confidentialité</a>
-
-              <a href="#" class="transition hover:text-white">Conditions d’utilisation</a>
-
+        <div class="mt-12 border-t border-white/10 pt-6">
+          <div class="flex flex-col items-center justify-between gap-4 text-xs text-white/50 sm:flex-row">
+            <p class="text-center sm:text-left">© 2026 CampusNest IUT-FV — Tous droits réservés.</p>
+            <div class="flex flex-wrap justify-center gap-4 sm:gap-6">
+              <a href="#" class="transition hover:text-white">Confidentialité</a>
+              <a href="#" class="transition hover:text-white">Conditions</a>
               <a href="#" class="transition hover:text-white">Assistance</a>
             </div>
           </div>
@@ -163,43 +132,20 @@
     </footer>
 
     {% block extra_js %}{% endblock %}
+
+    <script>
+      window.addEventListener('resize', function () {
+        if (window.innerWidth >= 1024) {
+          const menu = document.getElementById('mobile-public-menu');
+          const openIcon = document.getElementById('menu-icon-open');
+          const closeIcon = document.getElementById('menu-icon-close');
+          if (menu && !menu.classList.contains('hidden')) {
+            menu.classList.add('hidden');
+            openIcon.classList.remove('hidden');
+            closeIcon.classList.add('hidden');
+          }
+        }
+      });
+    </script>
   </body>
 </html>
-
-{% comment %}
-<!doctype html>
-<html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{% block title %}CampusNest IUT-FV{% endblock %}</title>
-
-    {% load static %} {# Tailwind CSS compilé #}
-    <link rel="stylesheet" href="{% static 'css/output.css' %}" />
-
-    {% block extra_head %}{% endblock %}
-  </head>
-
-  <body class="flex min-h-screen flex-col bg-gray-50 text-gray-900">
-    {# Inclusion de la navbar #} {% include "components/navbar.html" %} {# Messages Flash Django #} {% if messages %}
-    <div class="mx-auto w-full max-w-7xl px-4 pt-4">
-      {% for message in messages %}
-      <div
-        class="{% if message.tags == 'success' %}bg-green-50 {% elif message.tags == 'error' %}bg-red-50 {% elif message.tags == 'warning' %}bg-amber-50 {% else %}bg-blue-50 border-blue-200{% endif %} mb-2 flex items-center justify-between gap-4 rounded-xl border border-amber-200 border-green-200 border-red-200 px-4 py-3 text-base text-amber-800 text-blue-800 text-green-800 text-red-800"
-      >
-        <span>{{ message }}</span>
-        <button onclick="this.parentElement.remove()" class="ml-auto text-lg leading-none opacity-50 hover:opacity-100">&times;</button>
-      </div>
-      {% endfor %}
-    </div>
-    {% endif %}
-
-    <main class="flex-1">{% block content %}{% endblock %}</main>
-
-    {# Footer #}
-    <footer class="bg-primary text-secondary/60 mt-auto py-4 text-center text-xs">© 2026 CampusNest IUT-FV — IUT de Fotso Victor, Bandjoun</footer>
-
-    {% block extra_js %}{% endblock %}
-  </body>
-</html>
-{% endcomment %}

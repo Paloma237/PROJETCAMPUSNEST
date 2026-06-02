@@ -1,0 +1,166 @@
+{# templates/components/sidebar_admin.html #}
+
+<aside class="w-64 shrink-0 min-h-screen bg-primary flex flex-col">
+
+  {# ── Logo ── #}
+  <div class="px-6 py-5 border-b border-white/10">
+    <a href="/" class="flex items-center gap-2.5">
+      <span class="w-8 h-8 bg-secondary rounded-lg flex items-center justify-center
+                   text-primary font-bold text-sm shrink-0">N</span>
+      <span class="text-secondary font-semibold text-base">CampusNest</span>
+    </a>
+    <p class="text-secondary/40 text-xs mt-1 ml-10">Administration</p>
+  </div>
+
+  {# ── Profil admin ── #}
+  <div class="px-6 py-4 border-b border-white/10 flex items-center gap-3">
+    <div class="w-9 h-9 rounded-full bg-red-500/20 border border-red-500/30
+                flex items-center justify-center text-red-300 font-semibold text-sm shrink-0">
+      {{ user.prenom|first|upper }}{{ user.nom|first|upper }}
+    </div>
+    <div class="min-w-0">
+      <p class="text-white text-sm font-medium truncate">{{ user.get_full_name }}</p>
+      <span class="text-xs text-red-400">Administrateur</span>
+    </div>
+  </div>
+
+  {# ── Navigation ── #}
+  <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+
+    <p class="text-secondary/30 text-xs uppercase tracking-widest px-3 mb-2">Supervision</p>
+
+    <a href="{% url 'users:admin_dashboard' %}"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition
+              {% if request.resolver_match.url_name == 'admin_dashboard' %}
+                bg-secondary/20 text-secondary font-medium
+              {% else %}
+                text-secondary/60 hover:bg-white/5 hover:text-secondary
+              {% endif %}">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0
+                 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0
+                 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+      </svg>
+      Tableau de bord
+    </a>
+
+    <p class="text-secondary/30 text-xs uppercase tracking-widest px-3 mt-4 mb-2">Utilisateurs</p>
+
+    <a href="{% url 'users:admin_dashboard' %}#proprietaires"
+       class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition
+              text-secondary/60 hover:bg-white/5 hover:text-secondary">
+      <span class="flex items-center gap-3">
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283
+                   -.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283
+                   .356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        Propriétaires
+      </span>
+      {% if stats.proprietaires_attente %}
+        <span class="bg-amber-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+          {{ stats.proprietaires_attente }}
+        </span>
+      {% endif %}
+    </a>
+
+    <p class="text-secondary/30 text-xs uppercase tracking-widest px-3 mt-4 mb-2">Logements</p>
+
+    <a href="{% url 'logements:liste_admin' %}"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition
+              text-secondary/60 hover:bg-white/5 hover:text-secondary">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5
+                 m-9 0H3m2 0h5"/>
+      </svg>
+      Tous les logements
+    </a>
+
+    <p class="text-secondary/30 text-xs uppercase tracking-widest px-3 mt-4 mb-2">Modération</p>
+
+    <a href="{% url 'signalements:liste' %}"
+       class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition
+              text-secondary/60 hover:bg-white/5 hover:text-secondary">
+      <span class="flex items-center gap-3">
+        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667
+                   1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34
+                   16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        Signalements
+      </span>
+      {% if stats.signalements_ouverts %}
+        <span class="bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+          {{ stats.signalements_ouverts }}
+        </span>
+      {% endif %}
+    </a>
+
+    <a href="{% url 'avis:liste_admin' %}"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition
+              text-secondary/60 hover:bg-white/5 hover:text-secondary">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69
+                 h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118
+                 l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0
+                 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674
+                 a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914
+                 a1 1 0 00.951-.69l1.519-4.674z"/>
+      </svg>
+      Modération des avis
+    </a>
+
+    <a href="{% url 'contact:tous' %}"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition
+              text-secondary/60 hover:bg-white/5 hover:text-secondary">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7
+                 a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+      </svg>
+      Messages
+    </a>
+
+    <p class="text-secondary/30 text-xs uppercase tracking-widest px-3 mt-4 mb-2">Système</p>
+
+    <a href="{% url 'admin:index' %}"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition
+              text-secondary/60 hover:bg-white/5 hover:text-secondary">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573
+                 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756
+                 .426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826
+                 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756
+                 -3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37
+                 a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724
+                 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07
+                 2.572-1.065z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+      </svg>
+      Admin Django
+    </a>
+
+  </nav>
+
+  {# ── Déconnexion ── #}
+  <div class="px-3 py-4 border-t border-white/10">
+    <a href="{% url 'users:deconnexion' %}"
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm
+              text-secondary/50 hover:bg-red-500/10 hover:text-red-400 transition">
+      <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7
+                 a3 3 0 013-3h4a3 3 0 013 3v1"/>
+      </svg>
+      Se déconnecter
+    </a>
+  </div>
+
+</aside>

@@ -12,7 +12,7 @@
   --font-body: "Inter", sans-serif;
 
   /* Couleurs principales CampusNest */
-  --color-primary:       #1A2517;  /* indigo-700 — couleur principale */
+  --color-primary:       #1A2517;  /* couleur principale */
   --color-secondary:     #ACC8A2;  /*couleur secondaire*/
   --color-primary-dark:  #3730a3;  /* indigo-800 — hover */
   --color-primary-light: #6366f1;  /* indigo-500 — accents */
@@ -40,15 +40,28 @@
   /* Style pour tous les inputs textuels, select et textarea du formulaire */
   .form-professional input[type="text"],
   .form-professional input[type="number"],
+  .form-professional input[type="email"],
+  .form-professional input[type="tel"],
+  .form-professional input[type="search"],
   .form-professional textarea,
   .form-professional select {
     @apply w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 transition-colors duration-200;
     @apply focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none;
   }
-
   /* Style spécifique pour les checkboxes */
   .form-professional input[type="checkbox"] {
     @apply h-4 w-4 rounded border-gray-300 text-primary transition-colors;
     @apply focus:ring-primary/20 focus:ring-offset-0;
+  }
+}
+
+@layer utilities {
+  /* Masquer la scrollbar sur les menus de navigation tout en permettant le défilement */
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
