@@ -30,6 +30,9 @@ urlpatterns = [
 
     # ─── Contact ─────────────────────────────────────────────────
     path("contact/", include("campusnest.contact.urls", namespace="contact")),
+    
+    # ─── Favoris ─────────────────────────────────────────────────
+    path("favoris/", include("campusnest.favoris.urls", namespace="favoris")),
 ]
 
 # ─── Servir les fichiers media en développement ──────────────────

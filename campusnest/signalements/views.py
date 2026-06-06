@@ -105,10 +105,10 @@ def liste_signalements_view(request):
 def detail_signalement_view(request, pk):
     """
     Détail d'un signalement pour l'administrateur.
-    Template : signalements/templates/signalements/detail.html
+    Template : signalements/templates/signalements/detail_signalements.html
     """
     signalement = get_object_or_404(Signalement, pk=pk)
-    return render(request, "signalements/detail.html", {"signalement": signalement})
+    return render(request, "signalements/detail_signalements.html", {"signalement": signalement})
 
 
 @admin_requis

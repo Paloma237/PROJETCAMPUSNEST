@@ -1,0 +1,152 @@
+{% extends "accounts/base_dashboard.html" %}
+{% block content %}
+<div class="mx-auto max-w-6xl px-4 py-8">
+
+  <!-- En-tête -->
+  <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <h1 class="text-2xl font-semibold text-gray-900">Messages de contact</h1>
+      <span class="rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-600">
+        {{ messages_liste|length }} message{{ messages_liste|length|pluralize }}
+      </span>
+    </div>
+    <div class="flex gap-2">
+      <a href="{% url 'contact:tous_messages_admin' %}"
+         class="rounded-full border px-4 py-1.5 text-base transition
+                {% if not request.GET.non_lus %}bg-primary text-secondary border-primary
+                {% else %}bg-white text-gray-500 border-gray-200 hover:border-gray-400{% endif %}">
+        Tous
+      </a>
+      <a href="{% url 'contact:tous_messages_admin' %}?non_lus=1"
+         class="rounded-full border px-4 py-1.5 text-base transition
+                {% if request.GET.non_lus %}bg-primary text-secondary border-primary
+                {% else %}bg-white text-gray-500 border-gray-200 hover:border-gray-400{% endif %}">
+        Non lus
+      </a>
+    </div>
+  </div>
+
+  <!-- Alertes Django -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="mb-4 rounded-xl px-4 py-3 text-base
+                  {% if 'success' in message.tags %}bg-green-50 text-green-700
+                  {% else %}bg-red-50 text-red-700{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if messages_liste %}
+  <div class="overflow-x-auto rounded-2xl border border-gray-100 bg-white shadow-sm">
+    <table class="w-full text-base">
+      <thead>
+        <tr class="border-b border-gray-100 bg-gray-50">
+          <th class="w-6 px-4 py-3"></th>
+          <th class="px-4 py-3 text-left text-sm font-semibold tracking-wide text-gray-400 uppercase">Expéditeur</th>
+          <th class="px-4 py-3 text-left text-sm font-semibold tracking-wide text-gray-400 uppercase">Objet</th>
+          <th class="hidden px-4 py-3 text-left text-sm font-semibold tracking-wide text-gray-400 uppercase md:table-cell">Date</th>
+          <th class="px-4 py-3 text-left text-sm font-semibold tracking-wide text-gray-400 uppercase">Statut</th>
+          <th class="px-4 py-3 text-left text-sm font-semibold tracking-wide text-gray-400 uppercase">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-50">
+        {% for msg in messages_liste %}
+        <tr class="transition hover:bg-gray-50 {% if not msg.est_lu %}bg-blue-50/30{% endif %}">
+
+          <!-- Indicateur lu / non lu -->
+          <td class="px-4 py-3">
+            {% if not msg.est_lu %}
+              <span class="inline-block h-2 w-2 rounded-full bg-blue-500" title="Non lu"></span>
+            {% else %}
+              <span class="inline-block h-2 w-2 rounded-full bg-gray-200" title="Lu"></span>
+            {% endif %}
+          </td>
+
+          <!-- Expéditeur -->
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-2.5">
+              <div class="bg-primary text-secondary flex h-8 w-8 flex-shrink-0 items-center
+                          justify-center rounded-full text-sm font-bold">
+                {{ msg.nom_expediteur|slice:":1"|upper }}
+              </div>
+              <div class="flex flex-col">
+                <span class="font-medium text-gray-800">{{ msg.nom_expediteur }}</span>
+                <span class="text-sm text-gray-400">{{ msg.email }}</span>
+              </div>
+            </div>
+          </td>
+
+          <!-- Objet -->
+          <td class="max-w-xs px-4 py-3">
+            <span class="block truncate font-medium text-gray-800">
+              {{ msg.objet|truncatechars:50 }}
+            </span>
+            {% if msg.reponse_admin %}
+              <span class="mt-0.5 inline-block rounded bg-green-50 px-2 py-0.5
+                           text-sm font-semibold text-green-600">Répondu</span>
+            {% endif %}
+          </td>
+
+          <!-- Date -->
+          <td class="hidden px-4 py-3 text-sm whitespace-nowrap text-gray-400 md:table-cell">
+            {{ msg.date_envoi|date:"d M Y" }}<br>
+            {{ msg.date_envoi|time:"H:i" }}
+          </td>
+
+          <!-- Statut -->
+          <td class="px-4 py-3">
+            {% if msg.reponse_admin %}
+              <span class="rounded-full bg-green-50 px-2.5 py-1 text-sm font-semibold text-green-600">Traité</span>
+            {% elif msg.est_lu %}
+              <span class="rounded-full bg-yellow-50 px-2.5 py-1 text-sm font-semibold text-yellow-600">Lu</span>
+            {% else %}
+              <span class="rounded-full bg-red-50 px-2.5 py-1 text-sm font-semibold text-red-500">Nouveau</span>
+            {% endif %}
+          </td>
+
+          <!-- Actions -->
+          <td class="px-4 py-3">
+            <div class="flex items-center gap-2">
+              {% if not msg.reponse_admin %}
+                <a href="{% url 'contact:repondre_message' msg.pk %}"
+                   class="bg-primary text-secondary hover:bg-primary/90 rounded-xl px-3
+                          py-1.5 text-sm font-medium transition">
+                  ↩ Répondre
+                </a>
+              {% else %}
+                <a href="{% url 'contact:repondre_message' msg.pk %}"
+                   class="rounded-xl border border-gray-200 px-3 py-1.5 text-sm
+                          text-gray-500 transition hover:bg-gray-50 hover:text-gray-700">
+                  ✏ Éditer
+                </a>
+              {% endif %}
+            </div>
+          </td>
+
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% else %}
+  <div class="rounded-2xl border border-gray-100 bg-white px-4 py-16 text-center shadow-sm">
+    <div class="mb-4 text-5xl">✉️</div>
+    <p class="mb-1 text-base font-semibold text-gray-800">Aucun message</p>
+    <p class="mb-6 text-base text-gray-400">
+      {% if request.GET.non_lus %}Tous les messages ont été lus.
+      {% else %}Aucun message de contact pour le moment.{% endif %}
+    </p>
+    {% if request.GET.non_lus %}
+      <a href="{% url 'contact:tous_messages_admin' %}"
+         class="bg-primary text-secondary hover:bg-primary/90 inline-block rounded-xl
+                px-5 py-2.5 text-base font-medium transition">
+        Voir tous les messages
+      </a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

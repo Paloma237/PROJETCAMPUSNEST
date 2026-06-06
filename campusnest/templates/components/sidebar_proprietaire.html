@@ -10,35 +10,35 @@
   {# ── Logo ── #}
   <div class="px-6 py-5 border-b border-white/10 shrink-0">
     <div class="flex items-center gap-2 shrink-0">
-    <a href="{% url 'logements:home' %}" class="flex items-center gap-2 text-sm font-semibold text-white group">
+    <a href="{% url 'logements:home' %}" class="flex items-center gap-2 text-base font-semibold text-white group">
       <div class="bg-white/10 p-1 rounded-lg transition-transform group-hover:scale-105">
         <img src="/static/images/WhatsApp_Image_2026-05-25_at_17.43.41-removebg-preview.png" alt="CampusNest Logo" class="h-8 w-8 object-contain" />
       </div>
       <span class="hidden xs:block sm:block text-base font-black tracking-wide text-secondary">CampusNest</span>
     </a>
   </div>
-    <p class="text-secondary/40 text-xs mt-1 ml-10">Espace propriétaire</p>
+    <p class="text-secondary/40 text-sm mt-1 ml-10">Espace propriétaire</p>
   </div>
 
   {# ── Profil rapide ── #}
   <div class="px-6 py-4 border-b border-white/10 flex items-center gap-3 shrink-0">
     <div class="w-9 h-9 rounded-full bg-secondary flex items-center justify-center
-                text-primary font-semibold text-sm shrink-0">
+                text-primary font-semibold text-base shrink-0">
       {{ user.prenom|first|upper }}{{ user.nom|first|upper }}
     </div>
     <div class="min-w-0">
-      <p class="text-white text-sm font-medium truncate">{{ user.get_full_name }}</p>
-      <p class="text-secondary/50 text-xs truncate">{{ user.email }}</p>
+      <p class="text-white text-base font-medium truncate">{{ user.get_full_name }}</p>
+      <p class="text-secondary/50 text-sm truncate">{{ user.email }}</p>
     </div>
   </div>
 
   {# ── Navigation (Défilement propre sans scrollbar visible) ── #}
   <nav class="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto scrollbar-none">
 
-    <p class="text-secondary/30 text-xs uppercase tracking-widest px-3 mb-2">Principal</p>
+    <p class="text-secondary/30 text-sm uppercase tracking-widest px-3 mb-2">Principal</p>
 
     <a href="{% url 'users:proprietaire_dashboard' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-base transition
               {% if request.resolver_match.url_name == 'proprietaire_dashboard' %}
                 bg-secondary/20 text-secondary font-medium
               {% else %}
@@ -54,7 +54,7 @@
     </a>
 
     <a href="{% url 'logements:mes_cites' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-base transition
               {% if 'mes_cites' in request.resolver_match.url_name or 'cite' in request.resolver_match.url_name %}
                 bg-secondary/20 text-secondary font-medium
               {% else %}
@@ -69,10 +69,10 @@
       Mes cités
     </a>
 
-    <p class="text-secondary/30 text-xs uppercase tracking-widest px-3 mt-4 mb-2">Réservations</p>
+    <p class="text-secondary/30 text-sm uppercase tracking-widest px-3 mt-4 mb-2">Réservations</p>
 
     <a href="{% url 'reservations:recues' %}"
-       class="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition
+       class="flex items-center justify-between px-3 py-2.5 rounded-xl text-base transition
               {% if 'recues' in request.resolver_match.url_name %}
                 bg-secondary/20 text-secondary font-medium
               {% else %}
@@ -87,14 +87,14 @@
         Réservations reçues
       </span>
       {% if stats.reservations_attente %}
-        <span class="bg-amber-500 text-white text-xs px-1.5 py-0.5 rounded-full font-medium">
+        <span class="bg-amber-500 text-white text-sm px-1.5 py-0.5 rounded-full font-medium">
           {{ stats.reservations_attente }}
         </span>
       {% endif %}
     </a>
 
     <a href="{% url 'reservations:historique' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-base transition
               text-secondary/60 hover:bg-white/5 hover:text-secondary">
       <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -103,10 +103,10 @@
       Historique
     </a>
 
-    <p class="text-secondary/30 text-xs uppercase tracking-widest px-3 mt-4 mb-2">Communication</p>
+    <p class="text-secondary/30 text-sm uppercase tracking-widest px-3 mt-4 mb-2">Communication</p>
 
     <a href="{% url 'contact:mes_messages' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-base transition
               text-secondary/60 hover:bg-white/5 hover:text-secondary">
       <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -116,10 +116,10 @@
       Messages
     </a>
 
-    <p class="text-secondary/30 text-xs uppercase tracking-widest px-3 mt-4 mb-2">Compte</p>
+    <p class="text-secondary/30 text-sm uppercase tracking-widest px-3 mt-4 mb-2">Compte</p>
 
     <a href="{% url 'users:profil' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-base transition
               text-secondary/60 hover:bg-white/5 hover:text-secondary">
       <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -133,7 +133,7 @@
   {# ── Déconnexion ── #}
   <div class="px-3 py-4 border-t border-white/10 shrink-0">
     <a href="{% url 'users:deconnexion' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm
+       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-base
               text-secondary/50 hover:bg-red-500/10 hover:text-red-400 transition">
       <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

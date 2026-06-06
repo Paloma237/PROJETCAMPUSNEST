@@ -1,48 +1,125 @@
-{% extends "base.html" %}
-
- 
+{% extends "accounts/base_dashboard.html" %}
 {% block content %}
-<div class="max-w-xl mx-auto px-4 py-8">
-  <a href="{% url 'logements:detail_chambre' chambre.pk %}"
-     class="text-sm text-gray-400 hover:text-primary transition mb-4 inline-block">
-    ← Retour à la chambre
-  </a>
-  <h1 class="text-2xl font-medium text-gray-900 mb-1">Demande de réservation</h1>
-  <p class="text-sm text-gray-500 mb-6">{{ chambre }} · {{ chambre.loyer|floatformat:0 }} FCFA/mois</p>
- 
-  <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-    <form method="post" novalidate>
+<div class="flex flex-col min-h-[80vh] px-4 py-8 md:py-12">
+  <div class="max-w-xl w-full mx-auto">
+
+    {# Fil d'Ariane #}
+    <div class="flex items-center gap-2 text-sm text-gray-400 mb-6">
+      <a href="{% url 'logements:detail_chambre' chambre.pk %}" class="hover:text-primary transition">
+        {{ chambre.cite.nom }}
+      </a>
+      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      <span class="text-gray-600 font-medium">Réserver</span>
+    </div>
+
+    <h1 class="text-2xl font-semibold tracking-tight text-gray-900 mb-1">Demande de réservation</h1>
+    <p class="text-base text-gray-500 mb-8">
+      Choisissez vos dates de séjour et une date de visite disponible, puis envoyez votre demande au propriétaire.
+    </p>
+
+    {# Résumé chambre #}
+    <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm flex gap-4 items-center mb-6">
+      {% with photo=chambre.photo_principale %}
+        {% if photo %}
+          <img src="{{ photo.image.url }}" alt="{{ chambre }}"
+               class="w-16 h-16 object-cover rounded-xl border border-gray-100 shrink-0">
+        {% endif %}
+      {% endwith %}
+      <div class="min-w-0">
+        <p class="text-base font-semibold text-gray-900 truncate">{{ chambre }}</p>
+        <p class="text-sm text-gray-500">{{ chambre.cite.adresse }}</p>
+        <p class="text-sm font-bold text-primary mt-1">{{ chambre.loyer|floatformat:0 }} FCFA / mois</p>
+      </div>
+    </div>
+
+    {# Formulaire #}
+    <form method="post" class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm space-y-5">
       {% csrf_token %}
-      <div class="mb-4">
-        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
-          Date d'entrée
+
+      {# Erreurs globales #}
+      {% if form.non_field_errors %}
+        <div class="bg-rose-50 border border-rose-200 text-rose-700 text-base rounded-xl px-4 py-3">
+          {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {# Dates de séjour #}
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">
+            Date d'entrée <span class="text-rose-500">*</span>
+          </label>
+          {{ form.date_debut }}
+          {% if form.date_debut.errors %}
+            <p class="text-sm text-rose-500 mt-1">{{ form.date_debut.errors.0 }}</p>
+          {% endif %}
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">
+            Date de sortie <span class="text-rose-500">*</span>
+          </label>
+          {{ form.date_fin }}
+          {% if form.date_fin.errors %}
+            <p class="text-sm text-rose-500 mt-1">{{ form.date_fin.errors.0 }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      {# Date de visite #}
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+          Date de visite souhaitée <span class="text-rose-500">*</span>
         </label>
-        {{ form.date_debut }}
-        {% if form.date_debut.errors %}
-          <p class="text-red-600 text-xs mt-1">{{ form.date_debut.errors|first }}</p>
+        <p class="text-sm text-gray-400 mb-2">
+          Le propriétaire a mis à disposition les créneaux suivants. Choisissez celui qui vous convient.
+        </p>
+        {{ form.date_visite }}
+        {% if form.date_visite.errors %}
+          <p class="text-sm text-rose-500 mt-1">{{ form.date_visite.errors.0 }}</p>
         {% endif %}
       </div>
-      <div class="mb-6">
-        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
-          Date de sortie prévue
-        </label>
-        {{ form.date_fin }}
-        {% if form.date_fin.errors %}
-          <p class="text-red-600 text-xs mt-1">{{ form.date_fin.errors|first }}</p>
-        {% endif %}
+
+      {# Estimation montant (JS) #}
+      <div id="estimation-bloc" class="hidden bg-primary/5 border border-primary/20 rounded-xl px-4 py-3">
+        <p class="text-sm text-gray-500">Montant estimé</p>
+        <p class="text-base font-bold text-primary" id="estimation-montant">—</p>
       </div>
- 
-      <div class="flex items-center gap-3 p-3 bg-secondary/10 border border-secondary/30
-                  rounded-xl mb-6 text-xs text-primary">
-        Durée minimale : 30 jours. La chambre sera marquée indisponible après confirmation.
-      </div>
- 
+
+      {# Bouton envoi #}
       <button type="submit"
-              class="w-full py-3 bg-primary text-secondary text-sm font-medium
-                     rounded-xl hover:bg-primary/90 transition">
-        Envoyer la demande
+              class="w-full text-base font-semibold px-6 py-3 bg-primary text-secondary
+                     rounded-xl hover:opacity-90 transition shadow-sm">
+        Envoyer la demande de réservation
       </button>
     </form>
+
   </div>
 </div>
+
+<script>
+  // Calcul dynamique du montant estimé
+  const loyer      = {{ chambre.loyer }};
+  const dateDebut  = document.querySelector('[name="date_debut"]');
+  const dateFin    = document.querySelector('[name="date_fin"]');
+  const bloc       = document.getElementById('estimation-bloc');
+  const montantEl  = document.getElementById('estimation-montant');
+
+  function updateEstimation() {
+    const d = new Date(dateDebut.value);
+    const f = new Date(dateFin.value);
+    if (d && f && f > d) {
+      const jours  = Math.round((f - d) / (1000 * 60 * 60 * 24));
+      const montant = Math.round(loyer * jours / 30);
+      montantEl.textContent = montant.toLocaleString('fr-FR') + ' FCFA';
+      bloc.classList.remove('hidden');
+    } else {
+      bloc.classList.add('hidden');
+    }
+  }
+
+  dateDebut.addEventListener('change', updateEstimation);
+  dateFin.addEventListener('change', updateEstimation);
+</script>
 {% endblock %}

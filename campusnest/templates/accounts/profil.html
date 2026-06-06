@@ -12,8 +12,8 @@
       </div>
       <div>
         <p class="font-medium text-gray-900">{{ user.get_full_name }}</p>
-        <p class="text-sm text-gray-500">{{ user.email }}</p>
-        <span class="inline-block mt-1 px-2 py-0.5 text-xs rounded-full
+        <p class="text-base text-gray-500">{{ user.email }}</p>
+        <span class="inline-block mt-1 px-2 py-0.5 text-sm rounded-full
           {% if user.role == 'admin' %}bg-red-50 text-red-700
           {% elif user.role == 'proprietaire' %}bg-amber-50 text-amber-700
           {% else %}bg-secondary/20 text-primary{% endif %}">
@@ -26,28 +26,28 @@
       {% csrf_token %}
       <div class="grid grid-cols-2 gap-4 mb-4">
         <div>
-          <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Nom</label>
+          <label class="block text-sm font-medium text-gray-500 uppercase tracking-wide mb-1.5">Nom</label>
           {{ form.nom }}
-          {% if form.nom.errors %}<p class="text-red-600 text-xs mt-1">{{ form.nom.errors|first }}</p>{% endif %}
+          {% if form.nom.errors %}<p class="text-red-600 text-sm mt-1">{{ form.nom.errors|first }}</p>{% endif %}
         </div>
         <div>
-          <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Prénom</label>
+          <label class="block text-sm font-medium text-gray-500 uppercase tracking-wide mb-1.5">Prénom</label>
           {{ form.prenom }}
-          {% if form.prenom.errors %}<p class="text-red-600 text-xs mt-1">{{ form.prenom.errors|first }}</p>{% endif %}
+          {% if form.prenom.errors %}<p class="text-red-600 text-sm mt-1">{{ form.prenom.errors|first }}</p>{% endif %}
         </div>
       </div>
       <div class="mb-6">
-        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">Téléphone</label>
+        <label class="block text-sm font-medium text-gray-500 uppercase tracking-wide mb-1.5">Téléphone</label>
         {{ form.telephone }}
       </div>
       <div class="flex items-center gap-3">
         <button type="submit"
-                class="px-6 py-2.5 bg-primary text-secondary text-sm font-medium
+                class="px-6 py-2.5 bg-primary text-secondary text-base font-medium
                        rounded-xl hover:bg-primary/90 transition">
           Enregistrer
         </button>
         <a href="{% url 'users:dashboard' %}"
-           class="px-6 py-2.5 border border-gray-200 text-gray-600 text-sm
+           class="px-6 py-2.5 border border-gray-200 text-gray-600 text-base
                   rounded-xl hover:bg-gray-50 transition">
           Annuler
         </a>

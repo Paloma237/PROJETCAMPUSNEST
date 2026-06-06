@@ -27,9 +27,11 @@ urlpatterns = [
     path("dashboard/",               views.dashboard_view,              name="dashboard"),
     path("dashboard/client/",        views.client_dashboard_view,       name="client_dashboard"),
     path("dashboard/proprietaire/",  views.proprietaire_dashboard_view, name="proprietaire_dashboard"),
-    path("dashboard/admin/",         views.admin_dashboard_view,        name="admin_dashboard"),
-
+    
     # Actions admin
     path("valider/<int:pk>/",   views.valider_proprietaire_view, name="valider_proprietaire"),
     path("suspendre/<int:pk>/", views.suspendre_compte_view,     name="suspendre_compte"),
+    path("dashboard/admin/",         views.admin_dashboard_view,        name="admin_dashboard"),
+    path("proprietaire/<int:pk>/gerer/", views.gerer_proprietaire_view, name="gerer_proprietaire"),
+
 ]

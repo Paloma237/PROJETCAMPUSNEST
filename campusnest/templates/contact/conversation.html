@@ -1,0 +1,107 @@
+{% extends "accounts/base_dashboard.html" %}
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+
+  <!-- En-tête -->
+  <div class="mb-4">
+    <a href="{% url 'contact:mes_messages' %}"
+       class="text-base text-gray-400 hover:text-primary transition mb-3 inline-block">
+      ← Retour
+    </a>
+
+    <!-- Infos chambre -->
+    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm px-4 py-3
+                flex items-center gap-3">
+      <span class="text-2xl">🏠</span>
+      <div>
+        <p class="text-base font-semibold text-gray-800">
+          {{ conversation.chambre.description|truncatechars:60 }}
+        </p>
+        <p class="text-sm text-gray-400">
+          {{ conversation.chambre.get_type_display }}
+          · {{ conversation.chambre.superficie }} m²
+          · {{ conversation.chambre.loyer|floatformat:0 }} FCFA/mois
+          · {{ conversation.chambre.cite.nom }}
+        </p>
+      </div>
+      <div class="ml-auto text-right">
+        <p class="text-sm text-gray-400">
+          {% if request.user == conversation.client %}
+            Avec {{ conversation.proprietaire.get_full_name }}
+          {% else %}
+            Avec {{ conversation.client.get_full_name }}
+          {% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fil de messages -->
+  <div class="space-y-3 py-4 min-h-[300px]" id="chat-messages">
+    {% for message in tous_messages %}
+
+      {% if message.auteur == request.user %}
+        <!-- Message envoyé (à droite) -->
+        <div class="flex justify-end">
+          <div class="max-w-xs lg:max-w-md">
+            <div class="bg-primary text-secondary px-4 py-2.5 rounded-2xl rounded-tr-sm
+                        text-base leading-relaxed">
+              {{ message.contenu }}
+            </div>
+            <p class="text-xs text-gray-400 mt-1 text-right">
+              {{ message.date_envoi|date:"d M, H:i" }}
+              {% if message.est_lu %}· ✓✓{% endif %}
+            </p>
+          </div>
+        </div>
+
+      {% else %}
+        <!-- Message reçu (à gauche) -->
+        <div class="flex justify-start gap-2">
+          <div class="w-7 h-7 rounded-full bg-gray-200 text-gray-600 text-sm font-bold
+                      flex items-center justify-center flex-shrink-0 mt-1">
+            {{ message.auteur.get_full_name|slice:":1"|upper }}
+          </div>
+          <div class="max-w-xs lg:max-w-md">
+            <div class="bg-white border border-gray-100 shadow-sm px-4 py-2.5
+                        rounded-2xl rounded-tl-sm text-base text-gray-800 leading-relaxed">
+              {{ message.contenu }}
+            </div>
+            <p class="text-xs text-gray-400 mt-1">
+              {{ message.date_envoi|date:"d M, H:i" }}
+            </p>
+          </div>
+        </div>
+      {% endif %}
+
+    {% empty %}
+      <p class="text-center text-gray-400 text-base py-8">Aucun message pour le moment.</p>
+    {% endfor %}
+  </div>
+
+  <!-- Formulaire envoi -->
+  <div class="bg-white border border-gray-100 rounded-2xl shadow-sm p-4 mt-4">
+    <form method="post" novalidate class="flex gap-3 items-end">
+      {% csrf_token %}
+      <div class="flex-1">
+        {{ form.contenu }}
+        {% if form.contenu.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.contenu.errors|first }}</p>
+        {% endif %}
+      </div>
+      <button type="submit"
+              class="px-5 py-2.5 bg-primary text-secondary text-base font-medium
+                     rounded-xl hover:bg-primary/90 transition shrink-0">
+        Envoyer
+      </button>
+    </form>
+  </div>
+
+</div>
+
+<!-- Scroll automatique vers le bas -->
+<script>
+  const chat = document.getElementById("chat-messages");
+  if (chat) chat.scrollTop = chat.scrollHeight;
+</script>
+{% endblock %}

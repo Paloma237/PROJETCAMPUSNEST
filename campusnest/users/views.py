@@ -2,9 +2,11 @@ from django.contrib import messages
 from django.contrib.auth import login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
-from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.db.models import Count, Q, Sum
+import datetime
+
 
 from .forms import (
     ConnexionForm,
@@ -17,13 +19,19 @@ from .forms import (
 )
 from .models import LogActivite, OTPCode, ProfilProprietaire, Utilisateur
 from .utils import enregistrer_log, admin_requis, proprietaire_valide_requis
+from campusnest.contact.models import MessageContact
+from campusnest.logements.models import Chambre, Cite
+from campusnest.signalements.models import Signalement
+from campusnest.reservations.models import Reservation
+from campusnest.avis.models import Avis
+
 
 def devenir_proprietaire(request):
     return render(request, "accounts/devenir_proprietaire.html")
 
 
 # ─────────────────────────────────────────────
-#  Helper — redirection par rôle  ← CORRIGÉ
+#  Helper — redirection par rôle et dashboard
 # ────────────────────────────────────────────
 
 def _redirection_par_role(user):
@@ -324,15 +332,31 @@ def profil_view(request):
 def dashboard_view(request):
     return redirect(_redirection_par_role(request.user))
 
-
 @login_required
 def client_dashboard_view(request):
-    from campusnest.logements.models import Chambre, Cite
-    from campusnest.reservations.models import Reservation
+    from campusnest.contact.models import Conversation
+
+    # Messages de contact envoyés à CampusNest
+    mes_messages_recents = MessageContact.objects.filter(
+        expediteur=request.user
+    ).order_by('-date_envoi')[:4]
+
+    # Conversations avec des propriétaires (non lus = messages reçus non lus)
+    conversations = Conversation.objects.filter(
+        client=request.user
+    ).select_related("proprietaire", "chambre").prefetch_related("messages")
+
+    messages_non_lus = sum(
+        conv.messages.filter(est_lu=False).exclude(auteur=request.user).count()
+        for conv in conversations
+    )
+
     return render(request, "accounts/client_dashboard.html", {
-        "cites":            Cite.objects.all()[:6],
-        "chambres":         Chambre.objects.filter(est_disponible=True)[:8],
-        "mes_reservations": Reservation.objects.filter(
+        'mes_messages_recents': mes_messages_recents,
+        'messages_non_lus':     messages_non_lus,
+        "cites":                Cite.objects.all()[:6],
+        "chambres":             Chambre.objects.filter(est_disponible=True)[:8],
+        "mes_reservations":     Reservation.objects.filter(
             client=request.user).select_related("chambre__cite")[:3],
     })
 
@@ -342,21 +366,13 @@ Remplace les fonctions proprietaire_dashboard_view et admin_dashboard_view
 dans campusnest/users/views.py
 """
 
-from django.utils import timezone
-from django.db.models import Count, Q, Sum
-import datetime
-
-
 # ─────────────────────────────────────────────
 #  Dashboard Propriétaire
 # ─────────────────────────────────────────────
 
 @proprietaire_valide_requis
 def proprietaire_dashboard_view(request):
-    from campusnest.logements.models import Chambre, Cite
-    from campusnest.reservations.models import Reservation
-
-    # ── Données de base ──
+# ── Données de base ──
     cites    = Cite.objects.filter(proprietaire=request.user)
     chambres = Chambre.objects.filter(cite__proprietaire=request.user)
 
@@ -420,6 +436,17 @@ def proprietaire_dashboard_view(request):
     repartition_types = list(
         chambres.values("type").annotate(nb=Count("id")).order_by("-nb")
     )
+    
+    avis_recents = (
+        Avis.objects
+        .filter(
+            chambre__in=chambres,   # chambres appartenant au proprio
+            est_visible=True,
+        )
+        .select_related("client", "chambre__cite")
+        .order_by("-date_creation")[:4]     # 4 avis les plus récents
+    )
+
 
     # Top 3 chambres par nombre de réservations
     top_chambres = list(
@@ -432,6 +459,7 @@ def proprietaire_dashboard_view(request):
         "chambres": chambres[:8],
         "q":        q,
         "reservations_recentes": toutes_reservations[:5],
+        "avis_recents": avis_recents,
         "stats": {
             "total_cites":           cites.count(),
             "total_chambres":        total_chambres,
@@ -457,10 +485,6 @@ def proprietaire_dashboard_view(request):
 
 @admin_requis
 def admin_dashboard_view(request):
-    from campusnest.logements.models import Chambre, Cite
-    from campusnest.reservations.models import Reservation
-    from campusnest.signalements.models import Signalement
-
     aujourd_hui = timezone.now().date()
     debut_mois  = aujourd_hui.replace(day=1)
 
@@ -607,3 +631,48 @@ def _masquer_email(email: str) -> str:
 
 def _otp_tentatives_restantes(request) -> int:
     return max(0, 5 - request.session.get("otp_attempts", 0))
+
+@admin_requis
+def gerer_proprietaire_view(request, pk):
+    profil = get_object_or_404(ProfilProprietaire, utilisateur__pk=pk)
+    user   = profil.utilisateur
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+
+        if action == "valider":
+            profil.est_valide      = True
+            profil.date_validation = timezone.now()
+            profil.save()
+            user.is_active = True
+            user.save(update_fields=["is_active"])
+            enregistrer_log(request, request.user,
+                f"Propriétaire validé : {user.email}")
+            messages.success(request,
+                f"Le compte de {user.get_full_name()} a été validé.")
+
+        elif action == "suspendre":
+            user.is_active = False
+            user.save(update_fields=["is_active"])
+            enregistrer_log(request, request.user,
+                f"Compte suspendu : {user.email}")
+            messages.warning(request,
+                f"Le compte de {user.get_full_name()} a été suspendu.")
+
+        return redirect("users:admin_dashboard")
+
+    # Statistiques du propriétaire
+
+    cites    = Cite.objects.filter(proprietaire=user)
+    chambres = Chambre.objects.filter(cite__proprietaire=user)
+    reservations = Reservation.objects.filter(
+        chambre__cite__proprietaire=user
+    ).count()
+
+    return render(request, "accounts/gerer_proprietaire.html", {
+        "profil":      profil,
+        "proprietaire": user,
+        "nb_cites":    cites.count(),
+        "nb_chambres": chambres.count(),
+        "nb_reservations": reservations,
+    })

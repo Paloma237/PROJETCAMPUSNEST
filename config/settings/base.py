@@ -95,6 +95,7 @@ LOCAL_APPS = [
     "campusnest.avis",
     "campusnest.signalements",
     "campusnest.contact",
+    "campusnest.favoris",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

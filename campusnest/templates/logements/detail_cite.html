@@ -26,7 +26,7 @@
       <div class="absolute right-0 bottom-0 opacity-10 translate-x-10 translate-y-10">
         <svg class="w-64 h-64 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/></svg>
       </div>
-      <span class="text-white/60 text-[10px] uppercase font-bold tracking-widest mb-1">Résidence Universitaire</span>
+      <span class="text-white/60 text-xs uppercase font-bold tracking-widest mb-1">Résidence Universitaire</span>
       <h2 class="text-white text-xl sm:text-2xl font-black">{{ cite.nom }}</h2>
     </div>
   {% endif %}
@@ -39,15 +39,15 @@
       <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
         <h1 class="text-xl font-black text-gray-900 leading-tight">{{ cite.nom }}</h1>
         
-        <p class="text-xs text-gray-500 mt-2 flex items-center gap-1.5 leading-normal">
+        <p class="text-sm text-gray-500 mt-2 flex items-center gap-1.5 leading-normal">
           <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
           {{ cite.adresse }}
         </p>
 
         {% if cite.description %}
           <div class="mt-4 pt-4 border-t border-gray-50">
-            <h3 class="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">À propos</h3>
-            <p class="text-xs text-gray-600 leading-relaxed whitespace-pre-line">{{ cite.description }}</p>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5">À propos</h3>
+            <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{{ cite.description }}</p>
           </div>
         {% endif %}
 
@@ -55,22 +55,22 @@
         <div class="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-gray-50">
           <div class="bg-gray-50/70 border border-gray-100 rounded-xl p-3 text-center">
             <p class="text-xl font-black text-[#1A2517]">{{ cite.chambres.count }}</p>
-            <p class="text-[10px] font-bold text-gray-400 uppercase mt-0.5">Chambres</p>
+            <p class="text-xs font-bold text-gray-400 uppercase mt-0.5">Chambres</p>
           </div>
           <div class="bg-green-50/40 border border-green-100/30 rounded-xl p-3 text-center">
             <p class="text-xl font-black text-green-600">{{ cite.chambres_disponibles.count }}</p>
-            <p class="text-[10px] font-bold text-green-700 uppercase mt-0.5">Dispo{{ cite.chambres_disponibles.count|pluralize }}</p>
+            <p class="text-xs font-bold text-green-700 uppercase mt-0.5">Dispo{{ cite.chambres_disponibles.count|pluralize }}</p>
           </div>
         </div>
 
         {# Informations du Bailleur #}
         <div class="mt-5 pt-4 border-t border-gray-50 flex items-center gap-3">
-          <div class="w-8 h-8 rounded-full bg-[#1A2517] text-white text-xs font-bold flex items-center justify-center shadow-sm select-none">
+          <div class="w-8 h-8 rounded-full bg-[#1A2517] text-white text-sm font-bold flex items-center justify-center shadow-sm select-none">
             {{ cite.proprietaire.prenom|first|upper }}{{ cite.proprietaire.nom|first|upper }}
           </div>
           <div class="min-w-0">
-            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Gestionnaire</p>
-            <p class="text-xs font-bold text-gray-700 truncate">{{ cite.proprietaire.get_full_name }}</p>
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wide">Gestionnaire</p>
+            <p class="text-sm font-bold text-gray-700 truncate">{{ cite.proprietaire.get_full_name }}</p>
           </div>
         </div>
       </div>
@@ -79,7 +79,7 @@
     {# ═══ DROITE : LISTE DES CHAMBRES HABILLÉES EN CARTES ═══ #}
     <div class="lg:col-span-2 space-y-4">
       <div class="flex items-center justify-between border-b border-gray-100 pb-3">
-        <h2 class="text-sm font-extrabold text-gray-900 uppercase tracking-wider">
+        <h2 class="text-base font-extrabold text-gray-900 uppercase tracking-wider">
           Logements à disposition <span class="text-[#7BA87A] font-black ml-1">({{ chambres|length }})</span>
         </h2>
       </div>
@@ -110,11 +110,11 @@
               <div class="p-4 flex-1 flex flex-col justify-between min-w-0">
                 <div>
                   <div class="flex items-start justify-between gap-2">
-                    <h3 class="text-sm font-bold text-gray-900 group-hover:text-[#7BA87A] transition truncate">
+                    <h3 class="text-base font-bold text-gray-900 group-hover:text-[#7BA87A] transition truncate">
                       {{ chambre.get_type_display }}
                     </h3>
                     {% if chambre.note_moyenne %}
-                      <span class="inline-flex items-center gap-0.5 rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-bold text-amber-700 shrink-0">★ {{ chambre.note_moyenne }}</span>
+                      <span class="inline-flex items-center gap-0.5 rounded bg-amber-50 px-1.5 py-0.5 text-xs font-bold text-amber-700 shrink-0">★ {{ chambre.note_moyenne }}</span>
                     {% endif %}
                   </div>
                   <p class="text-[11px] text-gray-400 font-medium mt-0.5">Dimension : {{ chambre.superficie }} m²</p>
@@ -130,11 +130,11 @@
 
                 {# Footer Interne de la Carte #}
                 <div class="flex items-center justify-between mt-4 pt-2.5 border-t border-gray-50">
-                  <span class="text-sm font-black text-[#1A2517]">
+                  <span class="text-base font-black text-[#1A2517]">
                     {{ chambre.loyer|floatformat:0 }}
-                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-normal">F / mois</span>
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-normal">F / mois</span>
                   </span>
-                  <div class="text-[10px] font-bold text-[#7BA87A] flex items-center gap-0.5 group-hover:translate-x-0.5 transition">
+                  <div class="text-xs font-bold text-[#7BA87A] flex items-center gap-0.5 group-hover:translate-x-0.5 transition">
                     <span>Visiter</span>
                     <svg class="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
                   </div>
@@ -148,7 +148,7 @@
         {# Bloc vide qualitatif #}
         <div class="bg-white border border-dashed border-gray-200 rounded-2xl p-12 text-center shadow-sm">
           <svg class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 012.008 1.24l.885 1.77a2.25 2.25 0 002.007 1.24h1.98a2.25 2.25 0 002.007-1.24l.885-1.77a2.25 2.25 0 012.007-1.24h3.86m-18 0h18M2.25 13.5l1.114-6.126A2.25 2.25 0 015.584 5.25h12.832a2.25 2.25 0 012.22 1.81l1.114 6.126M2.25 13.5V19.5A2.25 2.25 0 004.5 21.75h15a2.25 2.25 0 002.25-2.25V13.5"/></svg>
-          <p class="text-gray-400 text-xs font-medium">Toutes les chambres de cette résidence ont déjà été réservées ou ne sont pas configurées.</p>
+          <p class="text-gray-400 text-sm font-medium">Toutes les chambres de cette résidence ont déjà été réservées ou ne sont pas configurées.</p>
         </div>
       {% endif %}
     </div>

@@ -1,3 +1,6 @@
+"""
+campusnest/reservations/models.py
+"""
 from django.db import models
 from django.utils import timezone
 
@@ -10,22 +13,30 @@ class Reservation(models.Model):
         ANNULEE    = "annulee",    "Annulée"
         ARCHIVEE   = "archivee",   "Archivée"
 
-    chambre      = models.ForeignKey(
+    chambre = models.ForeignKey(
         "logements.Chambre",
         on_delete=models.CASCADE,
         related_name="reservations",
         verbose_name="Chambre",
     )
-    client       = models.ForeignKey(
+    client = models.ForeignKey(
         "users.Utilisateur",
         on_delete=models.CASCADE,
         related_name="reservations",
         limit_choices_to={"role": "client"},
         verbose_name="Étudiant",
     )
-    date_debut   = models.DateField("Date d'entrée")
-    date_fin     = models.DateField("Date de sortie")
-    statut       = models.CharField(
+    date_debut = models.DateField("Date d'entrée")
+    date_fin   = models.DateField("Date de sortie")
+
+    # Date de visite choisie par le CLIENT lors de la réservation
+    date_visite = models.DateField("Date de visite choisie", null=True, blank=True)
+
+    # Informations de visite complétées par le PROPRIÉTAIRE lors de l'acceptation
+    lieu_visite  = models.CharField("Lieu de la visite", max_length=255, blank=True)
+    heure_visite = models.TimeField("Heure de la visite", null=True, blank=True)
+
+    statut = models.CharField(
         "Statut", max_length=20,
         choices=Statut.choices,
         default=Statut.EN_ATTENTE,
@@ -33,7 +44,6 @@ class Reservation(models.Model):
     date_demande      = models.DateTimeField("Date de demande", default=timezone.now)
     date_confirmation = models.DateTimeField("Date de confirmation", null=True, blank=True)
     motif_annulation  = models.TextField("Motif d'annulation", blank=True)
-    date_visite       = models.DateField("Date de visite prévue", null=True, blank=True)
 
     class Meta:
         verbose_name        = "Réservation"
@@ -43,11 +53,14 @@ class Reservation(models.Model):
     def __str__(self):
         return f"Réservation #{self.pk} — {self.client} → {self.chambre}"
 
-    # ── Actions métier ───────────────────────
+    # ── Actions métier ──────────────────────────────────────
 
-    def confirmer(self):
+    def confirmer(self, lieu_visite="", heure_visite=None):
+        """Accepte la réservation et enregistre les infos de visite fournies par le proprio."""
         self.statut            = self.Statut.CONFIRMEE
         self.date_confirmation = timezone.now()
+        self.lieu_visite       = lieu_visite
+        self.heure_visite      = heure_visite
         self.chambre.est_disponible = False
         self.chambre.save(update_fields=["est_disponible"])
         self.save()

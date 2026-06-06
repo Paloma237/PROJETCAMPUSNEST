@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from .models import Avis
  
-CSS = "w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-secondary/50 transition"
+CSS = "w-full px-3 py-2 text-base border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-secondary/50 transition"
  
  
 class AvisForm(forms.ModelForm):

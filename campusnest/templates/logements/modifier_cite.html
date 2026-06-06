@@ -2,8 +2,7 @@
 {% block content %}
 <div class="max-w-2xl mx-auto px-4 py-8">
 
-  {# ── Breadcrumb ── #}
-  <nav class="flex items-center gap-2 text-xs text-gray-400 mb-6">
+  <nav class="flex items-center gap-2 text-sm text-gray-400 mb-6">
     <a href="{% url 'logements:mes_cites' %}" class="hover:text-primary transition">Mes cités</a>
     <span>›</span>
     <span class="text-gray-600">Modifier {{ cite.nom }}</span>
@@ -17,91 +16,73 @@
 
       {# Nom #}
       <div class="mb-4">
-        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+        <label class="block text-sm font-medium text-gray-500 uppercase tracking-wide mb-1.5">
           Nom de la cité <span class="text-red-400">*</span>
         </label>
         <input type="text" name="nom" value="{{ form.nom.value|default:'' }}"
-               class="w-full px-3 py-2.5 text-sm border rounded-xl bg-gray-50
+               class="w-full px-3 py-2.5 text-base border rounded-xl bg-gray-50
                       focus:outline-none focus:ring-2 focus:ring-secondary/50 transition
                       {% if form.nom.errors %}border-red-300{% else %}border-gray-200{% endif %}"/>
         {% if form.nom.errors %}
-          <p class="text-red-500 text-xs mt-1">{{ form.nom.errors|first }}</p>
+          <p class="text-red-500 text-sm mt-1">{{ form.nom.errors|first }}</p>
         {% endif %}
       </div>
 
       {# Adresse #}
       <div class="mb-4">
-        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+        <label class="block text-sm font-medium text-gray-500 uppercase tracking-wide mb-1.5">
           Adresse <span class="text-red-400">*</span>
         </label>
         <input type="text" name="adresse" value="{{ form.adresse.value|default:'' }}"
-               class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50
+               class="w-full px-3 py-2.5 text-base border border-gray-200 rounded-xl bg-gray-50
                       focus:outline-none focus:ring-2 focus:ring-secondary/50 transition"/>
         {% if form.adresse.errors %}
-          <p class="text-red-500 text-xs mt-1">{{ form.adresse.errors|first }}</p>
+          <p class="text-red-500 text-sm mt-1">{{ form.adresse.errors|first }}</p>
         {% endif %}
       </div>
 
       {# Description #}
-      <div class="mb-4">
-        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-500 uppercase tracking-wide mb-1.5">
           Description
         </label>
         <textarea name="description" rows="4"
-                  class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50
+                  class="w-full px-3 py-2.5 text-base border border-gray-200 rounded-xl bg-gray-50
                          focus:outline-none focus:ring-2 focus:ring-secondary/50 transition resize-none"
                   placeholder="Décrivez la cité : emplacement, ambiance, accès...">{{ form.description.value|default:'' }}</textarea>
       </div>
 
-      {# Coordonnées GPS #}
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
-            Latitude
-          </label>
-          <input type="number" name="latitude" step="0.000001"
-                 value="{{ form.latitude.value|default:'' }}"
-                 class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50
-                        focus:outline-none focus:ring-2 focus:ring-secondary/50 transition"
-                 placeholder="Ex : 5.353"/>
-        </div>
-        <div>
-          <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
-            Longitude
-          </label>
-          <input type="number" name="longitude" step="0.000001"
-                 value="{{ form.longitude.value|default:'' }}"
-                 class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50
-                        focus:outline-none focus:ring-2 focus:ring-secondary/50 transition"
-                 placeholder="Ex : 10.521"/>
-        </div>
-      </div>
-
-      {#  Le champ d'upload pour ajouter de nouvelles photos #}
+      {# Nouvelles photos #}
       <div class="mb-6">
-        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
-          Ajouter de nouvelles photos <span class="text-gray-400 normal-case">(plusieurs fichiers possibles)</span>
+        <label class="block text-sm font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+          Ajouter de nouvelles photos
+          <span class="text-gray-400 normal-case font-normal">(plusieurs fichiers possibles)</span>
         </label>
-        <input
-          type="file"
-          name="photos"
-          multiple
-          accept="image/*"
-          class="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-primary/10 file:px-3 file:py-1 file:text-xs file:font-medium file:text-primary"
-        />
+        <input type="file" name="photos" multiple accept="image/*"
+               class="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-base
+                      text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-primary/10
+                      file:px-3 file:py-1 file:text-sm file:font-medium file:text-primary"/>
       </div>
 
-      {#  Gestion des photos existantes #}
+      {# Photos existantes avec modale #}
       {% if photos_cite %}
       <div class="mb-6">
-        <p class="mb-2 text-xs font-medium text-gray-500 uppercase tracking-wide">Photos actuelles</p>
-        <div class="flex flex-wrap gap-2">
+        <p class="mb-3 text-sm font-medium text-gray-500 uppercase tracking-wide">
+          Photos actuelles
+          <span class="text-gray-400 normal-case font-normal">({{ photos_cite|length }} photo{{ photos_cite|length|pluralize }})</span>
+        </p>
+        <div class="flex flex-wrap gap-3">
           {% for photo in photos_cite %}
-          <div class="group relative h-20 w-20 overflow-hidden rounded-xl">
-            <img src="{{ photo.image.url }}" class="h-full w-full object-cover" />
-            
-            <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition group-hover:opacity-100">
-              <button type="submit" form="form-supprimer-cite-{{ photo.pk }}" class="text-xs text-white hover:underline font-medium">
+          <div class="group relative h-24 w-24 overflow-hidden rounded-2xl border-2 border-gray-100 shadow-sm">
+            <img src="{{ photo.image.url }}" class="h-full w-full object-cover">
+            <div class="absolute inset-0 flex items-center justify-center bg-black/40
+                        opacity-0 group-hover:opacity-100 transition duration-200 rounded-2xl">
+              <button type="button"
+                      data-url="{{ photo.image.url }}"
+                      data-action="{% url 'logements:supprimer_photo_cite' cite.pk photo.pk %}"
+                      onclick="ouvrirModalPhoto(event, this)"
+                      class="text-primary bg-secondary rounded-xl px-2.5 py-1.5 text-xs font-black
+                             uppercase shadow-md transition hover:scale-105">
                 Supprimer
               </button>
             </div>
@@ -111,46 +92,122 @@
       </div>
       {% endif %}
 
-      {# Actions du formulaire d'édition #}
+      {# Actions #}
       <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
         <button type="submit"
-                class="px-6 py-2.5 bg-primary text-secondary text-sm font-medium
+                class="px-6 py-2.5 bg-primary text-secondary text-base font-medium
                        rounded-xl hover:bg-primary/90 transition">
           Enregistrer les modifications
         </button>
         <a href="{% url 'logements:mes_cites' %}"
-           class="px-6 py-2.5 border border-gray-200 text-gray-600 text-sm
+           class="px-6 py-2.5 border border-gray-200 text-gray-600 text-base
                   rounded-xl hover:bg-gray-50 transition">
           Annuler
         </a>
-
-        {#  Bouton de suppression de cité lié à son formulaire déporté tout en bas #}
-        <button type="submit" form="form-supprimer-cite-globale"
-                class="ml-auto px-4 py-2.5 text-xs text-red-500 border border-red-200
+        {# Bouton suppression cité — ouvre la modale #}
+        <button type="button"
+                onclick="ouvrirModalCite()"
+                class="ml-auto px-4 py-2.5 text-sm text-red-500 border border-red-200
                        rounded-xl hover:bg-red-50 transition">
           Supprimer la cité
         </button>
       </div>
-
     </form>
-
-    {# ──  FORMULAIRES EXTERNES (Totalement hors du formulaire d'édition pour éviter les conflits) ── #}
-    
-    {# 1. Formulaire pour la suppression totale de la cité #}
-    <form id="form-supprimer-cite-globale" method="post" action="{% url 'logements:supprimer_cite' cite.pk %}"
-          class="hidden" onsubmit="return confirm('Supprimer définitivement {{ cite.nom }} et toutes ses chambres ?')">
-      {% csrf_token %}
-    </form>
-
-    {# 2. Formulaires individuels pour les suppressions de photos #}
-    {% if photos_cite %}
-      {% for photo in photos_cite %}
-        <form id="form-supprimer-cite-{{ photo.pk }}" method="post" action="{% url 'logements:supprimer_cite' photo.pk %}" class="hidden">
-          {% csrf_token %}
-        </form>
-      {% endfor %}
-    {% endif %}
-
   </div>
 </div>
+
+{# ── Modale suppression photo ── #}
+<div id="modal-photo" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="fermerModalPhoto()"></div>
+  <div class="relative z-10 w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl">
+    <div class="flex flex-col items-center gap-4 text-center">
+      <div class="flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-rose-100 bg-rose-50">
+        <svg class="h-7 w-7 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-base font-black text-gray-900">Supprimer cette photo ?</h3>
+        <p class="mt-1 text-sm text-gray-500">Cette action est irréversible.</p>
+      </div>
+      <img id="modal-photo-preview" src="" alt="Aperçu"
+           class="h-24 w-24 rounded-2xl border-2 border-gray-100 object-cover shadow">
+      <div class="flex w-full gap-3">
+        <button type="button" onclick="fermerModalPhoto()"
+                class="flex-1 rounded-2xl border-2 border-gray-200 px-4 py-2.5 text-sm font-black
+                       tracking-wider text-gray-600 uppercase transition hover:bg-gray-50">
+          Annuler
+        </button>
+        <form id="modal-photo-form" method="post" action="" class="flex-1">
+          {% csrf_token %}
+          <button type="submit"
+                  class="w-full rounded-2xl bg-rose-600 px-4 py-2.5 text-sm font-black
+                         tracking-wider text-white uppercase shadow-sm transition hover:bg-rose-700">
+            Supprimer
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ── Modale suppression cité ── #}
+<div id="modal-cite" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="fermerModalCite()"></div>
+  <div class="relative z-10 w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl">
+    <div class="flex flex-col items-center gap-4 text-center">
+      <div class="flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-rose-100 bg-rose-50">
+        <svg class="h-7 w-7 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-base font-black text-gray-900">Supprimer « {{ cite.nom }} » ?</h3>
+        <p class="mt-1 text-sm text-gray-500">
+          Toutes les chambres, photos et données associées seront définitivement supprimées.
+        </p>
+      </div>
+      <div class="flex w-full gap-3">
+        <button type="button" onclick="fermerModalCite()"
+                class="flex-1 rounded-2xl border-2 border-gray-200 px-4 py-2.5 text-sm font-black
+                       tracking-wider text-gray-600 uppercase transition hover:bg-gray-50">
+          Annuler
+        </button>
+        <form method="post" action="{% url 'logements:supprimer_cite' cite.pk %}" class="flex-1">
+          {% csrf_token %}
+          <button type="submit"
+                  class="w-full rounded-2xl bg-rose-600 px-4 py-2.5 text-sm font-black
+                         tracking-wider text-white uppercase shadow-sm transition hover:bg-rose-700">
+            Supprimer
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function ouvrirModalPhoto(event, btn) {
+    event.stopPropagation();
+    document.getElementById('modal-photo-form').action = btn.dataset.action;
+    document.getElementById('modal-photo-preview').src  = btn.dataset.url;
+    document.getElementById('modal-photo').classList.remove('hidden');
+    document.getElementById('modal-photo').classList.add('flex');
+  }
+  function fermerModalPhoto() {
+    document.getElementById('modal-photo').classList.add('hidden');
+    document.getElementById('modal-photo').classList.remove('flex');
+  }
+
+  function ouvrirModalCite() {
+    document.getElementById('modal-cite').classList.remove('hidden');
+    document.getElementById('modal-cite').classList.add('flex');
+  }
+  function fermerModalCite() {
+    document.getElementById('modal-cite').classList.add('hidden');
+    document.getElementById('modal-cite').classList.remove('flex');
+  }
+</script>
 {% endblock %}

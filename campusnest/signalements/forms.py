@@ -1,7 +1,7 @@
 from django import forms
 from .models import Signalement
 
-CSS = "w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-secondary/50 transition"
+CSS = "w-full px-3 py-2 text-base border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-secondary/50 transition"
 
 MOTIFS = [
     ("", "— Choisissez un motif —"),

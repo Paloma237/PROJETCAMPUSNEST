@@ -1,35 +1,67 @@
 from django import forms
-from .models import MessageDeContact
- 
-CSS = "w-full px-3 py-2 text-sm border border-gray-200 rounded-xl bg-gray-50 focus:outline-none focus:ring-2 focus:ring-secondary/50 transition"
- 
- 
-class MessageForm(forms.ModelForm):
+from .models import MessageContact, MessageConversation
+
+
+class MessageContactForm(forms.ModelForm):
     class Meta:
-        model  = MessageDeContact
-        fields = ["nom_expediteur", "telephone", "email", "objet_message", "message"]
+        model  = MessageContact
+        fields = ["nom_expediteur", "email", "telephone", "objet", "message"]
         widgets = {
-            "nom_expediteur": forms.TextInput(attrs={"class": CSS, "placeholder": "Votre nom complet"}),
-            "telephone":      forms.TextInput(attrs={"class": CSS, "placeholder": "6XX XXX XXX"}),
-            "email":          forms.EmailInput(attrs={"class": CSS, "placeholder": "votre@email.cm"}),
-            "objet_message":  forms.TextInput(attrs={"class": CSS, "placeholder": "Objet du message"}),
-            "message":        forms.Textarea(attrs={
-                "class": CSS + " resize-none",
+            "nom_expediteur": forms.TextInput(attrs={
+                "placeholder": "Votre nom complet",
+                "class": "w-full px-3 py-2.5 text-base border border-gray-200 rounded-xl "
+                         "bg-gray-50 focus:outline-none focus:ring-2 focus:ring-secondary/50 transition",
+            }),
+            "email": forms.EmailInput(attrs={
+                "placeholder": "votre@email.com",
+                "class": "w-full px-3 py-2.5 text-base border border-gray-200 rounded-xl "
+                         "bg-gray-50 focus:outline-none focus:ring-2 focus:ring-secondary/50 transition",
+            }),
+            "telephone": forms.TextInput(attrs={
+                "placeholder": "Ex : +237 6XX XXX XXX",
+                "class": "w-full px-3 py-2.5 text-base border border-gray-200 rounded-xl "
+                         "bg-gray-50 focus:outline-none focus:ring-2 focus:ring-secondary/50 transition",
+            }),
+            "objet": forms.TextInput(attrs={
+                "placeholder": "Ex : Question sur un logement",
+                "class": "w-full px-3 py-2.5 text-base border border-gray-200 rounded-xl "
+                         "bg-gray-50 focus:outline-none focus:ring-2 focus:ring-secondary/50 transition",
+            }),
+            "message": forms.Textarea(attrs={
+                "placeholder": "Écrivez votre message...",
                 "rows": 5,
-                "placeholder": "Votre message...",
+                "class": "w-full px-3 py-2.5 text-base border border-gray-200 rounded-xl "
+                         "bg-gray-50 focus:outline-none focus:ring-2 focus:ring-secondary/50 "
+                         "transition resize-none",
             }),
         }
- 
- 
-class ReponseForm(forms.ModelForm):
+
+
+class ReponseAdminForm(forms.ModelForm):
     class Meta:
-        model  = MessageDeContact
+        model  = MessageContact
         fields = ["reponse_admin"]
         widgets = {
             "reponse_admin": forms.Textarea(attrs={
-                "class": CSS + " resize-none",
-                "rows": 5,
-                "placeholder": "Votre réponse...",
+                "placeholder": "Rédigez votre réponse...",
+                "rows": 6,
+                "class": "w-full px-3 py-2.5 text-base border border-gray-200 rounded-xl "
+                         "bg-gray-50 focus:outline-none focus:ring-2 focus:ring-secondary/50 "
+                         "transition resize-none",
             }),
         }
-        labels = {"reponse_admin": "Réponse"}
+
+
+class MessageConversationForm(forms.ModelForm):
+    class Meta:
+        model  = MessageConversation
+        fields = ["contenu"]
+        widgets = {
+            "contenu": forms.Textarea(attrs={
+                "placeholder": "Écrivez votre message...",
+                "rows": 3,
+                "class": "w-full px-3 py-2.5 text-base border border-gray-200 rounded-xl "
+                         "bg-gray-50 focus:outline-none focus:ring-2 focus:ring-secondary/50 "
+                         "transition resize-none",
+            }),
+        }

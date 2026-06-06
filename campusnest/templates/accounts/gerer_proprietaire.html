@@ -1,0 +1,225 @@
+{% extends "accounts/base_dashboard.html" %}
+{% block page_title %}Gérer le propriétaire{% endblock %}
+{% block page_subtitle %}{{ proprietaire.get_full_name }}{% endblock %}
+
+{% block sidebar %}
+  {% include "components/sidebar_admin.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+
+  <a href="{% url 'users:admin_dashboard' %}"
+     class="text-sm text-gray-400 hover:text-primary transition mb-6 inline-block">
+    ← Retour au dashboard
+  </a>
+
+  <!-- Alertes Django -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="mb-4 px-4 py-3 rounded-xl text-sm
+                  {% if 'success' in message.tags %}bg-green-50 text-green-700
+                  {% else %}bg-amber-50 text-amber-700{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Carte infos propriétaire -->
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-5">
+
+    <div class="flex items-center gap-4 mb-6 pb-5 border-b border-gray-100">
+      <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-700 text-xl font-black
+                  flex items-center justify-center shrink-0">
+        {{ proprietaire.prenom|first|upper }}{{ proprietaire.nom|first|upper }}
+      </div>
+      <div>
+        <h1 class="text-lg font-bold text-gray-900">{{ proprietaire.get_full_name }}</h1>
+        <p class="text-sm text-gray-400">Propriétaire · Inscrit le {{ proprietaire.date_joined|date:"d M Y" }}</p>
+        {% if profil.est_valide %}
+          <span class="text-xs font-semibold bg-green-50 text-green-600 px-2.5 py-0.5 rounded-full mt-1 inline-block">
+            ✓ Validé
+          </span>
+        {% else %}
+          <span class="text-xs font-semibold bg-amber-50 text-amber-600 px-2.5 py-0.5 rounded-full mt-1 inline-block">
+            ⏳ En attente de validation
+          </span>
+        {% endif %}
+        {% if not proprietaire.is_active %}
+          <span class="text-xs font-semibold bg-red-50 text-red-600 px-2.5 py-0.5 rounded-full mt-1 inline-block ml-1">
+            Suspendu
+          </span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Informations personnelles -->
+    <div class="grid grid-cols-2 gap-4 mb-6">
+
+      <div class="flex flex-col gap-0.5">
+        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Email</span>
+        <span class="text-sm text-gray-800">{{ proprietaire.email }}</span>
+      </div>
+
+      <div class="flex flex-col gap-0.5">
+        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Téléphone</span>
+        <span class="text-sm text-gray-800">{{ proprietaire.telephone|default:"Non renseigné" }}</span>
+      </div>
+
+      {% if profil.numero_piece %}
+      <div class="flex flex-col gap-0.5">
+        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">N° pièce d'identité</span>
+        <span class="text-sm text-gray-800">{{ profil.numero_piece }}</span>
+      </div>
+      {% endif %}
+
+      {% if profil.date_validation %}
+      <div class="flex flex-col gap-0.5">
+        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Date de validation</span>
+        <span class="text-sm text-gray-800">{{ profil.date_validation|date:"d M Y à H:i" }}</span>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <!-- Statistiques activité -->
+    <div class="grid grid-cols-3 gap-3 mb-2">
+      <div class="bg-gray-50 rounded-xl p-3 text-center">
+        <p class="text-xl font-black text-gray-900">{{ nb_cites }}</p>
+        <p class="text-xs text-gray-400 mt-0.5">cité{{ nb_cites|pluralize }}</p>
+      </div>
+      <div class="bg-gray-50 rounded-xl p-3 text-center">
+        <p class="text-xl font-black text-gray-900">{{ nb_chambres }}</p>
+        <p class="text-xs text-gray-400 mt-0.5">chambre{{ nb_chambres|pluralize }}</p>
+      </div>
+      <div class="bg-gray-50 rounded-xl p-3 text-center">
+        <p class="text-xl font-black text-gray-900">{{ nb_reservations }}</p>
+        <p class="text-xs text-gray-400 mt-0.5">réservation{{ nb_reservations|pluralize }}</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Actions — avec confirmation JS -->
+  <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+    <h2 class="text-sm font-bold text-gray-700 mb-4">Actions sur ce compte</h2>
+
+    <div class="flex flex-col sm:flex-row gap-3">
+
+      <!-- Valider -->
+      {% if not profil.est_valide %}
+      <form method="post" class="flex-1"
+            onsubmit="return confirmer(event, 'valider', '{{ proprietaire.get_full_name }}')">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="valider">
+        <button type="submit"
+                class="w-full py-3 bg-green-600 text-white text-sm font-semibold
+                       rounded-xl hover:bg-green-700 transition">
+          ✓ Valider ce propriétaire
+        </button>
+      </form>
+      {% else %}
+      <div class="flex-1 py-3 bg-green-50 text-green-600 text-sm font-semibold
+                  rounded-xl text-center">
+        ✓ Déjà validé
+      </div>
+      {% endif %}
+
+      <!-- Suspendre -->
+      {% if proprietaire.is_active %}
+      <form method="post" class="flex-1"
+            onsubmit="return confirmer(event, 'suspendre', '{{ proprietaire.get_full_name }}')">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="suspendre">
+        <button type="submit"
+                class="w-full py-3 bg-red-50 text-red-600 border border-red-200 text-sm
+                       font-semibold rounded-xl hover:bg-red-100 transition">
+          ✕ Suspendre ce compte
+        </button>
+      </form>
+      {% else %}
+      <div class="flex-1 py-3 bg-red-50 text-red-400 text-sm font-semibold
+                  rounded-xl text-center border border-red-100">
+        Compte déjà suspendu
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal de confirmation -->
+<div id="modal-confirmation"
+     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 backdrop-blur-sm px-4">
+  <div class="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full">
+    <div id="modal-icon" class="text-3xl text-center mb-3"></div>
+    <h3 id="modal-titre" class="text-base font-bold text-gray-900 text-center mb-1"></h3>
+    <p id="modal-texte" class="text-sm text-gray-500 text-center mb-6"></p>
+    <div class="flex gap-3">
+      <button onclick="annulerModal()"
+              class="flex-1 py-2.5 border border-gray-200 text-gray-500 text-sm font-medium
+                     rounded-xl hover:bg-gray-50 transition">
+        Annuler
+      </button>
+      <button id="modal-confirmer"
+              class="flex-1 py-2.5 text-white text-sm font-semibold rounded-xl transition">
+        Confirmer
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let _formEnAttente = null;
+
+  function confirmer(event, action, nom) {
+    event.preventDefault();
+    _formEnAttente = event.target;
+
+    const modal   = document.getElementById("modal-confirmation");
+    const icon    = document.getElementById("modal-icon");
+    const titre   = document.getElementById("modal-titre");
+    const texte   = document.getElementById("modal-texte");
+    const btnConf = document.getElementById("modal-confirmer");
+
+    if (action === "valider") {
+      icon.textContent      = "✅";
+      titre.textContent     = "Confirmer la validation";
+      texte.textContent     = `Vous êtes sur le point de valider le compte de ${nom}. Cette action activera son accès à la plateforme.`;
+      btnConf.className     = btnConf.className.replace(/bg-\S+/g, "") + " bg-green-600 hover:bg-green-700";
+      btnConf.textContent   = "Oui, valider";
+    } else {
+      icon.textContent      = "⚠️";
+      titre.textContent     = "Confirmer la suspension";
+      texte.textContent     = `Vous êtes sur le point de suspendre le compte de ${nom}. Il ne pourra plus se connecter.`;
+      btnConf.className     = btnConf.className.replace(/bg-\S+/g, "") + " bg-red-600 hover:bg-red-700";
+      btnConf.textContent   = "Oui, suspendre";
+    }
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+    return false;
+  }
+
+  function annulerModal() {
+    const modal = document.getElementById("modal-confirmation");
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+    _formEnAttente = null;
+  }
+
+  document.getElementById("modal-confirmer").addEventListener("click", function () {
+    if (_formEnAttente) {
+      annulerModal();
+      _formEnAttente.submit();
+    }
+  });
+
+  // Fermer en cliquant sur le fond
+  document.getElementById("modal-confirmation").addEventListener("click", function (e) {
+    if (e.target === this) annulerModal();
+  });
+</script>
+
+{% endblock %}

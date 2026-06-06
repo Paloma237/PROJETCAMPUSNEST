@@ -1,4 +1,6 @@
-from django.shortcuts import render
+"""
+campusnest/reservations/views.py
+"""
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
@@ -7,7 +9,7 @@ from django.utils import timezone
 from campusnest.users.utils import client_requis, proprietaire_valide_requis, admin_requis
 from campusnest.logements.models import Chambre
 from campusnest.reservations.models import Reservation
-from .forms import ReservationForm, DateVisiteForm
+from .forms import ReservationForm, AccepterReservationForm
 
 
 # ─────────────────────────────────────────────
@@ -18,8 +20,8 @@ from .forms import ReservationForm, DateVisiteForm
 def reserver_view(request, chambre_pk):
     """
     Formulaire de réservation d'une chambre par un étudiant.
-    Vérifie que la chambre est disponible avant d'afficher le formulaire.
-    Template : reservations/templates/reservations/reserver.html
+    Le client choisit ses dates de séjour ET une date de visite parmi
+    celles proposées par le propriétaire pour cette chambre.
     """
     chambre = get_object_or_404(Chambre, pk=chambre_pk, est_disponible=True)
 
@@ -33,7 +35,16 @@ def reserver_view(request, chambre_pk):
         messages.warning(request, "Vous avez déjà une réservation active pour cette chambre.")
         return redirect("logements:detail_chambre", pk=chambre_pk)
 
-    form = ReservationForm(request.POST or None)
+    # Vérifier qu'il existe au moins une date de visite disponible
+    dates_disponibles = chambre.dates_visites_disponibles()
+    if not dates_disponibles.exists():
+        messages.warning(
+            request,
+            "Ce propriétaire n'a pas encore renseigné de dates de visite disponibles pour cette chambre."
+        )
+        return redirect("logements:detail_chambre", pk=chambre_pk)
+
+    form = ReservationForm(request.POST or None, chambre=chambre)
 
     if request.method == "POST" and form.is_valid():
         reservation = form.save(commit=False)
@@ -48,8 +59,9 @@ def reserver_view(request, chambre_pk):
         return redirect("reservations:mes_reservations")
 
     return render(request, "reservations/reserver.html", {
-        "chambre": chambre,
-        "form":    form,
+        "chambre":            chambre,
+        "form":               form,
+        "dates_disponibles":  dates_disponibles,
     })
 
 
@@ -57,8 +69,6 @@ def reserver_view(request, chambre_pk):
 def mes_reservations_view(request):
     """
     Liste de toutes les réservations de l'étudiant connecté.
-    Triées par date de demande décroissante.
-    Template : reservations/templates/reservations/mes_reservations.html
     """
     reservations = Reservation.objects.filter(
         client=request.user
@@ -72,15 +82,11 @@ def mes_reservations_view(request):
 @client_requis
 def detail_reservation_view(request, pk):
     """
-    Détail d'une réservation de l'étudiant : statut, dates, montant total.
-    Template : reservations/templates/reservations/detail_reservation.html
+    Détail d'une réservation de l'étudiant.
     """
-    reservation = get_object_or_404(
-        Reservation, pk=pk, client=request.user
-    )
+    reservation = get_object_or_404(Reservation, pk=pk, client=request.user)
     return render(request, "reservations/detail_reservation.html", {
         "reservation": reservation,
-       # "montant_total": reservation.get_montant_total(),
     })
 
 
@@ -88,7 +94,6 @@ def detail_reservation_view(request, pk):
 def annuler_reservation_client_view(request, pk):
     """
     Annulation d'une réservation par l'étudiant (uniquement si statut = en_attente).
-    POST uniquement.
     """
     reservation = get_object_or_404(
         Reservation, pk=pk, client=request.user, statut=Reservation.Statut.EN_ATTENTE
@@ -99,35 +104,16 @@ def annuler_reservation_client_view(request, pk):
     return redirect("reservations:mes_reservations")
 
 
-@client_requis
-def demander_nouvelle_date_view(request, pk):
-    """
-    L'étudiant peut proposer une nouvelle date de visite au propriétaire.
-    Template : reservations/templates/reservations/demander_date.html
-    """
-    reservation = get_object_or_404(
-        Reservation, pk=pk, client=request.user
-    )
-    form = DateVisiteForm(request.POST or None)
-
-    if request.method == "POST" and form.is_valid():
-        reservation.date_visite_chambre = form.cleaned_data["date_visite"]
-        reservation.save(update_fields=["date_visite_chambre"])
-        messages.success(request, "Nouvelle date de visite proposée au propriétaire.")
-        return redirect("reservations:detail_reservation", pk=pk)
-
-    return render(request, "reservations/demander_date.html", {
-        "reservation": reservation,
-        "form": form,
-    })
-
-
 # ─────────────────────────────────────────────
 #  Vues propriétaire
 # ─────────────────────────────────────────────
 
 @proprietaire_valide_requis
 def reservations_recues_view(request):
+    """
+    Liste des réservations reçues par le propriétaire.
+    Chaque carte affiche les infos essentielles + un bouton "Traiter" unique.
+    """
     reservations = Reservation.objects.filter(
         chambre__cite__proprietaire=request.user
     ).select_related("client", "chambre__cite").order_by("-date_demande")
@@ -137,40 +123,60 @@ def reservations_recues_view(request):
         reservations = reservations.filter(statut=statut_filtre)
 
     return render(request, "reservations/reservations_recues.html", {
-        "reservations":   reservations,
-        "statut_filtre":  statut_filtre,
-        "statuts":        Reservation.Statut.choices,
+        "reservations":  reservations,
+        "statut_filtre": statut_filtre,
+        "statuts":       Reservation.Statut.choices,
     })
 
 
 @proprietaire_valide_requis
-def confirmer_reservation_view(request, pk):
+def traiter_reservation_view(request, pk):
     """
-    Le propriétaire confirme une réservation (statut → confirmée).
-    La chambre est automatiquement marquée comme indisponible.
-    POST uniquement.
+    Page de traitement d'une réservation par le propriétaire.
+    Affiche tous les détails de la chambre + du client.
+    Permet d'accepter (avec lieu + heure de visite) ou de refuser.
     """
     reservation = get_object_or_404(
         Reservation,
         pk=pk,
         chambre__cite__proprietaire=request.user,
-        statut=Reservation.Statut.EN_ATTENTE,
     )
+    form = AccepterReservationForm(request.POST or None)
+
     if request.method == "POST":
-        reservation.confirmer()
-        messages.success(
-            request,
-            f"Réservation de {reservation.client.get_full_name()} confirmée."
+        action = request.POST.get("action")
+        if action == "accepter":
+            if form.is_valid():
+                reservation.confirmer(
+            lieu_visite=form.cleaned_data["lieu_visite"],
+            heure_visite=form.cleaned_data["heure_visite"],
         )
-    return redirect("reservations:recues")
+        # Construire le message en gérant le cas où date_visite est None
+        if reservation.date_visite:
+            date_str = reservation.date_visite.strftime('%d/%m/%Y')
+            msg = (
+                f"Réservation de {reservation.client.get_full_name()} acceptée. "
+                f"La visite est fixée le {date_str} "
+                f"à {reservation.heure_visite.strftime('%H:%M')} — {reservation.lieu_visite}."
+            )
+        else:
+            msg = (
+                f"Réservation de {reservation.client.get_full_name()} acceptée. "
+                f"Visite à {reservation.heure_visite.strftime('%H:%M')} — {reservation.lieu_visite}."
+            )
+        messages.success(request, msg)
+        return redirect("reservations:recues")
+
+    return render(request, "reservations/traiter_reservation.html", {
+        "reservation": reservation,
+        "form":        form,
+    })
 
 
 @proprietaire_valide_requis
 def annuler_reservation_proprio_view(request, pk):
     """
-    Le propriétaire annule une réservation avec un motif.
-    La chambre est remise à disponible.
-    POST uniquement.
+    Le propriétaire annule une réservation déjà confirmée.
     """
     reservation = get_object_or_404(
         Reservation,
@@ -186,32 +192,9 @@ def annuler_reservation_proprio_view(request, pk):
 
 
 @proprietaire_valide_requis
-def programmer_visite_view(request, pk):
-    """
-    Le propriétaire fixe ou modifie la date de visite d'une réservation.
-    Template : reservations/templates/reservations/programmer_visite.html
-    """
-    reservation = get_object_or_404(
-        Reservation, pk=pk, chambre__cite__proprietaire=request.user
-    )
-    form = DateVisiteForm(request.POST or None)
-
-    if request.method == "POST" and form.is_valid():
-        reservation.programmer_visite(form.cleaned_data["date_visite"])
-        messages.success(request, "Date de visite enregistrée.")
-        return redirect("reservations:recues")
-
-    return render(request, "reservations/programmer_visite.html", {
-        "reservation": reservation,
-        "form": form,
-    })
-
-
-@proprietaire_valide_requis
 def historique_reservations_view(request):
     """
-    Historique complet des réservations du propriétaire (confirmées + annulées + archivées).
-    Template : reservations/templates/reservations/historique.html
+    Historique complet : confirmées + annulées + archivées.
     """
     reservations = Reservation.objects.filter(
         chambre__cite__proprietaire=request.user,
@@ -234,8 +217,7 @@ def historique_reservations_view(request):
 @admin_requis
 def toutes_reservations_view(request):
     """
-    Vue admin : toutes les réservations de la plateforme avec filtres.
-    Template : reservations/templates/reservations/toutes_reservations.html
+    Vue admin : toutes les réservations de la plateforme.
     """
     reservations = Reservation.objects.select_related(
         "client", "chambre__cite__proprietaire"

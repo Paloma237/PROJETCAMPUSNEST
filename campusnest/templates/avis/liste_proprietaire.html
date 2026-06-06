@@ -1,0 +1,173 @@
+{% extends "accounts/base_dashboard.html" %}
+{% block page_title %}Avis reçus{% endblock %}
+{% block page_subtitle %}Avis laissés sur vos chambres{% endblock %}
+
+{% block sidebar %}
+  {% include "components/sidebar_proprietaire.html" %}
+{% endblock %}
+
+{% block content %}
+
+  {# ── KPIs rapides ── #}
+  <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <p class="text-[11px] text-gray-400 uppercase tracking-widest font-semibold mb-2">Total avis</p>
+      <p class="text-3xl font-black text-gray-900 tracking-tight">{{ total_avis }}</p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <p class="text-[11px] text-gray-400 uppercase tracking-widest font-semibold mb-2">Note moyenne</p>
+      {% if note_moy %}
+        <p class="text-3xl font-black text-amber-500 tracking-tight">
+          {{ note_moy|floatformat:1 }}
+          <span class="text-base font-semibold text-gray-400">/ 5</span>
+        </p>
+        {# Barre étoiles #}
+        <div class="flex items-center gap-0.5 mt-1">
+          {% for i in "12345" %}
+            {% if note_moy >= forloop.counter %}
+              <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+              </svg>
+            {% else %}
+              <svg class="w-4 h-4 text-gray-200" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+              </svg>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-xl font-semibold text-gray-300">—</p>
+      {% endif %}
+    </div>
+
+    {# Bouton retour tableau de bord #}
+    <div class="flex items-center justify-end sm:col-span-1 col-span-2">
+      <a href="{% url 'users:proprietaire_dashboard' %}"
+         class="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-50 transition">
+        ← Tableau de bord
+      </a>
+    </div>
+
+  </div>
+
+  {# ── Filtres ── #}
+  <form method="get" class="flex flex-wrap items-center gap-3 mb-6">
+
+    {# Filtre par note #}
+    <select name="note"
+            class="text-sm border border-gray-200 rounded-xl px-3 py-2 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/30">
+      <option value="">Toutes les notes</option>
+      {% for n in "54321" %}
+        <option value="{{ n }}" {% if note_filtre == n|add:0 %}selected{% endif %}>
+          {{ n }} étoile{{ n|pluralize }}
+        </option>
+      {% endfor %}
+    </select>
+
+    {# Filtre par cité #}
+    <select name="cite"
+            class="text-sm border border-gray-200 rounded-xl px-3 py-2 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary/30">
+      <option value="">Toutes les cités</option>
+      {% for cite in cites %}
+        <option value="{{ cite.pk }}" {% if cite_filtre == cite.pk %}selected{% endif %}>
+          {{ cite.nom }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <button type="submit"
+            class="px-4 py-2 bg-primary text-white text-sm font-medium rounded-xl hover:bg-primary/90 transition">
+      Filtrer
+    </button>
+
+    {% if note_filtre or cite_filtre %}
+      <a href="{% url 'avis:liste_proprietaire' %}"
+         class="text-sm text-gray-400 hover:text-gray-600 transition">
+        Réinitialiser
+      </a>
+    {% endif %}
+
+  </form>
+
+  {# ── Liste des avis ── #}
+  {% if avis %}
+    <div class="space-y-4">
+      {% for a in avis %}
+        <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex items-start gap-4">
+
+            {# Avatar #}
+            <div class="w-10 h-10 rounded-full bg-[#1A2517]/10 text-primary font-bold text-sm flex items-center justify-center shrink-0">
+              {{ a.client.prenom|first|upper }}{{ a.client.nom|first|upper }}
+            </div>
+
+            <div class="flex-1 min-w-0">
+
+              {# Ligne 1 : nom + étoiles + date #}
+              <div class="flex flex-wrap items-center gap-2 mb-1">
+                <span class="text-sm font-bold text-gray-900">{{ a.client.get_full_name }}</span>
+
+                {# Étoiles #}
+                <span class="flex items-center gap-0.5">
+                  {% for i in "12345" %}
+                    <svg class="w-3.5 h-3.5 {% if forloop.counter <= a.note %}text-amber-400{% else %}text-gray-200{% endif %}"
+                         fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                  {% endfor %}
+                </span>
+
+                <span class="text-xs text-gray-400">{{ a.date_creation|date:"d M Y" }}</span>
+              </div>
+
+              {# Chambre / cité #}
+              <p class="text-xs text-gray-400 mb-2">{{ a.chambre }} — {{ a.chambre.cite.nom }}</p>
+
+              {# Commentaire #}
+              {% if a.commentaire %}
+                <p class="text-sm text-gray-700 leading-relaxed">{{ a.commentaire }}</p>
+              {% else %}
+                <p class="text-sm text-gray-300 italic">Aucun commentaire.</p>
+              {% endif %}
+
+            </div>
+
+            {# Action signaler #}
+            <div class="shrink-0">
+              <form method="post" action="{% url 'avis:signaler' a.pk %}"
+                    onsubmit="return confirm('Signaler et masquer cet avis ?');">
+                {% csrf_token %}
+                <button type="submit"
+                        class="flex items-center gap-1.5 text-xs text-gray-400 hover:text-rose-500 transition font-medium">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21"/>
+                  </svg>
+                  Signaler
+                </button>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+  {% else %}
+    <div class="bg-white rounded-2xl border border-gray-100 p-12 shadow-sm text-center">
+      <svg class="w-12 h-12 text-gray-200 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+      </svg>
+      <p class="text-gray-400 font-medium">Aucun avis trouvé.</p>
+      {% if note_filtre or cite_filtre %}
+        <a href="{% url 'avis:liste_proprietaire' %}" class="text-sm text-primary hover:underline mt-2 inline-block">
+          Voir tous les avis
+        </a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+{% endblock %}

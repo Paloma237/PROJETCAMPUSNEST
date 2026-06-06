@@ -8,7 +8,7 @@
       {% if chambre %}Modifier la chambre{% else %}Nouvelle chambre{% endif %}
     </h1>
     {% if cite %}
-      <p class="mt-2 text-xs font-bold text-white bg-primary px-3 py-1.5 rounded-xl inline-block shadow-sm">
+      <p class="mt-2 text-sm font-bold text-white bg-primary px-3 py-1.5 rounded-xl inline-block shadow-sm">
         Cité : <span class="text-secondary font-black">{{ cite.nom }}</span>
       </p>
     {% endif %}
@@ -23,7 +23,7 @@
 
       {# Description #}
       <div class="space-y-1.5">
-        <label class="block text-xs font-black tracking-wider text-primary uppercase">Description du logement</label>
+        <label class="block text-sm font-black tracking-wider text-primary uppercase">Description du logement</label>
         <div class="[&_textarea]:px-4 [&_textarea]:py-3 [&_textarea]:h-32">
           {{ form.description }}
         </div>
@@ -32,17 +32,17 @@
       {# Superficie & Loyer #}
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div class="space-y-1.5">
-          <label class="block text-xs font-black tracking-wider text-primary uppercase">Superficie (m²)</label>
+          <label class="block text-sm font-black tracking-wider text-primary uppercase">Superficie (m²)</label>
           <div class="relative flex items-center [&_input]:px-4 [&_input]:py-3">
             {{ form.superficie }}
-            <span class="absolute right-4 text-xs font-black text-primary bg-gray-200 px-2.5 py-1 rounded-md pointer-events-none">m²</span>
+            <span class="absolute right-4 text-sm font-black text-primary bg-gray-200 px-2.5 py-1 rounded-md pointer-events-none">m²</span>
           </div>
         </div>
         <div class="space-y-1.5">
-          <label class="block text-xs font-black tracking-wider text-primary uppercase">Loyer mensuel (FCFA)</label>
+          <label class="block text-sm font-black tracking-wider text-primary uppercase">Loyer mensuel (FCFA)</label>
           <div class="relative flex items-center [&_input]:px-4 [&_input]:py-3">
             {{ form.loyer }}
-            <span class="absolute right-4 text-xs font-black text-primary bg-secondary px-2.5 py-1 rounded-md shadow-sm pointer-events-none">FCFA</span>
+            <span class="absolute right-4 text-sm font-black text-primary bg-secondary px-2.5 py-1 rounded-md shadow-sm pointer-events-none">FCFA</span>
           </div>
         </div>
       </div>
@@ -50,13 +50,13 @@
       {# Type & État #}
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div class="space-y-1.5">
-          <label class="block text-xs font-black tracking-wider text-primary uppercase">Type de chambre</label>
+          <label class="block text-sm font-black tracking-wider text-primary uppercase">Type de chambre</label>
           <div class="[&_select]:px-4 [&_select]:py-3">
             {{ form.type }}
           </div>
         </div>
         <div class="space-y-1.5">
-          <label class="block text-xs font-black tracking-wider text-primary uppercase">État général</label>
+          <label class="block text-sm font-black tracking-wider text-primary uppercase">État général</label>
           <div class="[&_select]:px-4 [&_select]:py-3">
             {{ form.etat }}
           </div>
@@ -65,13 +65,13 @@
 
       {# Équipements #}
       <div class="space-y-3 bg-primary/[0.03] rounded-2xl p-5 border-2 border-primary/10">
-        <p class="text-xs font-black tracking-wider text-primary uppercase">Équipements & Commodités</p>
+        <p class="text-sm font-black tracking-wider text-primary uppercase">Équipements & Commodités</p>
         <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {% for field in form %} 
             {% if field.field.widget.input_type == 'checkbox' %}
               <label class="flex cursor-pointer items-center gap-3 p-3 bg-white rounded-xl border-2 border-gray-200 shadow-sm hover:border-secondary hover:bg-secondary/[0.02] transition group">
                 {{ field }}
-                <span class="text-xs font-bold text-gray-700 group-hover:text-primary transition">{{ field.label }}</span>
+                <span class="text-sm font-bold text-gray-700 group-hover:text-primary transition">{{ field.label }}</span>
               </label>
             {% endif %} 
           {% endfor %}
@@ -81,10 +81,10 @@
       {# GESTION DE LA GRILLE DE 4 PHOTOS #}
       <div class="space-y-3 pt-2">
         <div class="flex justify-between items-end">
-          <label class="block text-xs font-black tracking-wider text-primary uppercase">
+          <label class="block text-sm font-black tracking-wider text-primary uppercase">
             Photos de la chambre <span class="text-secondary font-black normal-case">(4 images max)</span>
           </label>
-          <span id="photo-counter" class="text-xs font-black text-white bg-primary px-2.5 py-1 rounded-lg shadow-sm">
+          <span id="photo-counter" class="text-sm font-black text-white bg-primary px-2.5 py-1 rounded-lg shadow-sm">
             {{ photos|length }} / 4 sélectionnée(s)
           </span>
         </div>
@@ -106,7 +106,7 @@
               {% with photo=photos.0 %}
                 <img src="{{ photo.image.url }}" class="w-full h-full object-cover rounded-2xl">
                 <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 transition duration-200 group-hover:opacity-100 z-20 rounded-2xl">
-                  <button type="submit" form="form-supprimer-{{ photo.pk }}" onclick="event.stopPropagation();" class="text-xs text-white font-bold bg-red-600 px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wider hover:scale-105 transition">
+                  <button type="submit" form="form-supprimer-{{ photo.pk }}" onclick="event.stopPropagation();" class="text-sm text-white font-bold bg-red-600 px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wider hover:scale-105 transition">
                     Supprimer
                   </button>
                 </div>
@@ -114,11 +114,11 @@
             {% else %}
               <div id="empty-1" class="flex flex-col items-center justify-center text-primary group-hover:text-secondary transition duration-200 pointer-events-none">
                 <div class="bg-primary/10 group-hover:bg-secondary/20 p-2 rounded-full mb-1 transition duration-200"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg></div>
-                <span class="text-[10px] font-black uppercase tracking-wider">Photo 1</span>
+                <span class="text-xs font-black uppercase tracking-wider">Photo 1</span>
               </div>
               <img id="img-1" class="hidden w-full h-full object-cover rounded-2xl">
               <div id="overlay-local-1" class="hidden absolute inset-0 bg-black/40 flex items-center justify-center z-20 rounded-2xl">
-                <button type="button" onclick="removeImage(event, 1)" class="text-xs text-white font-bold bg-red-600 px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wider hover:scale-105 transition">Supprimer</button>
+                <button type="button" onclick="removeImage(event, 1)" class="text-sm text-white font-bold bg-red-600 px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wider hover:scale-105 transition">Supprimer</button>
               </div>
             {% endif %}
           </div>
@@ -129,7 +129,7 @@
               {% with photo=photos.1 %}
                 <img src="{{ photo.image.url }}" class="w-full h-full object-cover rounded-2xl">
                 <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 transition duration-200 group-hover:opacity-100 z-20 rounded-2xl">
-                  <button type="submit" form="form-supprimer-{{ photo.pk }}" onclick="event.stopPropagation();" class="text-xs text-white font-bold bg-red-600 px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wider hover:scale-105 transition">
+                  <button type="submit" form="form-supprimer-{{ photo.pk }}" onclick="event.stopPropagation();" class="text-sm text-white font-bold bg-red-600 px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wider hover:scale-105 transition">
                     Supprimer
                   </button>
                 </div>
@@ -137,11 +137,11 @@
             {% else %}
               <div id="empty-2" class="flex flex-col items-center justify-center text-primary group-hover:text-secondary transition duration-200 pointer-events-none">
                 <div class="bg-primary/10 group-hover:bg-secondary/20 p-2 rounded-full mb-1 transition duration-200"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg></div>
-                <span class="text-[10px] font-black uppercase tracking-wider">Photo 2</span>
+                <span class="text-xs font-black uppercase tracking-wider">Photo 2</span>
               </div>
               <img id="img-2" class="hidden w-full h-full object-cover rounded-2xl">
               <div id="overlay-local-2" class="hidden absolute inset-0 bg-black/40 flex items-center justify-center z-20 rounded-2xl">
-                <button type="button" onclick="removeImage(event, 2)" class="text-xs text-white font-bold bg-red-600 px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wider hover:scale-105 transition">Supprimer</button>
+                <button type="button" onclick="removeImage(event, 2)" class="text-sm text-white font-bold bg-red-600 px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wider hover:scale-105 transition">Supprimer</button>
               </div>
             {% endif %}
           </div>
@@ -152,7 +152,7 @@
               {% with photo=photos.2 %}
                 <img src="{{ photo.image.url }}" class="w-full h-full object-cover rounded-2xl">
                 <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 transition duration-200 group-hover:opacity-100 z-20 rounded-2xl">
-                  <button type="submit" form="form-supprimer-{{ photo.pk }}" onclick="event.stopPropagation();" class="text-xs text-white font-bold bg-red-600 px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wider hover:scale-105 transition">
+                  <button type="submit" form="form-supprimer-{{ photo.pk }}" onclick="event.stopPropagation();" class="text-sm text-white font-bold bg-red-600 px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wider hover:scale-105 transition">
                     Supprimer
                   </button>
                 </div>
@@ -160,11 +160,11 @@
             {% else %}
               <div id="empty-3" class="flex flex-col items-center justify-center text-primary group-hover:text-secondary transition duration-200 pointer-events-none">
                 <div class="bg-primary/10 group-hover:bg-secondary/20 p-2 rounded-full mb-1 transition duration-200"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg></div>
-                <span class="text-[10px] font-black uppercase tracking-wider">Photo 3</span>
+                <span class="text-xs font-black uppercase tracking-wider">Photo 3</span>
               </div>
               <img id="img-3" class="hidden w-full h-full object-cover rounded-2xl">
               <div id="overlay-local-3" class="hidden absolute inset-0 bg-black/40 flex items-center justify-center z-20 rounded-2xl">
-                <button type="button" onclick="removeImage(event, 3)" class="text-xs text-white font-bold bg-red-600 px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wider hover:scale-105 transition">Supprimer</button>
+                <button type="button" onclick="removeImage(event, 3)" class="text-sm text-white font-bold bg-red-600 px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wider hover:scale-105 transition">Supprimer</button>
               </div>
             {% endif %}
           </div>
@@ -175,7 +175,7 @@
               {% with photo=photos.3 %}
                 <img src="{{ photo.image.url }}" class="w-full h-full object-cover rounded-2xl">
                 <div class="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 transition duration-200 group-hover:opacity-100 z-20 rounded-2xl">
-                  <button type="submit" form="form-supprimer-{{ photo.pk }}" onclick="event.stopPropagation();" class="text-xs text-white font-bold bg-red-600 px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wider hover:scale-105 transition">
+                  <button type="submit" form="form-supprimer-{{ photo.pk }}" onclick="event.stopPropagation();" class="text-sm text-white font-bold bg-red-600 px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wider hover:scale-105 transition">
                     Supprimer
                   </button>
                 </div>
@@ -183,11 +183,11 @@
             {% else %}
               <div id="empty-4" class="flex flex-col items-center justify-center text-primary group-hover:text-secondary transition duration-200 pointer-events-none">
                 <div class="bg-primary/10 group-hover:bg-secondary/20 p-2 rounded-full mb-1 transition duration-200"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg></div>
-                <span class="text-[10px] font-black uppercase tracking-wider">Photo 4</span>
+                <span class="text-xs font-black uppercase tracking-wider">Photo 4</span>
               </div>
               <img id="img-4" class="hidden w-full h-full object-cover rounded-2xl">
               <div id="overlay-local-4" class="hidden absolute inset-0 bg-black/40 flex items-center justify-center z-20 rounded-2xl">
-                <button type="button" onclick="removeImage(event, 4)" class="text-xs text-white font-bold bg-red-600 px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wider hover:scale-105 transition">Supprimer</button>
+                <button type="button" onclick="removeImage(event, 4)" class="text-sm text-white font-bold bg-red-600 px-3 py-1.5 rounded-xl shadow-md uppercase tracking-wider hover:scale-105 transition">Supprimer</button>
               </div>
             {% endif %}
           </div>
@@ -197,10 +197,10 @@
 
       {# Boutons d'action #}
       <div class="flex items-center gap-4 pt-4 border-t-2 border-gray-100">
-        <button type="submit" class="bg-primary text-secondary hover:bg-primary/95 hover:scale-[1.01] font-black rounded-2xl px-6 py-3.5 text-xs tracking-wider uppercase transition shadow-lg shadow-primary/20 flex-1 sm:flex-initial">
+        <button type="submit" class="bg-primary text-secondary hover:bg-primary/95 hover:scale-[1.01] font-black rounded-2xl px-6 py-3.5 text-sm tracking-wider uppercase transition shadow-lg shadow-primary/20 flex-1 sm:flex-initial">
           {% if chambre %}Enregistrer les modifications{% else %}Ajouter la chambre{% endif %}
         </button>
-        <a href="{% url 'logements:mes_cites' %}" class="rounded-2xl border-2 border-gray-300 px-6 py-3.5 text-xs font-black text-gray-500 uppercase tracking-wider transition hover:bg-gray-100 hover:text-gray-700 text-center flex-1 sm:flex-initial">
+        <a href="{% url 'logements:mes_cites' %}" class="rounded-2xl border-2 border-gray-300 px-6 py-3.5 text-sm font-black text-gray-500 uppercase tracking-wider transition hover:bg-gray-100 hover:text-gray-700 text-center flex-1 sm:flex-initial">
           Annuler
         </a>
       </div>

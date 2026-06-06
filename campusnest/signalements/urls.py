@@ -11,7 +11,7 @@ urlpatterns = [
 
     # ── Admin ───────────────────────────────────────────────
     path("",                   views.liste_signalements_view,   name="liste"),
-    path("<int:pk>/",          views.detail_signalement_view,  name="detail"),
+    path("<int:pk>/",          views.detail_signalement_view,  name="detail_signalements"),
     path("<int:pk>/traiter/",  views.traiter_signalement_view, name="traiter"),
     path("<int:pk>/cloturer/", views.cloturer_signalement_view, name="cloturer"),
 ]

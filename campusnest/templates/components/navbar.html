@@ -2,7 +2,7 @@
   
   {# 1. LOGO & NOM DU PROJET #}
   <div class="flex items-center gap-2 shrink-0">
-    <a href="{% url 'logements:home' %}" class="flex items-center gap-2 text-sm font-semibold text-white group">
+    <a href="{% url 'logements:home' %}" class="flex items-center gap-2 text-base font-semibold text-white group">
       <div class="bg-white/10 p-1 rounded-lg transition-transform group-hover:scale-105">
         <img src="/static/images/WhatsApp_Image_2026-05-25_at_17.43.41-removebg-preview.png" alt="CampusNest Logo" class="h-8 w-8 object-contain" />
       </div>
@@ -12,9 +12,9 @@
 
   {# 2. LIENS PUBLICS STATIQUES (PC) #}
   <div class="hidden lg:flex items-center gap-2">
-    <a href="{% url 'logements:home' %}" class="hover:text-secondary {% if request.resolver_match.url_name == 'home' %}bg-white/10 text-secondary{% endif %} rounded-xl px-3 py-2 text-xs font-bold whitespace-nowrap text-white transition hover:bg-white/10">Accueil</a>
-    <a href="{% url 'logements:liste_cites' %}" class="hover:text-secondary {% if request.resolver_match.url_name == 'liste_cites' %}bg-white/10 text-secondary{% endif %} rounded-xl px-3 py-2 text-xs font-bold whitespace-nowrap text-white transition hover:bg-white/10">Logements</a>
-    <a href="{% url 'contact:contact' %}" class="hover:text-secondary {% if request.resolver_match.url_name == 'contact' %}bg-white/10 text-secondary{% endif %} rounded-xl px-3 py-2 text-xs font-bold whitespace-nowrap text-white transition hover:bg-white/10">Contact</a>
+    <a href="{% url 'logements:home' %}" class="hover:text-secondary {% if request.resolver_match.url_name == 'home' %}bg-white/10 text-secondary{% endif %} rounded-xl px-3 py-2 text-sm font-bold whitespace-nowrap text-white transition hover:bg-white/10">Accueil</a>
+    <a href="{% url 'logements:liste_cites' %}" class="hover:text-secondary {% if request.resolver_match.url_name == 'liste_cites' %}bg-white/10 text-secondary{% endif %} rounded-xl px-3 py-2 text-sm font-bold whitespace-nowrap text-white transition hover:bg-white/10">Logements</a>
+    <a href="{% url 'contact:contact' %}" class="hover:text-secondary {% if request.resolver_match.url_name == 'contact' %}bg-white/10 text-secondary{% endif %} rounded-xl px-3 py-2 text-sm font-bold whitespace-nowrap text-white transition hover:bg-white/10">Contact</a>
   </div>
 
   {# 3. BARRE DE RECHERCHE CENTRALE + FILTRE PRIX (DESKTOP) #}
@@ -23,7 +23,7 @@
       
       {# Champ Mots-clés / Catégories #}
       <div class="relative flex-[2]">
-        <input type="text" name="q" autocomplete="off" placeholder="Studio, meublé, quartier..." value="{{ request.GET.q|default:'' }}" class="w-full bg-transparent py-1.5 px-3 pl-8 text-xs text-white placeholder-white/50 focus:outline-none" />
+        <input type="text" name="q" autocomplete="off" placeholder="Studio, meublé, quartier..." value="{{ request.GET.q|default:'' }}" class="w-full bg-transparent py-1.5 px-3 pl-8 text-sm text-white placeholder-white/50 focus:outline-none" />
         <div class="pointer-events-none absolute top-1/2 left-2 -translate-y-1/2 text-white/50">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-3.5 w-3.5"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.604 10.604z" /></svg>
         </div>
@@ -34,28 +34,28 @@
 
       {# Nouveau champ : Prix Maximum #}
       <div class="relative flex-[1.2]">
-        <input type="number" name="prix_max" min="0" placeholder="Prix max (FCFA)" value="{{ request.GET.prix_max|default:'' }}" class="w-full bg-transparent py-1.5 px-3 pl-7 text-xs text-white placeholder-white/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+        <input type="number" name="prix_max" min="0" placeholder="Prix max (FCFA)" value="{{ request.GET.prix_max|default:'' }}" class="w-full bg-transparent py-1.5 px-3 pl-7 text-sm text-white placeholder-white/50 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
         <div class="pointer-events-none absolute top-1/2 left-2 -translate-y-1/2 text-white/50 text-[10px] font-bold">
         </div>
       </div>
 
       {# Bouton Soumettre #}
-      <button type="submit" class="bg-secondary text-primary hover:bg-secondary/90 shrink-0 rounded-lg px-4 py-1.5 text-xs font-bold transition">Rechercher</button>
+      <button type="submit" class="bg-secondary text-primary hover:bg-secondary/90 shrink-0 rounded-lg px-4 py-1.5 text-sm font-bold transition">Rechercher</button>
     </form>
 
     {# DROPDOWN DES RECHERCHES POPULAIRES #}
     <div class="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 py-4 px-4 hidden group-focus-within:block hover:block z-50 transition duration-150">
-      <p class="text-xs font-black text-gray-900 mb-2.5 tracking-wide uppercase">Recherches populaires</p>
+      <p class="text-sm font-black text-gray-900 mb-2.5 tracking-wide uppercase">Recherches populaires</p>
       <div class="flex flex-col gap-1">
-        <a href="{% url 'logements:home' %}?type=studio" class="flex items-center gap-2.5 py-2 px-2.5 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50 hover:text-primary transition">
+        <a href="{% url 'logements:home' %}?type=studio" class="flex items-center gap-2.5 py-2 px-2.5 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-primary transition">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           Studios uniquement
         </a>
-        <a href="{% url 'logements:home' %}?meublee=1" class="flex items-center gap-2.5 py-2 px-2.5 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50 hover:text-primary transition">
+        <a href="{% url 'logements:home' %}?meublee=1" class="flex items-center gap-2.5 py-2 px-2.5 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-primary transition">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           Chambres meublées
         </a>
-        <a href="{% url 'logements:home' %}?prix_max=25000" class="flex items-center gap-2.5 py-2 px-2.5 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50 hover:text-primary transition">
+        <a href="{% url 'logements:home' %}?prix_max=25000" class="flex items-center gap-2.5 py-2 px-2.5 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-primary transition">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           Budgets étudiants (Moins de 25 000 FCFA)
         </a>
@@ -65,21 +65,21 @@
 
     {# DROPDOWN DES RECHERCHES POPULAIRES #}
     <div class="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 py-4 px-4 hidden group-focus-within:block hover:block z-50 transition duration-150">
-      <p class="text-xs font-black text-gray-900 mb-2.5 tracking-wide uppercase">Recherches populaires</p>
+      <p class="text-sm font-black text-gray-900 mb-2.5 tracking-wide uppercase">Recherches populaires</p>
       <div class="flex flex-col gap-1">
-        <a href="{% url 'logements:home' %}?type=studio" class="flex items-center gap-2.5 py-2 px-2.5 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50 hover:text-primary transition">
+        <a href="{% url 'logements:home' %}?type=studio" class="flex items-center gap-2.5 py-2 px-2.5 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-primary transition">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           Studios uniquement
         </a>
-        <a href="{% url 'logements:home' %}?meublee=1" class="flex items-center gap-2.5 py-2 px-2.5 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50 hover:text-primary transition">
+        <a href="{% url 'logements:home' %}?meublee=1" class="flex items-center gap-2.5 py-2 px-2.5 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-primary transition">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           Chambres meublées
         </a>
-        <a href="{% url 'logements:home' %}?wc=1&cuisine=1" class="flex items-center gap-2.5 py-2 px-2.5 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50 hover:text-primary transition">
+        <a href="{% url 'logements:home' %}?wc=1&cuisine=1" class="flex items-center gap-2.5 py-2 px-2.5 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-primary transition">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           Avec WC et Cuisine interne
         </a>
-        <a href="{% url 'logements:home' %}?q=Bandjoun" class="flex items-center gap-2.5 py-2 px-2.5 rounded-xl text-xs font-semibold text-gray-600 hover:bg-gray-50 hover:text-primary transition">
+        <a href="{% url 'logements:home' %}?q=Bandjoun" class="flex items-center gap-2.5 py-2 px-2.5 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-primary transition">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           Logements à Bandjoun
         </a>
@@ -92,8 +92,8 @@
     <div class="hidden lg:flex items-center gap-3">
       {% if user.is_authenticated %}
         <div class="relative group py-2">
-          <button type="button" class="flex items-center gap-2 rounded-full bg-white/5 pl-2 pr-3 py-1.5 text-xs font-bold text-white hover:bg-white/10 transition border border-white/10 shadow-sm">
-            <div class="bg-secondary text-primary flex h-7 w-7 items-center justify-center rounded-full text-xs font-black shadow-inner">
+          <button type="button" class="flex items-center gap-2 rounded-full bg-white/5 pl-2 pr-3 py-1.5 text-sm font-bold text-white hover:bg-white/10 transition border border-white/10 shadow-sm">
+            <div class="bg-secondary text-primary flex h-7 w-7 items-center justify-center rounded-full text-sm font-black shadow-inner">
               {{ user.get_initials }}
             </div>
             <span class="max-w-[110px] truncate text-white/90">
@@ -106,7 +106,7 @@
 
           <div class="absolute right-0 top-full z-50 w-64 origin-top-right rounded-2xl bg-white py-1.5 shadow-2xl border border-gray-100 hidden group-hover:block transition duration-150">
             <div class="px-4 py-2.5 border-b border-gray-100">
-              <p class="text-xs font-bold text-gray-900 truncate">{{ user.get_full_name }}</p>
+              <p class="text-sm font-bold text-gray-900 truncate">{{ user.get_full_name }}</p>
               <p class="text-[10px] font-bold text-primary mt-0.5 tracking-wide uppercase">
                 {% if user.role == 'admin' %}Administrateur
                 {% elif user.role == 'proprietaire' %}Bailleur Certifié
@@ -114,23 +114,23 @@
               </p>
             </div>
             <div class="py-1 text-gray-700">
-              <a href="{% url 'users:dashboard' %}" class="flex items-center px-4 py-2 text-xs font-semibold hover:bg-gray-50 hover:text-primary transition"><i class="fa-solid fa-chart-pie w-4 mr-2.5 text-gray-400"></i>Tableau de bord</a>
-              <a href="{% url 'users:profil' %}" class="flex items-center px-4 py-2 text-xs font-semibold hover:bg-gray-50 hover:text-primary transition"><i class="fa-regular fa-user w-4 mr-2.5 text-gray-400"></i>Mon profil</a>
+              <a href="{% url 'users:dashboard' %}" class="flex items-center px-4 py-2 text-sm font-semibold hover:bg-gray-50 hover:text-primary transition"><i class="fa-solid fa-chart-pie w-4 mr-2.5 text-gray-400"></i>Tableau de bord</a>
+              <a href="{% url 'users:profil' %}" class="flex items-center px-4 py-2 text-sm font-semibold hover:bg-gray-50 hover:text-primary transition"><i class="fa-regular fa-user w-4 mr-2.5 text-gray-400"></i>Mon profil</a>
               <hr class="border-gray-100 my-1">
               {% if user.role == 'admin' %}
-                <a href="{% url 'logements:liste_admin' %}" class="flex items-center px-4 py-2 text-xs font-semibold hover:bg-gray-50 hover:text-primary transition"><i class="fa-solid fa-list-check w-4 mr-2.5 text-gray-400"></i>Logements Admin</a>
+                <a href="{% url 'logements:liste_admin' %}" class="flex items-center px-4 py-2 text-sm font-semibold hover:bg-gray-50 hover:text-primary transition"><i class="fa-solid fa-list-check w-4 mr-2.5 text-gray-400"></i>Logements Admin</a>
               {% elif user.role == 'proprietaire' %}
-                <a href="{% url 'logements:mes_cites' %}" class="flex items-center px-4 py-2 text-xs font-semibold hover:bg-gray-50 hover:text-primary transition"><i class="fa-solid fa-hotel w-4 mr-2.5 text-gray-400"></i>Mes cités</a>
+                <a href="{% url 'logements:mes_cites' %}" class="flex items-center px-4 py-2 text-sm font-semibold hover:bg-gray-50 hover:text-primary transition"><i class="fa-solid fa-hotel w-4 mr-2.5 text-gray-400"></i>Mes cités</a>
               {% endif %}
             </div>
             <div class="border-t border-gray-100 mt-1 pt-1">
-              <a href="{% url 'users:deconnexion' %}" class="flex items-center px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 transition"><i class="fa-solid fa-arrow-right-from-bracket w-4 mr-2.5 text-red-400"></i>Déconnexion</a>
+              <a href="{% url 'users:deconnexion' %}" class="flex items-center px-4 py-2 text-sm font-bold text-red-600 hover:bg-red-50 transition"><i class="fa-solid fa-arrow-right-from-bracket w-4 mr-2.5 text-red-400"></i>Déconnexion</a>
             </div>
           </div>
         </div>
       {% else %}
-        <a href="{% url 'users:connexion' %}" class="border-secondary/30 hover:text-secondary hover:border-secondary/60 rounded-xl border px-4 py-2 text-xs text-white/80 font-bold transition">Se connecter</a>
-        <a href="{% url 'users:inscription' %}" class="bg-secondary text-primary hover:bg-secondary/90 rounded-xl px-4 py-2 text-xs font-bold transition">S'inscrire</a>
+        <a href="{% url 'users:connexion' %}" class="border-secondary/30 hover:text-secondary hover:border-secondary/60 rounded-xl border px-4 py-2 text-sm text-white/80 font-bold transition">Se connecter</a>
+        <a href="{% url 'users:inscription' %}" class="bg-secondary text-primary hover:bg-secondary/90 rounded-xl px-4 py-2 text-sm font-bold transition">S'inscrire</a>
       {% endif %}
     </div>
 
@@ -154,7 +154,7 @@
         
         {# Input Recherche #}
         <div class="relative w-full">
-          <input type="text" name="q" placeholder="Studio, meublé, quartier..." value="{{ request.GET.q|default:'' }}" class="w-full rounded-xl border border-transparent bg-white/10 py-2.5 px-4 pl-10 text-xs text-white placeholder-white/50 focus:bg-white/20 focus:outline-none" />
+          <input type="text" name="q" placeholder="Studio, meublé, quartier..." value="{{ request.GET.q|default:'' }}" class="w-full rounded-xl border border-transparent bg-white/10 py-2.5 px-4 pl-10 text-sm text-white placeholder-white/50 focus:bg-white/20 focus:outline-none" />
           <div class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-white/50">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.604 10.604z" /></svg>
           </div>
@@ -163,10 +163,10 @@
         {# Input Prix Max + Bouton alignés #}
         <div class="flex items-center gap-2 w-full">
           <div class="relative flex-1">
-            <input type="number" name="prix_max" placeholder="Prix maximum (FCFA)" value="{{ request.GET.prix_max|default:'' }}" class="w-full rounded-xl border border-transparent bg-white/10 py-2.5 px-4 pl-12 text-xs text-white placeholder-white/50 focus:bg-white/20 focus:outline-none" />
+            <input type="number" name="prix_max" placeholder="Prix maximum (FCFA)" value="{{ request.GET.prix_max|default:'' }}" class="w-full rounded-xl border border-transparent bg-white/10 py-2.5 px-4 pl-12 text-sm text-white placeholder-white/50 focus:bg-white/20 focus:outline-none" />
             <div class="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-white/50 text-[10px] font-bold">FCFA</div>
           </div>
-          <button type="submit" class="bg-secondary text-primary rounded-xl px-5 py-2.5 text-xs font-bold shrink-0">Filtrer</button>
+          <button type="submit" class="bg-secondary text-primary rounded-xl px-5 py-2.5 text-sm font-bold shrink-0">Filtrer</button>
         </div>
 
       </form>
@@ -175,33 +175,33 @@
     {# Navigation standard mobile #}
     <div class="flex flex-col gap-1.5">
       <p class="text-white/30 text-[10px] uppercase tracking-wider font-bold px-2">Navigation</p>
-      <a href="{% url 'logements:home' %}" class="text-white/80 hover:text-secondary hover:bg-white/5 px-3 py-2 rounded-lg text-sm font-medium transition">Accueil</a>
-      <a href="{% url 'logements:liste_cites' %}" class="text-white/80 hover:text-secondary hover:bg-white/5 px-3 py-2 rounded-lg text-sm font-medium transition">Logements</a>
-      <a href="{% url 'contact:contact' %}" class="text-white/80 hover:text-secondary hover:bg-white/5 px-3 py-2 rounded-lg text-sm font-medium transition">Contact</a>
+      <a href="{% url 'logements:home' %}" class="text-white/80 hover:text-secondary hover:bg-white/5 px-3 py-2 rounded-lg text-base font-medium transition">Accueil</a>
+      <a href="{% url 'logements:liste_cites' %}" class="text-white/80 hover:text-secondary hover:bg-white/5 px-3 py-2 rounded-lg text-base font-medium transition">Logements</a>
+      <a href="{% url 'contact:contact' %}" class="text-white/80 hover:text-secondary hover:bg-white/5 px-3 py-2 rounded-lg text-base font-medium transition">Contact</a>
     </div>
 
     {% if user.is_authenticated %}
       <div class="flex flex-col gap-1.5 border-t border-white/10 pt-3">
         <p class="text-secondary text-[10px] uppercase tracking-wider font-bold px-2">Mon Espace</p>
-        <a href="{% url 'users:dashboard' %}" class="text-white/80 hover:text-secondary hover:bg-white/5 px-3 py-2 rounded-lg text-sm transition">Tableau de bord</a>
+        <a href="{% url 'users:dashboard' %}" class="text-white/80 hover:text-secondary hover:bg-white/5 px-3 py-2 rounded-lg text-base transition">Tableau de bord</a>
       </div>
 
       <div class="flex items-center justify-between border-t border-white/10 pt-4 px-2 mt-2">
         <div class="flex items-center gap-2.5">
-          <div class="bg-secondary text-primary flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold">
+          <div class="bg-secondary text-primary flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold">
             {{ user.prenom|first|upper }}{{ user.nom|first|upper }}
           </div>
           <div class="flex flex-col">
-            <span class="text-xs text-white font-medium leading-none">{{ user.get_full_name }}</span>
+            <span class="text-sm text-white font-medium leading-none">{{ user.get_full_name }}</span>
             <span class="text-[10px] text-white/40 mt-1">{{ user.email|truncatechars:20 }}</span>
           </div>
         </div>
-        <a href="{% url 'users:deconnexion' %}" class="text-xs text-red-400 bg-red-500/10 px-3 py-1.5 rounded-xl font-bold transition hover:bg-red-500/20">Déconnexion</a>
+        <a href="{% url 'users:deconnexion' %}" class="text-sm text-red-400 bg-red-500/10 px-3 py-1.5 rounded-xl font-bold transition hover:bg-red-500/20">Déconnexion</a>
       </div>
     {% else %}
       <div class="flex flex-col gap-2 border-t border-white/10 pt-4">
-        <a href="{% url 'users:connexion' %}" class="w-full text-center border border-secondary/30 text-white rounded-xl py-2.5 text-xs font-bold transition hover:bg-white/5">Se connecter</a>
-        <a href="{% url 'users:inscription' %}" class="w-full text-center bg-secondary text-primary rounded-xl py-2.5 text-xs font-black transition hover:opacity-90">S'inscrire</a>
+        <a href="{% url 'users:connexion' %}" class="w-full text-center border border-secondary/30 text-white rounded-xl py-2.5 text-sm font-bold transition hover:bg-white/5">Se connecter</a>
+        <a href="{% url 'users:inscription' %}" class="w-full text-center bg-secondary text-primary rounded-xl py-2.5 text-sm font-black transition hover:opacity-90">S'inscrire</a>
       </div>
     {% endif %}
   </div>

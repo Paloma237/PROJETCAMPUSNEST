@@ -7,8 +7,8 @@
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
       <div>
         <h1 class="text-3xl font-semibold tracking-tight text-gray-900">Cités disponibles</h1>
-        <p class="text-sm text-gray-500 mt-1">
-          <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-primary/10 text-primary">
+        <p class="text-base text-gray-500 mt-1">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-primary/10 text-primary">
             {{ cites|length }} cité{{ cites|length|pluralize }} enregistrée{{ cites|length|pluralize }}
           </span>
         </p>
@@ -22,7 +22,7 @@
                  class="w-full md:w-64 pl-4 pr-4 py-2.5"/>
         </div>
         <button type="submit"
-                class="px-5 py-2.5 bg-primary text-secondary text-sm font-medium rounded-xl
+                class="px-5 py-2.5 bg-primary text-secondary text-base font-medium rounded-xl
                        hover:bg-primary/95 shadow-sm transition shrink-0">
           Recherche
         </button>
@@ -50,7 +50,7 @@
                   <svg class="w-10 h-10 text-primary/40 group-hover:text-primary/60 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                   </svg>
-                  <span class="text-[10px] uppercase tracking-wider text-primary/50 font-medium">Aucune photo</span>
+                  <span class="text-xs uppercase tracking-wider text-primary/50 font-medium">Aucune photo</span>
                 </div>
               {% endif %}
 
@@ -70,21 +70,21 @@
             {# Cadre d'informations structuré en dessous #}
             <div class="p-4 flex flex-col flex-grow bg-white">
               <div class="flex-grow">
-                <h2 class="text-sm font-semibold text-gray-900 group-hover:text-primary transition line-clamp-1">
+                <h2 class="text-base font-semibold text-gray-900 group-hover:text-primary transition line-clamp-1">
                   {{ cite.nom }}
                 </h2>
                 
-                <p class="text-xs text-gray-500 mt-1 flex items-center gap-1 truncate">
+                <p class="text-sm text-gray-500 mt-1 flex items-center gap-1 truncate">
                   <svg class="w-3.5 h-3.5 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                   {{ cite.adresse }}
                 </p>
 
                 {% if cite.description %}
-                  <p class="text-xs text-gray-400 mt-2.5 line-clamp-2 leading-relaxed">{{ cite.description }}</p>
+                  <p class="text-sm text-gray-400 mt-2.5 line-clamp-2 leading-relaxed">{{ cite.description }}</p>
                 {% endif %}
               </div>
 
-              <div class="flex items-center justify-between mt-4 pt-3 border-t border-gray-100 text-xs text-gray-500 font-medium">
+              <div class="flex items-center justify-between mt-4 pt-3 border-t border-gray-100 text-sm text-gray-500 font-medium">
                 <span>Capacité totale</span>
                 <span class="text-gray-900 font-semibold">{{ cite.chambres.count }} chambre{{ cite.chambres.count|pluralize }}</span>
               </div>
@@ -101,9 +101,9 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/>
         </svg>
         <h3 class="text-base font-semibold text-gray-900 mb-1">Aucune cité</h3>
-        <p class="text-gray-400 text-sm">Aucune cité ne correspond à votre recherche ou n'est disponible pour l'instant.</p>
+        <p class="text-gray-400 text-base">Aucune cité ne correspond à votre recherche ou n'est disponible pour l'instant.</p>
         <a href="{% url 'logements:home' %}"
-           class="inline-flex items-center justify-center mt-6 px-5 py-2.5 bg-primary text-secondary text-sm font-medium
+           class="inline-flex items-center justify-center mt-6 px-5 py-2.5 bg-primary text-secondary text-base font-medium
                   rounded-xl hover:bg-primary/95 shadow-sm transition">
           Retour à l'accueil
         </a>

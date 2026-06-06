@@ -1,54 +1,52 @@
-{% comment %}contact/contacter_proprietaire.html{% endcomment %}
 {% extends "base.html" %}
 {% block content %}
 <div class="max-w-xl mx-auto px-4 py-8">
+
   <a href="javascript:history.back()"
-     class="text-sm text-gray-400 hover:text-primary transition mb-4 inline-block">
+     class="text-base text-gray-400 hover:text-primary transition mb-4 inline-block">
     ← Retour
   </a>
+
   <h1 class="text-2xl font-semibold text-gray-900 mb-1">Contacter le propriétaire</h1>
-  <p class="text-sm text-gray-500 mb-6">
-    {{ proprietaire.get_full_name }}
-  </p>
+  <p class="text-base text-gray-500 mb-6">{{ proprietaire.get_full_name }}</p>
+
+  <!-- Contexte chambre -->
+  <div class="bg-primary/5 border border-primary/20 rounded-xl px-4 py-3 mb-6 flex items-start gap-3">
+    <span class="text-lg mt-0.5">🏠</span>
+    <div>
+      <p class="text-sm font-semibold text-primary uppercase tracking-wide mb-0.5">
+        Chambre concernée
+      </p>
+      <p class="text-base font-medium text-gray-800">
+        {{ chambre.description|truncatechars:60 }}
+      </p>
+      <p class="text-sm text-gray-400 mt-1">
+        {{ chambre.get_type_display }} · {{ chambre.superficie }} m²
+        · {{ chambre.loyer|floatformat:0 }} FCFA/mois
+        · {{ chambre.cite.nom }}
+      </p>
+    </div>
+  </div>
 
   <div class="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
     <form method="post" novalidate>
       {% csrf_token %}
-
-      <div class="mb-4">
-        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
-          Objet du message <span class="text-red-400">*</span>
-        </label>
-        <input type="text" name="objet"
-               value="{{ form.objet.value|default:'' }}"
-               placeholder="Ex : Question sur la chambre A3"
-               class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50
-                      focus:outline-none focus:ring-2 focus:ring-secondary/50 transition"/>
-        {% if form.objet.errors %}
-          <p class="text-red-500 text-xs mt-1">{{ form.objet.errors|first }}</p>
-        {% endif %}
-      </div>
-
       <div class="mb-6">
-        <label class="block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1.5">
-          Message <span class="text-red-400">*</span>
+        <label class="block text-sm font-medium text-gray-500 uppercase tracking-wide mb-1.5">
+          Votre message <span class="text-red-400">*</span>
         </label>
-        <textarea name="message" rows="5"
-                  placeholder="Écrivez votre message..."
-                  class="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50
-                         focus:outline-none focus:ring-2 focus:ring-secondary/50 transition
-                         resize-none">{{ form.message.value|default:'' }}</textarea>
-        {% if form.message.errors %}
-          <p class="text-red-500 text-xs mt-1">{{ form.message.errors|first }}</p>
+        {{ form.contenu }}
+        {% if form.contenu.errors %}
+          <p class="text-red-500 text-sm mt-1">{{ form.contenu.errors|first }}</p>
         {% endif %}
       </div>
-
       <button type="submit"
-              class="w-full py-3 bg-primary text-secondary text-sm font-medium
+              class="w-full py-3 bg-primary text-secondary text-base font-medium
                      rounded-xl hover:bg-primary/90 transition">
         Envoyer le message
       </button>
     </form>
   </div>
+
 </div>
 {% endblock %}

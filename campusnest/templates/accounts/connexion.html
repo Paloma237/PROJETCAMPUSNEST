@@ -3,7 +3,7 @@
 {% block content %}
 <div class="mb-8">
   <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Bienvenue</h1>
-  <p class="text-sm text-gray-500 mt-1">Connectez-vous à votre espace</p>
+  <p class="text-base text-gray-500 mt-1">Connectez-vous à votre espace</p>
 </div>
 
 <form method="post" novalidate class="space-y-5">
@@ -12,25 +12,25 @@
 
   {# Champ Email #}
   <div>
-    <label class="mb-1.5 block text-xs font-bold tracking-widest uppercase text-gray-400">Email</label>
+    <label class="mb-1.5 block text-sm font-bold tracking-widest uppercase text-gray-400">Email</label>
     <input
       type="email"
       name="username"
       value="{{ form.username.value|default:'' }}"
       placeholder="votre@email.cm"
       autofocus
-      class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10 shadow-sm"
+      class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-base outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10 shadow-sm"
     />
     {% if form.username.errors %}
-      <p class="mt-1.5 text-xs text-red-600 font-medium">{{ form.username.errors|first }}</p>
+      <p class="mt-1.5 text-sm text-red-600 font-medium">{{ form.username.errors|first }}</p>
     {% endif %}
   </div>
 
   {# Champ Mot de passe avec fonction "Afficher" #}
   <div>
     <div class="flex justify-between items-center mb-1.5">
-      <label class="block text-xs font-bold tracking-widest uppercase text-gray-400">Mot de passe</label>
-      <a href="{% url 'users:mot_de_passe_oublie' %}" class="text-xs font-bold text-primary hover:underline">OUBLIÉ ?</a>
+      <label class="block text-sm font-bold tracking-widest uppercase text-gray-400">Mot de passe</label>
+      <a href="{% url 'users:mot_de_passe_oublie' %}" class="text-sm font-bold text-primary hover:underline">OUBLIÉ ?</a>
     </div>
     
     <div class="relative">
@@ -39,7 +39,7 @@
         id="id_password"
         name="password"
         placeholder="••••••••"
-        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm pr-12 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10 shadow-sm"
+        class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-base pr-12 outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/10 shadow-sm"
       />
       <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition p-2">
         <svg id="eye-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,22 +48,22 @@
       </button>
     </div>
     {% if form.password.errors %}
-      <p class="mt-1.5 text-xs text-red-600 font-medium">{{ form.password.errors|first }}</p>
+      <p class="mt-1.5 text-sm text-red-600 font-medium">{{ form.password.errors|first }}</p>
     {% endif %}
   </div>
 
   {% if form.non_field_errors %}
-    <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 font-medium">
+    <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-base text-red-800 font-medium">
       {{ form.non_field_errors|first }}
     </div>
   {% endif %}
 
-  <button type="submit" class="w-full rounded-xl bg-primary py-3.5 text-sm font-bold text-secondary shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98]">
+  <button type="submit" class="w-full rounded-xl bg-primary py-3.5 text-base font-bold text-secondary shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all active:scale-[0.98]">
     Se connecter
   </button>
 </form>
 
-<p class="mt-8 text-center text-sm text-gray-400">
+<p class="mt-8 text-center text-base text-gray-400">
   Pas encore de compte ?
   <a href="{% url 'users:inscription' %}" class="text-primary font-bold hover:underline">S'inscrire</a>
 </p>

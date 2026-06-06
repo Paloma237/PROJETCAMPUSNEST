@@ -2,14 +2,14 @@
 {% block sidebar_quote %}« Récupérez l'accès à votre compte en quelques secondes. »{% endblock %} 
 {% block content %}
 <h1 class="mb-1 text-2xl font-medium text-gray-900">Mot de passe oublié</h1>
-<p class="mb-6 text-sm text-gray-500">Entrez votre adresse email. Nous vous enverrons un code à 6 chiffres.</p>
+<p class="mb-6 text-base text-gray-500">Entrez votre adresse email. Nous vous enverrons un code à 6 chiffres.</p>
 
 <form method="post" novalidate>
   {% csrf_token %}
   <div class="mb-4">
-    <label class="mb-1.5 block text-xs font-medium tracking-wide text-gray-500 uppercase">Adresse email</label>
+    <label class="mb-1.5 block text-sm font-medium tracking-wide text-gray-500 uppercase">Adresse email</label>
     {{ form.email }} {% if form.email.errors %}
-    <p class="mt-1 text-xs text-red-600">{{ form.email.errors|first }}</p>
+    <p class="mt-1 text-sm text-red-600">{{ form.email.errors|first }}</p>
     {% endif %}
   </div>
 
@@ -17,17 +17,17 @@
     <svg class="text-primary h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
     </svg>
-    <p class="text-primary text-xs">
+    <p class="text-primary text-sm">
       Un code valide
       <strong>10 minutes</strong>
       vous sera envoyé par email. Vérifiez également vos spams.
     </p>
   </div>
 
-  <button type="submit" class="bg-primary text-secondary hover:bg-primary/90 w-full rounded-xl py-3 text-sm font-medium transition">Envoyer le code</button>
+  <button type="submit" class="bg-primary text-secondary hover:bg-primary/90 w-full rounded-xl py-3 text-base font-medium transition">Envoyer le code</button>
 </form>
 
-<p class="mt-6 text-center text-sm text-gray-400">
+<p class="mt-6 text-center text-base text-gray-400">
   <a href="{% url 'users:connexion' %}" class="text-primary hover:underline">← Retour à la connexion</a>
 </p>
 {% endblock %}

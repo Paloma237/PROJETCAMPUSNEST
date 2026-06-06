@@ -1,13 +1,12 @@
-"""
-campusnest/logements/views.py — VERSION CORRIGÉE COMPLÈTE
-"""
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q, Exists, OuterRef, Value, BooleanField
 from django.shortcuts import get_object_or_404, redirect, render
+from urllib3 import request
 
 from campusnest.users.utils import admin_requis, proprietaire_valide_requis
 from .models import Chambre, Cite, PhotoCity, PhotoChambre
-from .forms import ChambreForm, CiteForm
+from .forms import ChambreForm, CiteForm, DateVisiteFormSet
+from campusnest.favoris.models import Favori
 
 
 # ─────────────────────────────────────────────
@@ -90,6 +89,20 @@ def liste_chambres_view(request):
         chambres = chambres.filter(wc_interieur=True)
     if request.GET.get("cuisine"):
         chambres = chambres.filter(cuisine=True)
+    if request.user.is_authenticated and request.user.role == "client":
+        chambres = chambres.annotate(
+            est_favori=Exists(
+                Favori.objects.filter(
+                    client=request.user,
+                    chambre=OuterRef("pk"),
+                )
+            )
+        )
+    else:
+        chambres = chambres.annotate(
+            est_favori=Value(False, output_field=BooleanField())
+        )
+
 
     return render(request, "logements/liste_chambres.html", {
         "chambres":      chambres,
@@ -111,13 +124,18 @@ def detail_cite_view(request, pk):
 
 def detail_chambre_view(request, pk):
     chambre    = get_object_or_404(Chambre, pk=pk)
-    # ✅ PhotoChambre filtrée par chambre=
     photos     = PhotoChambre.objects.filter(chambre=chambre)
     avis       = chambre.avis.filter(est_visible=True).select_related("client")
     note_moy   = chambre.note_moyenne()
     similaires = Chambre.objects.filter(
         cite=chambre.cite, est_disponible=True
     ).exclude(pk=chambre.pk)[:3]
+    est_favori = (
+        request.user.is_authenticated
+        and request.user.role == "client"
+        and Favori.objects.filter(client=request.user, chambre=chambre).exists()
+    )
+
 
     return render(request, "logements/detail_chambre.html", {
         "chambre":    chambre,
@@ -125,6 +143,7 @@ def detail_chambre_view(request, pk):
         "avis":       avis,
         "note_moy":   note_moy,
         "similaires": similaires,
+        "est_favori": est_favori,
     })
 
 
@@ -183,7 +202,18 @@ def modifier_cite_view(request, pk):
     return render(request, "logements/modifier_cite.html", {
         "form": form, "cite": cite, "photos_cite": photos_cite,
     })
-
+@proprietaire_valide_requis
+def supprimer_photo_view(request, pk):
+    """Supprime une photo de chambre appartenant au propriétaire connecté."""
+    photo = get_object_or_404(
+        PhotoChambre, pk=pk, chambre__cite__proprietaire=request.user
+    )
+    chambre_pk = photo.chambre.pk
+    if request.method == "POST":
+        photo.image.delete(save=False)  # supprime le fichier disque
+        photo.delete()
+        messages.success(request, "Photo supprimée.")
+    return redirect("logements:modifier_chambre", pk=chambre_pk)
 
 @proprietaire_valide_requis
 def supprimer_cite_view(request, pk):
@@ -214,48 +244,90 @@ def supprimer_photo_cite_view(request, pk):
 @proprietaire_valide_requis
 def ajouter_chambre_view(request, cite_pk):
     cite = get_object_or_404(Cite, pk=cite_pk, proprietaire=request.user)
-    form = ChambreForm(request.POST or None,request.FILES)
 
-    if request.method == "POST" and form.is_valid():
-        chambre = form.save(commit=False)
-        chambre.cite = cite
-        chambre.save()
+    form        = ChambreForm(request.POST or None, request.FILES or None)  # pas d'instance = création
+    date_formset = DateVisiteFormSet(request.POST or None)  # pas d'instance = création
 
-        # ✅ Photos de la chambre — champs : chambre= et image=
-        for i, fichier in enumerate(request.FILES.getlist("photos")):
-            PhotoChambre.objects.create(
-                chambre=chambre,
-                image=fichier,
-                est_principale=(i == 0),
-            )
+    if request.method == "POST":
+        if form.is_valid() and date_formset.is_valid():
+            # 1. Sauvegarder la chambre
+            chambre      = form.save(commit=False)
+            chambre.cite = cite
+            chambre.save()
 
-        messages.success(request, f"Chambre ajoutée à « {cite.nom} ».")
-        return redirect("logements:mes_cites")
+            # 2. Sauvegarder les dates de visite liées
+            date_formset.instance = chambre
+            date_formset.save()
 
-    return render(request, "logements/ajouter_chambre.html", {"form": form, "cite": cite})
+            # 3. Sauvegarder les photos (jusqu'à 4)
+            photos = request.FILES.getlist("photos")
+            for i, photo_file in enumerate(request.FILES.getlist("photos")[:4]):
+                PhotoChambre.objects.create(
+                    chambre=chambre,
+                    image=photo_file,
+                    est_principale=(i == 0),
+                )
+
+            messages.success(request, "Chambre ajoutée avec succès.")
+            return redirect("logements:mes_cites")
+        else:
+            # Afficher les erreurs dans la console pour debug
+            print("Erreurs form:", form.errors)
+            print("Erreurs formset:", date_formset.errors)
+            print("Erreurs non_form:", date_formset.non_form_errors())
+        
+    # ── Préparer les 4 slots pour le template ──
+    photo_slots = [None, None, None, None]
+
+    return render(request, "logements/ajouter_chambre.html", {
+        "form":         form,
+        "date_formset": date_formset,
+        "cite":         cite,
+        "chambre":      None,
+        "photos":       [],
+        "photo_slots":  photo_slots,
+    })
 
 
 @proprietaire_valide_requis
 def modifier_chambre_view(request, pk):
     chambre = get_object_or_404(Chambre, pk=pk, cite__proprietaire=request.user)
-    form    = ChambreForm(request.POST or None, instance=chambre)
+    cite    = chambre.cite
 
-    if request.method == "POST" and form.is_valid():
-        form.save()
+    form         = ChambreForm(request.POST or None, request.FILES or None, instance=chambre)
+    date_formset = DateVisiteFormSet(request.POST or None, instance=chambre)
 
-        # ✅ Nouvelles photos de la chambre
-        for fichier in request.FILES.getlist("photos"):
-            PhotoChambre.objects.create(chambre=chambre, image=fichier)
+    if request.method == "POST":
+        if form.is_valid() and date_formset.is_valid():
+            form.save()
+            date_formset.save()
+            photos_existantes = chambre.photos.all()
+            a_une_principale  = photos_existantes.filter(est_principale=True).exists()
+            for i, photo_file in enumerate(request.FILES.getlist("photos")[:4]):
+                PhotoChambre.objects.create(
+                    chambre=chambre,
+                    image=photo_file,
+                    est_principale=(i == 0 and not a_une_principale),
+                )
+            messages.success(request, "Chambre modifiée avec succès.")
+            return redirect("logements:mes_cites")
+        else:
+            print("Erreurs form:", form.errors)
+            print("Erreurs formset:", date_formset.errors)
 
-        messages.success(request, "Chambre mise à jour.")
-        return redirect("logements:mes_cites")
+    # ── Préparer les 4 slots pour le template ──
+    photos_qs = list(chambre.photos.all()[:4])
+    # On complète avec None jusqu'à 4 éléments
+    photo_slots = photos_qs + [None] * (4 - len(photos_qs))
 
-    # ✅ Filtre correct pour photos existantes
-    photos = PhotoChambre.objects.filter(chambre=chambre)
-    return render(request, "logements/modifier_chambre.html", {
-        "form": form, "chambre": chambre, "photos": photos,
+    return render(request, "logements/ajouter_chambre.html", {
+        "form":         form,
+        "date_formset": date_formset,
+        "cite":         cite,
+        "chambre":      chambre,
+        "photos":       photos_qs,
+        "photo_slots":  photo_slots,
     })
-
 
 @proprietaire_valide_requis
 def supprimer_chambre_view(request, pk):
