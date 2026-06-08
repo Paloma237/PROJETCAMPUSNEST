@@ -1,12 +1,77 @@
 {% extends "base.html" %} {% load static %} {% block content %}
+
+{# ═══════════════════════════════════════════ #}
+{#               LIGHTBOX OVERLAY              #}
+{# ═══════════════════════════════════════════ #}
+<div id="lightbox"
+     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 backdrop-blur-sm"
+     role="dialog" aria-modal="true">
+
+  {# Fermer au clic sur le fond #}
+  <div class="absolute inset-0" id="lb-backdrop"></div>
+
+  {# Bouton fermer #}
+  <button id="lb-close"
+          class="absolute top-4 right-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+          aria-label="Fermer">
+    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+    </svg>
+  </button>
+
+  {# Flèche gauche #}
+  <button id="lb-prev"
+          class="absolute left-3 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 disabled:opacity-30"
+          aria-label="Précédent">
+    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+    </svg>
+  </button>
+
+  {# Image principale #}
+  <div class="relative z-10 flex max-h-[90vh] max-w-[92vw] items-center justify-center sm:max-w-4xl">
+    <img id="lb-img"
+         src=""
+         alt=""
+         class="max-h-[85vh] max-w-full rounded-xl object-contain shadow-2xl transition-opacity duration-200"/>
+    <p id="lb-caption"
+       class="absolute bottom-0 left-0 right-0 rounded-b-xl bg-black/60 px-4 py-2 text-center text-sm text-white backdrop-blur-sm"></p>
+  </div>
+
+  {# Flèche droite #}
+  <button id="lb-next"
+          class="absolute right-3 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 disabled:opacity-30"
+          aria-label="Suivant">
+    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+    </svg>
+  </button>
+
+  {# Compteur #}
+  <span id="lb-counter"
+        class="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/80 backdrop-blur-sm"></span>
+</div>
+
+{# ═══════════════════════════════════════════ #}
+{#                  PAGE                       #}
+{# ═══════════════════════════════════════════ #}
 <div class="mx-auto max-w-5xl px-4 py-8 sm:px-6">
-  {# ═══ GALERIE PHOTOS MODERNISÉE ═══ #} {% if photos %}
+
+  {# ═══ GALERIE PHOTOS ═══ #}
+  {% if photos %}
   <div class="mb-8 grid h-64 grid-cols-1 gap-3 overflow-hidden rounded-2xl sm:h-80 sm:grid-cols-3 md:h-[380px]">
     {% for photo in photos|slice:":3" %}
     <div class="{% if forloop.first %}sm:col-span-2 sm:row-span-2{% endif %} relative h-full w-full overflow-hidden bg-gray-100">
-      <img src="{{ photo.image.url }}" alt="{{ photo.legende|default:chambre.get_type_display }}" class="h-full w-full object-cover transition-transform duration-500 hover:scale-105" />
+      <img
+        src="{{ photo.image.url }}"
+        alt="{{ photo.legende|default:chambre.get_type_display }}"
+        data-lightbox
+        data-src="{{ photo.image.url }}"
+        data-caption="{{ photo.legende|default:chambre.get_type_display }}"
+        class="h-full w-full cursor-zoom-in object-cover transition-transform duration-500 hover:scale-105"
+      />
       {% if photo.legende %}
-      <span class="absolute bottom-3 left-3 rounded bg-black/60 px-2 py-1 text-xs text-white backdrop-blur-sm">{{ photo.legende }}</span>
+      <span class="absolute bottom-3 left-3 rounded bg-black/60 px-2 py-1 text-xs text-white backdrop-blur-sm pointer-events-none">{{ photo.legende }}</span>
       {% endif %}
     </div>
     {% endfor %}
@@ -14,17 +79,14 @@
   {% else %}
   <div class="mb-8 flex h-52 flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-[#7BA87A]/20 bg-[#7BA87A]/5">
     <svg class="h-8 w-8 text-[#1A2517]/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
-      />
+      <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
     </svg>
     <p class="text-sm font-medium text-gray-400">Aucune photo disponible pour ce logement</p>
   </div>
   {% endif %}
 
   <div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-3">
+
     {# ═══ COLONNE PRINCIPALE : INFOS & AVIS ═══ #}
     <div class="space-y-6 lg:col-span-2">
       <div class="border-b border-gray-100 pb-5">
@@ -38,8 +100,8 @@
         </h1>
         <p class="mt-1.5 flex items-center gap-1 text-sm text-gray-500">
           <svg class="h-3.5 w-3.5 shrink-0 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
           </svg>
           {{ chambre.cite.adresse }}
         </p>
@@ -57,11 +119,14 @@
           </div>
           {% if chambre.meublee %}
           <div class="flex items-center gap-2 rounded-xl border border-emerald-100/50 bg-emerald-50/40 p-3 text-sm font-medium text-emerald-800">✨ Meublée</div>
-          {% endif %} {% if chambre.wc_interieur %}
+          {% endif %}
+          {% if chambre.wc_interieur %}
           <div class="flex items-center gap-2 rounded-xl border border-blue-100/50 bg-blue-50/40 p-3 text-sm font-medium text-blue-800">🚿 WC Intérieur</div>
-          {% endif %} {% if chambre.cuisine %}
+          {% endif %}
+          {% if chambre.cuisine %}
           <div class="flex items-center gap-2 rounded-xl border border-amber-100/50 bg-amber-50/40 p-3 text-sm font-medium text-amber-800">🍳 Cuisine</div>
-          {% endif %} {% if chambre.internet %}
+          {% endif %}
+          {% if chambre.internet %}
           <div class="flex items-center gap-2 rounded-xl border border-purple-100/50 bg-purple-50/40 p-3 text-sm font-medium text-purple-800">⚡ Wifi Gratuit</div>
           {% endif %}
         </div>
@@ -84,7 +149,6 @@
           <a href="{% url 'avis:laisser' chambre.pk %}" class="text-sm font-bold text-[#7BA87A] hover:underline">Laisser un avis</a>
           {% endif %}
         </div>
-
         <div class="space-y-3">
           {% for a in avis %}
           <div class="rounded-xl border border-gray-100 bg-gray-50/50 p-3.5">
@@ -115,60 +179,45 @@
           </p>
           <div class="mt-3 flex items-center gap-2 rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 text-[11px] text-gray-500">
             <div class="{% if chambre.est_disponible %}bg-emerald-500{% else %}bg-gray-400{% endif %} h-2 w-2 rounded-full"></div>
-            <span>
-              Bailleur :
-              <strong>{{ chambre.cite.proprietaire.get_full_name }}</strong>
-            </span>
+            <span>Bailleur : <strong>{{ chambre.cite.proprietaire.get_full_name }}</strong></span>
           </div>
         </div>
-        {# Bouton favori #}
         <div class="mb-3">{% include "components/btn_favori.html" with chambre=chambre est_favori=est_favori %}</div>
-
         <div class="space-y-2">
-          {% if chambre.est_disponible %} {% if user.is_authenticated and user.role == 'client' %}
-          <a
-            href="{% url 'reservations:reserver' chambre.pk %}"
-            class="flex w-full items-center justify-center rounded-xl bg-[#1A2517] py-3 text-center text-sm font-bold text-white shadow-sm transition hover:bg-[#1A2517]/90"
-          >
-            Réserver cette chambre
-          </a>
-          {% elif not user.is_authenticated %}
-          <a
-            href="{% url 'users:connexion' %}?next={{ request.path }}"
-            class="flex w-full items-center justify-center rounded-xl bg-[#1A2517] py-3 text-center text-sm font-bold text-white shadow-sm transition hover:bg-[#1A2517]/90"
-          >
-            Connectez-vous pour réserver
-          </a>
-          {% endif %} {% if user.is_authenticated and user.role == 'client' %}
-
-          <a
-            href="{% url 'contact:contacter_proprietaire' chambre.cite.proprietaire.pk chambre.pk %}"
-            class="flex w-full items-center justify-center rounded-xl border border-gray-200 py-2.5 text-center text-sm font-medium text-gray-500 transition hover:border-[#7BA87A]/30 hover:bg-[#7BA87A]/10 hover:text-[#7BA87A]"
-          >
-            ✉️ Contacter le propriétaire
-          </a>
-          {% endif %}
-
-          <a
-            href="{% url 'signalements:signaler' chambre.pk %}"
-            class="flex w-full items-center justify-center rounded-xl border border-gray-200 py-2.5 text-center text-sm font-medium text-gray-500 transition hover:border-red-100 hover:bg-red-50 hover:text-red-600"
-          >
-            🚨 Signaler une anomalie
-          </a>
+          {% if chambre.est_disponible %}
+            {% if user.is_authenticated and user.role == 'client' %}
+            <a href="{% url 'reservations:reserver' chambre.pk %}"
+               class="flex w-full items-center justify-center rounded-xl bg-[#1A2517] py-3 text-center text-sm font-bold text-white shadow-sm transition hover:bg-[#1A2517]/90">
+              Réserver cette chambre
+            </a>
+            {% elif not user.is_authenticated %}
+            <a href="{% url 'users:connexion' %}?next={{ request.path }}"
+               class="flex w-full items-center justify-center rounded-xl bg-[#1A2517] py-3 text-center text-sm font-bold text-white shadow-sm transition hover:bg-[#1A2517]/90">
+              Connectez-vous pour réserver
+            </a>
+            {% endif %}
+            {% if user.is_authenticated and user.role == 'client' %}
+            <a href="{% url 'contact:contacter_proprietaire' chambre.cite.proprietaire.pk chambre.pk %}"
+               class="flex w-full items-center justify-center rounded-xl border border-gray-200 py-2.5 text-center text-sm font-medium text-gray-500 transition hover:border-[#7BA87A]/30 hover:bg-[#7BA87A]/10 hover:text-[#7BA87A]">
+              ✉️ Contacter le propriétaire
+            </a>
+            {% endif %}
+            <a href="{% url 'signalements:signaler' chambre.pk %}"
+               class="flex w-full items-center justify-center rounded-xl border border-gray-200 py-2.5 text-center text-sm font-medium text-gray-500 transition hover:border-red-100 hover:bg-red-50 hover:text-red-600">
+              🚨 Signaler une anomalie
+            </a>
           {% else %}
           <div class="w-full cursor-not-allowed rounded-xl bg-gray-100 py-3 text-center text-sm font-bold tracking-wider text-gray-400 uppercase">🔒 Logement Indisponible</div>
           {% endif %}
         </div>
 
-        {# ═══ COMPOSANT CHAMBRES SIMILAIRES ═══ #} {% if similaires %}
+        {% if similaires %}
         <div class="mt-6 border-t border-gray-100 pt-5">
           <h3 class="mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase">Autres chambres de cette cité</h3>
           <div class="space-y-1.5">
             {% for s in similaires %}
-            <a
-              href="{% url 'logements:detail_chambre' s.pk %}"
-              class="group flex items-center justify-between gap-2 rounded-xl border border-transparent bg-gray-50/50 p-2.5 transition hover:border-gray-100 hover:bg-white"
-            >
+            <a href="{% url 'logements:detail_chambre' s.pk %}"
+               class="group flex items-center justify-between gap-2 rounded-xl border border-transparent bg-gray-50/50 p-2.5 transition hover:border-gray-100 hover:bg-white">
               <span class="truncate text-sm font-medium text-gray-700 transition group-hover:text-[#7BA87A]">{{ s.get_type_display }} ({{ s.superficie }}m²)</span>
               <span class="shrink-0 text-sm font-bold text-[#1A2517]">{{ s.loyer|floatformat:0 }} F</span>
             </a>
@@ -180,4 +229,66 @@
     </div>
   </div>
 </div>
+
+{# ═══ SCRIPT LIGHTBOX ═══ #}
+<script>
+(function () {
+  const lb        = document.getElementById('lightbox');
+  const lbImg     = document.getElementById('lb-img');
+  const lbCaption = document.getElementById('lb-caption');
+  const lbCounter = document.getElementById('lb-counter');
+  const lbPrev    = document.getElementById('lb-prev');
+  const lbNext    = document.getElementById('lb-next');
+  const lbClose   = document.getElementById('lb-close');
+  const lbBack    = document.getElementById('lb-backdrop');
+
+  // Collecte toutes les images lightbox de la page
+  const imgs = Array.from(document.querySelectorAll('[data-lightbox]'));
+  let current = 0;
+
+  function open(index) {
+    current = index;
+    refresh();
+    lb.classList.remove('hidden');
+    lb.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+    lbImg.style.opacity = '0';
+    setTimeout(() => { lbImg.style.opacity = '1'; }, 30);
+  }
+
+  function close() {
+    lb.classList.add('hidden');
+    lb.classList.remove('flex');
+    document.body.style.overflow = '';
+  }
+
+  function refresh() {
+    const el = imgs[current];
+    lbImg.src = el.dataset.src;
+    lbImg.alt = el.dataset.caption || '';
+    lbCaption.textContent = el.dataset.caption || '';
+    lbCaption.style.display = el.dataset.caption ? 'block' : 'none';
+    lbCounter.textContent = imgs.length > 1 ? `${current + 1} / ${imgs.length}` : '';
+    lbPrev.disabled = current === 0;
+    lbNext.disabled = current === imgs.length - 1;
+  }
+
+  imgs.forEach((img, i) => {
+    img.addEventListener('click', () => open(i));
+  });
+
+  lbClose.addEventListener('click', close);
+  lbBack.addEventListener('click', close);
+  lbPrev.addEventListener('click', () => { if (current > 0) open(current - 1); });
+  lbNext.addEventListener('click', () => { if (current < imgs.length - 1) open(current + 1); });
+
+  document.addEventListener('keydown', (e) => {
+    if (lb.classList.contains('hidden')) return;
+    if (e.key === 'Escape')      close();
+    if (e.key === 'ArrowLeft')   lbPrev.click();
+    if (e.key === 'ArrowRight')  lbNext.click();
+  });
+})();
+</script>
+
 {% endblock %}
