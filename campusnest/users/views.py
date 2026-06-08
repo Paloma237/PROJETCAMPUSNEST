@@ -24,6 +24,7 @@ from campusnest.logements.models import Chambre, Cite
 from campusnest.signalements.models import Signalement
 from campusnest.reservations.models import Reservation
 from campusnest.avis.models import Avis
+from campusnest.favoris.models import Favori
 
 
 def devenir_proprietaire(request):
@@ -334,33 +335,78 @@ def dashboard_view(request):
 
 @login_required
 def client_dashboard_view(request):
+    import datetime
     from campusnest.contact.models import Conversation
 
-    # Messages de contact envoyés à CampusNest
+    aujourd_hui = timezone.now().date()
+
+    # ── Réservations ──
+    toutes_reservations = Reservation.objects.filter(
+        client=request.user
+    ).select_related("chambre__cite")
+
+    res_attente   = toutes_reservations.filter(statut="en_attente").count()
+    res_validees  = toutes_reservations.filter(statut="confirmee").count()
+    res_annulees  = toutes_reservations.filter(statut="annulee").count()
+
+    # Réservation confirmée active (logement actuel)
+    reservation_active = toutes_reservations.filter(
+        statut="confirmee",
+        date_debut__lte=aujourd_hui,
+        date_fin__gte=aujourd_hui,
+    ).first()
+
+    # Réservations des 6 derniers mois (graphique)
+    six_mois = []
+    for i in range(5, -1, -1):
+        d         = aujourd_hui - datetime.timedelta(days=30 * i)
+        m_debut   = d.replace(day=1)
+        m_fin     = (m_debut + datetime.timedelta(days=32)).replace(day=1)
+        count     = toutes_reservations.filter(
+            date_demande__date__gte=m_debut,
+            date_demande__date__lt=m_fin,
+        ).count()
+        six_mois.append({"mois": m_debut.strftime("%b"), "count": count})
+
+    # ── Favoris ──
+    favoris_qs = (
+        Favori.objects
+        .filter(client=request.user)
+        .select_related("chambre__cite")
+        .prefetch_related("chambre__photos")
+        .order_by("-date_ajout")
+    )
+    mes_favoris_recents = favoris_qs[:4]
+    nb_favoris          = favoris_qs.count()
+
+    # ── Messages de contact ──
     mes_messages_recents = MessageContact.objects.filter(
         expediteur=request.user
-    ).order_by('-date_envoi')[:4]
+    ).order_by("-date_envoi")[:4]
 
-    # Conversations avec des propriétaires (non lus = messages reçus non lus)
-    conversations = Conversation.objects.filter(
-        client=request.user
-    ).select_related("proprietaire", "chambre").prefetch_related("messages")
+    # ── Signalements ──
+    nb_signalements = Signalement.objects.filter(client=request.user).count()
 
-    messages_non_lus = sum(
-        conv.messages.filter(est_lu=False).exclude(auteur=request.user).count()
-        for conv in conversations
-    )
+    # ── Chambres disponibles (accès rapide) ──
+    chambres_disponibles = Chambre.objects.filter(est_disponible=True).count()
 
     return render(request, "accounts/client_dashboard.html", {
-        'mes_messages_recents': mes_messages_recents,
-        'messages_non_lus':     messages_non_lus,
-        "cites":                Cite.objects.all()[:6],
-        "chambres":             Chambre.objects.filter(est_disponible=True)[:8],
-        "mes_reservations":     Reservation.objects.filter(
-            client=request.user).select_related("chambre__cite")[:3],
+        "reservation_active":   reservation_active,
+        "mes_reservations":     toutes_reservations.order_by("-date_demande")[:4],
+        "mes_favoris_recents":  mes_favoris_recents,
+        "mes_messages_recents": mes_messages_recents,
+        "stats": {
+            "attente":               res_attente,
+            "validees":              res_validees,
+            "annulees":              res_annulees,
+            "total_reservations":    toutes_reservations.count(),
+            "signalements":          nb_signalements,
+            "nb_favoris":            nb_favoris,
+            "chambres_disponibles":  chambres_disponibles,
+            "six_mois_labels":       [m["mois"]  for m in six_mois],
+            "six_mois_data":         [m["count"] for m in six_mois],
+        },
     })
-
-
 """
 Remplace les fonctions proprietaire_dashboard_view et admin_dashboard_view
 dans campusnest/users/views.py
@@ -639,6 +685,8 @@ def gerer_proprietaire_view(request, pk):
 
     if request.method == "POST":
         action = request.POST.get("action")
+        print(f">>> ACTION REÇUE : {action}") 
+        print(f">>> POST data : {request.POST}")
 
         if action == "valider":
             profil.est_valide      = True
