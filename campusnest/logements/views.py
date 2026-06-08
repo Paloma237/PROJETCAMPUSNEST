@@ -14,7 +14,7 @@ from campusnest.favoris.models import Favori
 # ─────────────────────────────────────────────
 
 def home_view(request):
-    chambres = Chambre.objects.filter(est_disponible=True).select_related("cite")
+    chambres = Chambre.objects.filter(est_disponible=True).select_related("cite").prefetch_related("photos")
     cites    = Cite.objects.prefetch_related("chambres", "photos_cite").all()
 
     q = request.GET.get("q", "").strip()
@@ -38,6 +38,21 @@ def home_view(request):
         chambres = chambres.filter(wc_interieur=True)
     if request.GET.get("cuisine"):
         chambres = chambres.filter(cuisine=True)
+
+    # ── Annotation est_favori ──
+    if request.user.is_authenticated and request.user.role == "client":
+        chambres = chambres.annotate(
+            est_favori=Exists(
+                Favori.objects.filter(
+                    client=request.user,
+                    chambre=OuterRef("pk"),
+                )
+            )
+        )
+    else:
+        chambres = chambres.annotate(
+            est_favori=Value(False, output_field=BooleanField())
+        )
 
     return render(request, "logements/home.html", {
         "cites":         cites[:6],
@@ -226,10 +241,9 @@ def supprimer_cite_view(request, pk):
 
 
 @proprietaire_valide_requis
-def supprimer_photo_cite_view(request, pk):
+def supprimer_photo_cite_view(request, cite_pk, pk):
     """Suppression d'une photo de cité."""
     photo = get_object_or_404(PhotoCity, pk=pk, city__proprietaire=request.user)
-    cite_pk = photo.city.pk
     if request.method == "POST":
         photo.image.delete(save=False)
         photo.delete()
