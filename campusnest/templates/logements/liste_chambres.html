@@ -17,16 +17,20 @@
         <div class="relative flex-grow md:flex-grow-0">
           <input type="text" name="q" value="{{ q }}" placeholder="Rechercher une chambre, une cité..." class="w-full py-2.5 pr-4 pl-4 md:w-64" />
         </div>
-        {# Conserver les autres filtres actifs lors de la recherche #} {% if request.GET.type %}
-        <input type="hidden" name="type" value="{{ request.GET.type }}" />
-        {% endif %} {% if request.GET.prix_max %}
-        <input type="hidden" name="prix_max" value="{{ request.GET.prix_max }}" />
-        {% endif %} {% if request.GET.meublee %}
-        <input type="hidden" name="meublee" value="1" />
-        {% endif %} {% if request.GET.wc %}
-        <input type="hidden" name="wc" value="1" />
-        {% endif %} {% if request.GET.cuisine %}
-        <input type="hidden" name="cuisine" value="1" />
+        {% if request.GET.type %}
+          <input type="hidden" name="type" value="{{ request.GET.type }}" />
+        {% endif %}
+        {% if request.GET.prix_max %}
+          <input type="hidden" name="prix_max" value="{{ request.GET.prix_max }}" />
+        {% endif %}
+        {% if request.GET.meublee %}
+          <input type="hidden" name="meublee" value="1" />
+        {% endif %}
+        {% if request.GET.wc %}
+          <input type="hidden" name="wc" value="1" />
+        {% endif %}
+        {% if request.GET.cuisine %}
+          <input type="hidden" name="cuisine" value="1" />
         {% endif %}
         <button type="submit" class="bg-primary text-secondary hover:bg-primary/95 shrink-0 rounded-xl px-5 py-2.5 text-base font-medium shadow-sm transition">Rechercher</button>
       </form>
@@ -37,23 +41,18 @@
       <summary class="flex cursor-pointer list-none items-center justify-between px-5 py-3.5 select-none">
         <span class="flex items-center gap-2 text-base font-medium text-gray-700">
           <svg class="text-primary h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"
-            />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
           </svg>
           Filtres avancés
         </span>
         <svg class="h-4 w-4 text-gray-400 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
         </svg>
       </summary>
 
       <form method="get" class="border-t border-gray-100 px-5 pt-2 pb-5">
         {% if q %}
-        <input type="hidden" name="q" value="{{ q }}" />
+          <input type="hidden" name="q" value="{{ q }}" />
         {% endif %}
 
         <div class="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -63,7 +62,7 @@
             <select name="type" class="focus:ring-primary/30 focus:border-primary rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-base transition outline-none focus:ring-2">
               <option value="">Tous les types</option>
               {% for val, label in types_chambre %}
-              <option value="{{ val }}" {% if request.GET.type %}<input type="hidden" name="type" value="{{ request.GET.type }}">{% endif %}>{{ label }}</option>
+                <option value="{{ val }}" {% if request.GET.type == val %}selected{% endif %}>{{ label }}</option>
               {% endfor %}
             </select>
           </div>
@@ -71,14 +70,8 @@
           {# Prix max #}
           <div class="flex flex-col gap-1">
             <label class="text-sm font-medium tracking-wider text-gray-500 uppercase">Prix max (FCFA)</label>
-            <input
-              type="number"
-              name="prix_max"
-              value="{{ request.GET.prix_max }}"
-              placeholder="Ex : 50000"
-              min="0"
-              class="focus:ring-primary/30 focus:border-primary rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-base transition outline-none focus:ring-2"
-            />
+            <input type="number" name="prix_max" value="{{ request.GET.prix_max }}" placeholder="Ex : 50000" min="0"
+                   class="focus:ring-primary/30 focus:border-primary rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-base transition outline-none focus:ring-2"/>
           </div>
 
           {# Équipements #}
@@ -86,15 +79,15 @@
             <label class="text-sm font-medium tracking-wider text-gray-500 uppercase">Équipements</label>
             <div class="flex flex-wrap gap-3">
               <label class="flex cursor-pointer items-center gap-2 text-base text-gray-600">
-                <input type="checkbox" name="meublee" value="1" {% if request.GET.meublee %}checked{% endif %} class="text-primary focus:ring-primary rounded border-gray-300" />
+                <input type="checkbox" name="meublee" value="1" {% if request.GET.meublee %}checked{% endif %} class="text-primary focus:ring-primary rounded border-gray-300"/>
                 Meublée
               </label>
               <label class="flex cursor-pointer items-center gap-2 text-base text-gray-600">
-                <input type="checkbox" name="wc" value="1" {% if request.GET.wc %}checked{% endif %} class="text-primary focus:ring-primary rounded border-gray-300" />
+                <input type="checkbox" name="wc" value="1" {% if request.GET.wc %}checked{% endif %} class="text-primary focus:ring-primary rounded border-gray-300"/>
                 WC intérieur
               </label>
               <label class="flex cursor-pointer items-center gap-2 text-base text-gray-600">
-                <input type="checkbox" name="cuisine" value="1" {% if request.GET.cuisine %}checked{% endif %} class="text-primary focus:ring-primary rounded border-gray-300" />
+                <input type="checkbox" name="cuisine" value="1" {% if request.GET.cuisine %}checked{% endif %} class="text-primary focus:ring-primary rounded border-gray-300"/>
                 Cuisine
               </label>
             </div>
@@ -108,128 +101,116 @@
       </form>
     </details>
 
-    {# ── Grille des chambres ── #} {% if chambres %}
-    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {% for chambre in chambres %}
-      <a
-        href="{% url 'logements:detail_chambre' chambre.pk %}"
-        class="hover:border-primary/20 group flex flex-col overflow-hidden rounded-2xl border border-gray-200/80 bg-white transition-all duration-300 hover:shadow-lg"
-      >
-        {# Photo #}
-        <div class="relative h-44 w-full shrink-0 overflow-hidden bg-gray-100 md:h-48">
-          {% with chambre.photo_principale as photo %} {% if photo %}
-          <img src="{{ photo.image.url }}" alt="{{ chambre }}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
-          {% else %}
-          <div class="from-secondary/20 to-secondary/40 flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br">
-            <svg class="text-primary/40 h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="1.5"
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-            <span class="text-primary/50 text-xs font-medium tracking-wider uppercase">Aucune photo</span>
-          </div>
-          {% endif %} {% endwith %} {# Badge type #}
-          <div class="absolute top-3 left-3">
-            <span class="rounded-lg border border-gray-200/50 bg-white/80 px-2 py-1 text-xs font-semibold tracking-wide text-gray-700 uppercase backdrop-blur-md">{{ chambre.get_type_display }}</span>
-          </div>
+    {# ── Grille des chambres ── #}
+    {% if chambres %}
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {% for chambre in chambres %}
 
-          {# Badge loyer #}
-          <div class="absolute right-3 bottom-3">
-            <span class="bg-primary text-secondary rounded-lg px-2.5 py-1 text-sm font-bold shadow backdrop-blur-md">{{ chambre.loyer|floatformat:0 }} FCFA/mois</span>
-          </div>
-          {# Bouton favori #}
-          <div class="absolute top-3 right-3" onclick="event.preventDefault()">{% include "components/btn_favori.html" with chambre=chambre est_favori=chambre.est_favori %}</div>
-        </div>
+          {# Carte = div (pas un <a>) pour que le bouton favori fonctionne #}
+          <div class="group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200/80 bg-white transition-all duration-300 hover:shadow-lg hover:border-primary/20">
 
-        {# Infos #}
-        <div class="flex flex-grow flex-col p-4">
-          <div class="flex-grow">
-            {# Nom de la cité #}
-            <p class="text-primary mb-0.5 text-[11px] font-semibold tracking-wider uppercase">{{ chambre.cite.nom }}</p>
+            {# ── Photo ── #}
+            <div class="relative h-44 w-full shrink-0 overflow-hidden bg-gray-100 md:h-48">
+              {% with chambre.photo_principale as photo %}
+                {% if photo %}
+                  <img src="{{ photo.image.url }}" alt="{{ chambre }}"
+                       class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"/>
+                {% else %}
+                  <div class="from-secondary/20 to-secondary/40 flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br">
+                    <svg class="text-primary/40 h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <span class="text-primary/50 text-xs font-medium tracking-wider uppercase">Aucune photo</span>
+                  </div>
+                {% endif %}
+              {% endwith %}
 
-            {# Description #}
-            <p class="line-clamp-2 text-base leading-snug font-medium text-gray-800">{{ chambre.description }}</p>
+              {# Badge type #}
+              <div class="absolute top-3 left-3">
+                <span class="rounded-lg border border-gray-200/50 bg-white/80 px-2 py-1 text-xs font-semibold tracking-wide text-gray-700 uppercase backdrop-blur-md">
+                  {{ chambre.get_type_display }}
+                </span>
+              </div>
 
-            {# Adresse #}
-            <p class="mt-1.5 flex items-center gap-1 truncate text-sm text-gray-500">
-              <svg class="h-3.5 w-3.5 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              {{ chambre.cite.adresse }}
-            </p>
+              {# Badge loyer #}
+              <div class="absolute right-3 bottom-3">
+                <span class="bg-primary text-secondary rounded-lg px-2.5 py-1 text-sm font-bold shadow backdrop-blur-md">
+                  {{ chambre.loyer|floatformat:0 }} FCFA/mois
+                </span>
+              </div>
 
-            {# Note moyenne #} {% with chambre.note_moyenne as note %} {% if note %}
-            <div class="mt-2 flex items-center gap-1">
-              <svg class="h-3.5 w-3.5 fill-amber-400 text-amber-400" viewBox="0 0 20 20">
-                <path
-                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
-                />
-              </svg>
-              <span class="text-sm font-semibold text-gray-700">{{ note }}</span>
-            </div>
-            {% endif %} {% endwith %}
-          </div>
-
-          {# Équipements + superficie #}
-          <div class="mt-3 border-t border-gray-100 pt-3">
-            <div class="mb-2 flex items-center justify-between">
-              <span class="text-sm text-gray-500">Superficie</span>
-              <span class="text-sm font-semibold text-gray-800">{{ chambre.superficie }} m²</span>
+              {# Bouton favori — HORS du <a>, z-index élevé #}
+              <div class="absolute top-3 right-3 z-10">
+                {% include "components/btn_favori.html" with chambre=chambre est_favori=chambre.est_favori %}
+              </div>
             </div>
 
-            <div class="flex flex-wrap gap-1.5">
-              {% if chambre.meublee %}
-              <span class="inline-flex items-center gap-1 rounded-full border border-blue-100 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
-                <svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                Meublée
-              </span>
-              {% endif %} {% if chambre.wc_interieur %}
-              <span class="inline-flex items-center gap-1 rounded-full border border-teal-100 bg-teal-50 px-2 py-0.5 text-xs font-medium text-teal-700">
-                <svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                WC
-              </span>
-              {% endif %} {% if chambre.cuisine %}
-              <span class="inline-flex items-center gap-1 rounded-full border border-orange-100 bg-orange-50 px-2 py-0.5 text-xs font-medium text-orange-700">
-                <svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                Cuisine
-              </span>
-              {% endif %} {% if chambre.internet %}
-              <span class="inline-flex items-center gap-1 rounded-full border border-purple-100 bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-700">
-                <svg class="h-2.5 w-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
-                Internet
-              </span>
-              {% endif %}
-            </div>
-          </div>
-        </div>
-      </a>
-      {% endfor %}
-    </div>
+            {# ── Infos — lien sur cette partie uniquement ── #}
+            <a href="{% url 'logements:detail_chambre' chambre.pk %}" class="flex flex-grow flex-col p-4">
+              <div class="flex-grow">
+                <p class="text-primary mb-0.5 text-[11px] font-semibold tracking-wider uppercase">{{ chambre.cite.nom }}</p>
+                <p class="line-clamp-2 text-base leading-snug font-medium text-gray-800">{{ chambre.description }}</p>
+                <p class="mt-1.5 flex items-center gap-1 truncate text-sm text-gray-500">
+                  <svg class="h-3.5 w-3.5 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  </svg>
+                  {{ chambre.cite.adresse }}
+                </p>
+                {% with chambre.note_moyenne as note %}
+                  {% if note %}
+                    <div class="mt-2 flex items-center gap-1">
+                      <svg class="h-3.5 w-3.5 fill-amber-400 text-amber-400" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                      </svg>
+                      <span class="text-sm font-semibold text-gray-700">{{ note }}</span>
+                    </div>
+                  {% endif %}
+                {% endwith %}
+              </div>
 
-    {% else %} {# État vide #}
-    <div class="mx-auto mt-12 max-w-sm rounded-2xl border border-gray-200 bg-white p-16 text-center shadow-sm">
-      <svg class="mx-auto mb-4 h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="1.5"
-          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-        />
-      </svg>
-      <h3 class="mb-1 text-base font-semibold text-gray-900">Aucune chambre trouvée</h3>
-      <p class="text-base text-gray-400">Aucune chambre ne correspond à vos critères pour l'instant.</p>
-      <a
-        href="{% url 'logements:liste_chambres' %}"
-        class="bg-primary text-secondary hover:bg-primary/95 mt-6 inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-base font-medium shadow-sm transition"
-      >
-        Réinitialiser les filtres
-      </a>
-    </div>
+              <div class="mt-3 border-t border-gray-100 pt-3">
+                <div class="mb-2 flex items-center justify-between">
+                  <span class="text-sm text-gray-500">Superficie</span>
+                  <span class="text-sm font-semibold text-gray-800">{{ chambre.superficie }} m²</span>
+                </div>
+                <div class="flex flex-wrap gap-1.5">
+                  {% if chambre.meublee %}
+                    <span class="inline-flex items-center gap-1 rounded-full border border-blue-100 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">Meublée</span>
+                  {% endif %}
+                  {% if chambre.wc_interieur %}
+                    <span class="inline-flex items-center gap-1 rounded-full border border-teal-100 bg-teal-50 px-2 py-0.5 text-xs font-medium text-teal-700">WC</span>
+                  {% endif %}
+                  {% if chambre.cuisine %}
+                    <span class="inline-flex items-center gap-1 rounded-full border border-orange-100 bg-orange-50 px-2 py-0.5 text-xs font-medium text-orange-700">Cuisine</span>
+                  {% endif %}
+                  {% if chambre.internet %}
+                    <span class="inline-flex items-center gap-1 rounded-full border border-purple-100 bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-700">Internet</span>
+                  {% endif %}
+                </div>
+              </div>
+            </a>
+
+          </div>
+        {% endfor %}
+      </div>
+
+    {% else %}
+      <div class="mx-auto mt-12 max-w-sm rounded-2xl border border-gray-200 bg-white p-16 text-center shadow-sm">
+        <svg class="mx-auto mb-4 h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+        <h3 class="mb-1 text-base font-semibold text-gray-900">Aucune chambre trouvée</h3>
+        <p class="text-base text-gray-400">Aucune chambre ne correspond à vos critères pour l'instant.</p>
+        <a href="{% url 'logements:liste_chambres' %}"
+           class="bg-primary text-secondary hover:bg-primary/95 mt-6 inline-flex items-center justify-center rounded-xl px-5 py-2.5 text-base font-medium shadow-sm transition">
+          Réinitialiser les filtres
+        </a>
+      </div>
     {% endif %}
+
   </div>
 </div>
 {% endblock %}
