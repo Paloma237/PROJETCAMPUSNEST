@@ -1,344 +1,402 @@
-{% extends "accounts/base_dashboard.html" %} {% block page_title %}Tableau de bord{% endblock %} {% block page_subtitle %}Bienvenue, {{ user.prenom|default:user.email }} 👋{% endblock %} 
-{% block sidebar %} {% include "components/sidebar_etudiant.html" %} {% endblock %} {% block content %} {# Injection JSON — pas de filtre custom #} {{ stats.six_mois_labels|json_script:"etud-labels" }} 
-{{stats.six_mois_data|json_script:"etud-data" }} {# ── Ligne 1 : KPIs ── #}
-<div class="mb-5 grid grid-cols-2 gap-4 xl:grid-cols-4">
-  {# En attente #}
-  <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
-    <div class="mb-3 flex items-center justify-between">
-      <p class="text-[11px] font-semibold tracking-widest text-gray-400 uppercase">En attente</p>
-      <div class="{% if stats.attente %}bg-amber-50{% else %}bg-gray-50{% endif %} flex h-8 w-8 items-center justify-center rounded-xl">
-        <svg class="{% if stats.attente %}text-amber-500{% else %}text-gray-400{% endif %} h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+{% extends "accounts/base_dashboard.html" %}
+{% block page_title %}Tableau de bord{% endblock %}
+{% block page_subtitle %}Bienvenue, {{ user.prenom|default:user.email }} 👋{% endblock %}
+
+{% block sidebar %}{% include "components/sidebar_etudiant.html" %}{% endblock %}
+
+{% block content %}
+
+  {{ stats.six_mois_labels|json_script:"etud-labels" }}
+  {{ stats.six_mois_data|json_script:"etud-data" }}
+
+  {# ── Ligne 1 : KPIs ── #}
+  <div class="mb-5 grid grid-cols-2 xl:grid-cols-4 gap-4">
+
+    {# En attente #}
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-[11px] font-semibold tracking-widest text-gray-400 uppercase">En attente</p>
+        <div class="w-8 h-8 rounded-xl flex items-center justify-center {% if stats.attente %}bg-amber-50{% else %}bg-gray-50{% endif %}">
+          <svg class="w-4 h-4 {% if stats.attente %}text-amber-500{% else %}text-gray-300{% endif %}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
       </div>
+      <p class="text-3xl font-black tracking-tight {% if stats.attente %}text-amber-500{% else %}text-gray-900{% endif %}">{{ stats.attente }}</p>
+      <a href="{% url 'reservations:mes_reservations' %}" class="text-sm text-primary font-medium hover:underline mt-1 inline-block">Voir tout →</a>
     </div>
-    <p class="{% if stats.attente %}text-amber-500{% else %}text-gray-900{% endif %} text-3xl font-black tracking-tight">{{ stats.attente }}</p>
-    <a href="{% url 'reservations:mes_reservations' %}" class="text-primary mt-1 inline-block text-sm font-medium hover:underline">Voir tout →</a>
+
+    {# Confirmées #}
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-[11px] font-semibold tracking-widest text-gray-400 uppercase">Confirmées</p>
+        <div class="w-8 h-8 rounded-xl bg-green-50 flex items-center justify-center">
+          <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+      </div>
+      <p class="text-3xl font-black tracking-tight text-green-600">{{ stats.validees }}</p>
+      <p class="text-sm text-gray-400 mt-1">réservation{{ stats.validees|pluralize }} active{{ stats.validees|pluralize }}</p>
+    </div>
+
+    {# Annulées #}
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-[11px] font-semibold tracking-widest text-gray-400 uppercase">Annulées</p>
+        <div class="w-8 h-8 rounded-xl bg-rose-50 flex items-center justify-center">
+          <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </div>
+      </div>
+      <p class="text-3xl font-black tracking-tight text-rose-500">{{ stats.annulees }}</p>
+      <p class="text-sm text-gray-400 mt-1">au total</p>
+    </div>
+
+    {# Favoris #}
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-[11px] font-semibold tracking-widest text-gray-400 uppercase">Favoris</p>
+        <div class="w-8 h-8 rounded-xl {% if stats.nb_favoris %}bg-rose-50{% else %}bg-gray-50{% endif %} flex items-center justify-center">
+          <svg class="w-4 h-4 {% if stats.nb_favoris %}text-rose-500{% else %}text-gray-300{% endif %}"
+               {% if stats.nb_favoris %}fill="currentColor"{% else %}fill="none" stroke="currentColor"{% endif %}
+               viewBox="0 0 24 24">
+            <path {% if not stats.nb_favoris %}stroke-linecap="round" stroke-linejoin="round" stroke-width="2"{% endif %}
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+          </svg>
+        </div>
+      </div>
+      <p class="text-3xl font-black tracking-tight {% if stats.nb_favoris %}text-rose-500{% else %}text-gray-900{% endif %}">{{ stats.nb_favoris|default:0 }}</p>
+      <a href="{% url 'favoris:mes_favoris' %}" class="text-sm text-primary font-medium hover:underline mt-1 inline-block">Mes favoris →</a>
+    </div>
+
   </div>
 
-  {# Confirmées #}
-  <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
-    <div class="mb-3 flex items-center justify-between">
-      <p class="text-[11px] font-semibold tracking-widest text-gray-400 uppercase">Confirmées</p>
-      <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-green-50">
-        <svg class="h-4 w-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      </div>
-    </div>
-    <p class="text-3xl font-black tracking-tight text-green-600">{{ stats.validees }}</p>
-    <p class="mt-1 text-sm text-gray-400">réservation{{ stats.validees|pluralize }} active{{ stats.validees|pluralize }}</p>
-  </div>
-
-  {# Annulées #}
-  <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
-    <div class="mb-3 flex items-center justify-between">
-      <p class="text-[11px] font-semibold tracking-widest text-gray-400 uppercase">Annulées</p>
-      <div class="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-50">
-        <svg class="h-4 w-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </div>
-    </div>
-    <p class="text-3xl font-black tracking-tight text-rose-500">{{ stats.annulees }}</p>
-    <p class="mt-1 text-sm text-gray-400">au total</p>
-  </div>
-
-  {# Signalements #}
-  <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
-    <div class="mb-3 flex items-center justify-between">
-      <p class="text-[11px] font-semibold tracking-widest text-gray-400 uppercase">Signalements</p>
-      <div class="{% if stats.signalements %}bg-red-50{% else %}bg-gray-50{% endif %} flex h-8 w-8 items-center justify-center rounded-xl">
-        <svg class="{% if stats.signalements %}text-red-500{% else %}text-gray-400{% endif %} h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-          />
-        </svg>
-      </div>
-    </div>
-    <p class="{% if stats.signalements %}text-red-500{% else %}text-gray-900{% endif %} text-3xl font-black tracking-tight">{{ stats.signalements }}</p>
-    <a href="{% url 'signalements:mes_signalements' %}" class="text-primary mt-1 inline-block text-sm font-medium hover:underline">Voir mes signalements →</a>
-  </div>
-</div>
-
-{# ── Réservation active (si confirmée) ── #} {% if reservation_active %}
-<div class="mb-5 rounded-2xl bg-gradient-to-br from-[#1A2517] to-[#2d3f28] p-5 text-white shadow-md">
-  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-    <div>
-      <p class="mb-1 text-xs font-semibold tracking-widest text-white/50 uppercase">Logement actuel</p>
-      <p class="text-base font-black tracking-tight">{{ reservation_active.chambre }}</p>
-      <p class="mt-1 flex items-center gap-1 text-sm text-white/50">
-        <svg class="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-        {{ reservation_active.chambre.cite.adresse }}
-      </p>
-    </div>
-    <div class="flex flex-wrap gap-4 sm:text-right">
+  {# ── Logement actuel (si réservation confirmée active) ── #}
+  {% if reservation_active %}
+  <div class="mb-5 rounded-2xl bg-gradient-to-br from-[#1A2517] to-[#2d3f28] p-5 text-white shadow-md">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <p class="text-xs tracking-wider text-white/40 uppercase">Entrée</p>
-        <p class="text-base font-bold">{{ reservation_active.date_debut|date:"d M Y" }}</p>
+        <p class="text-xs font-semibold tracking-widest text-white/50 uppercase mb-1">Logement actuel</p>
+        <p class="text-lg font-black tracking-tight">{{ reservation_active.chambre }}</p>
+        <p class="text-sm text-white/50 mt-1 flex items-center gap-1">
+          <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          {{ reservation_active.chambre.cite.adresse }}
+        </p>
       </div>
-      <div>
-        <p class="text-xs tracking-wider text-white/40 uppercase">Sortie</p>
-        <p class="text-base font-bold">{{ reservation_active.date_fin|date:"d M Y" }}</p>
-      </div>
-      <div>
-        <p class="text-xs tracking-wider text-white/40 uppercase">Loyer/mois</p>
-        <p class="text-base font-bold">{{ reservation_active.chambre.loyer|floatformat:0 }} FCFA</p>
+      <div class="flex flex-wrap gap-6 sm:text-right">
+        <div>
+          <p class="text-xs tracking-wider text-white/40 uppercase">Entrée</p>
+          <p class="text-sm font-bold">{{ reservation_active.date_debut|date:"d M Y" }}</p>
+        </div>
+        <div>
+          <p class="text-xs tracking-wider text-white/40 uppercase">Sortie</p>
+          <p class="text-sm font-bold">{{ reservation_active.date_fin|date:"d M Y" }}</p>
+        </div>
+        <div>
+          <p class="text-xs tracking-wider text-white/40 uppercase">Loyer/mois</p>
+          <p class="text-sm font-bold">{{ reservation_active.chambre.loyer|floatformat:0 }} FCFA</p>
+        </div>
       </div>
     </div>
   </div>
-</div>
-{% endif %} {# ── Ligne 2 : Graphique activité + Accès rapides ── #}
-<div class="mb-5 grid grid-cols-1 gap-5 xl:grid-cols-3">
-  {# Accès rapides #}
-  <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-    <h2 class="mb-4 text-base font-bold text-gray-900">Accès rapides</h2>
-    <div class="space-y-2">
-      <a href="{% url 'logements:liste_cites' %}" class="hover:bg-primary/5 hover:border-primary/20 group flex items-center gap-3 rounded-xl border border-transparent bg-gray-50 p-3 transition">
-        <div class="bg-primary/10 group-hover:bg-primary/20 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition">
-          <svg class="text-primary h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5" />
-          </svg>
-        </div>
-        <div>
-          <p class="text-xs font-semibold text-gray-800">Explorer les cités</p>
-          <p class="text-xs text-gray-400">Trouver un logement</p>
-        </div>
-      </a>
+  {% endif %}
 
-      <a href="{% url 'logements:liste_chambres' %}" class="hover:bg-primary/5 hover:border-primary/20 group flex items-center gap-3 rounded-xl border border-transparent bg-gray-50 p-3 transition">
-        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 transition group-hover:bg-blue-100">
-          <svg class="h-4 w-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-            />
-          </svg>
-        </div>
-        <div>
-          <p class="text-sm font-semibold text-gray-800">Toutes les chambres</p>
-          <p class="text-xs text-gray-400">{{ stats.chambres_disponibles }} disponible{{ stats.chambres_disponibles|pluralize }}</p>
-        </div>
-      </a>
+  {# ── Ligne 2 : Graphique activité (2/3) + Accès rapides (1/3) ── #}
+  <div class="mb-5 grid grid-cols-1 xl:grid-cols-3 gap-5">
 
-      <a
-        href="{% url 'reservations:mes_reservations' %}"
-        class="hover:bg-primary/5 hover:border-primary/20 group flex items-center gap-3 rounded-xl border border-transparent bg-gray-50 p-3 transition"
-      >
-        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-50 transition group-hover:bg-amber-100">
-          <svg class="h-4 w-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-            />
-          </svg>
-        </div>
-        <div>
-          <p class="text-sm font-semibold text-gray-800">Mes réservations</p>
-          <p class="text-xs text-gray-400">{{ stats.total_reservations }} au total</p>
-        </div>
-      </a>
-
-      <a href="{% url 'contact:contact' %}" class="hover:bg-primary/5 hover:border-primary/20 group flex items-center gap-3 rounded-xl border border-transparent bg-gray-50 p-3 transition">
-        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-purple-50 transition group-hover:bg-purple-100">
-          <svg class="h-4 w-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-          </svg>
-        </div>
-        <div>
-          <p class="text-sm font-semibold text-gray-800">Contacter le support</p>
-          <p class="text-xs text-gray-400">Besoin d'aide ?</p>
-        </div>
-      </a>
-    </div>
-  </div>
-</div>
-
-{# ── Ligne 3 : Dernières réservations + Derniers signalements ── #}
-<div class="grid grid-cols-1 gap-5 xl:grid-cols-3">
-  {# Réservations récentes #}
-  <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-    <div class="mb-4 flex items-center justify-between">
-      <h2 class="text-base font-bold text-gray-900">Mes dernières réservations</h2>
-      <a href="{% url 'reservations:mes_reservations' %}" class="text-primary text-sm font-medium hover:underline">Voir tout →</a>
+    {# Graphique activité réservations #}
+    <div class="xl:col-span-2 bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <h2 class="text-base font-bold text-gray-900 mb-4">Activité — 6 derniers mois</h2>
+      <div class="flex items-end gap-2 h-36" id="chart-etudiant"></div>
     </div>
 
-    {% if mes_reservations %}
-    <div class="divide-y divide-gray-50">
-      {% for r in mes_reservations %}
-      <div class="flex items-center gap-3 py-3">
-        {# Photo de la chambre ou icône #}
-        <div class="h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-gray-100">
-          {% with r.chambre.photo_principale as photo %} {% if photo %}
-          <img src="{{ photo.image.url }}" alt="" class="h-full w-full object-cover" />
-          {% else %}
-          <div class="flex h-full w-full items-center justify-center">
-            <svg class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-              />
+    {# Accès rapides #}
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <h2 class="text-base font-bold text-gray-900 mb-4">Accès rapides</h2>
+      <div class="space-y-2">
+
+        <a href="{% url 'logements:liste_cites' %}"
+           class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-transparent hover:bg-primary/5 hover:border-primary/20 transition group">
+          <div class="w-8 h-8 rounded-lg bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center shrink-0 transition">
+            <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
             </svg>
           </div>
-          {% endif %} {% endwith %}
-        </div>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">Explorer les cités</p>
+            <p class="text-xs text-gray-400">Trouver un logement</p>
+          </div>
+        </a>
 
-        <div class="min-w-0 flex-1">
-          <p class="truncate text-sm font-semibold text-gray-900">{{ r.chambre.cite.nom }}</p>
-          <p class="truncate text-xs text-gray-400">{{ r.chambre.get_type_display }} · {{ r.date_demande|date:"d M Y" }}</p>
-          {% if r.date_visite %}
-          <p class="text-primary mt-0.5 text-xs font-medium">Visite : {{ r.date_visite|date:"d M Y" }}</p>
-          {% endif %}
-        </div>
+        <a href="{% url 'logements:liste_chambres' %}"
+           class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-transparent hover:bg-blue-50 hover:border-blue-100 transition group">
+          <div class="w-8 h-8 rounded-lg bg-blue-50 group-hover:bg-blue-100 flex items-center justify-center shrink-0 transition">
+            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">Toutes les chambres</p>
+            <p class="text-xs text-gray-400">{{ stats.chambres_disponibles }} disponible{{ stats.chambres_disponibles|pluralize }}</p>
+          </div>
+        </a>
 
-        <div class="flex shrink-0 flex-col items-end gap-1">
-          <span
-            class="{% if r.statut == 'en_attente' %}bg-amber-50 {% elif r.statut == 'confirmee' %}bg-green-50 {% elif r.statut == 'annulee' %}bg-red-50 {% else %}bg-gray-100 text-gray-500{% endif %} rounded-full px-2 py-0.5 text-xs font-semibold text-amber-700 text-green-700 text-red-600"
-          >
-            {{ r.get_statut_display }}
-          </span>
-          {% if r.statut == 'en_attente' %}
-          <form method="post" action="{% url 'reservations:annuler_client' r.pk %}">
-            {% csrf_token %}
-            <button class="text-xs text-red-500 hover:underline">Annuler</button>
-          </form>
-          {% endif %}
-        </div>
+        <a href="{% url 'favoris:mes_favoris' %}"
+           class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-transparent hover:bg-rose-50 hover:border-rose-100 transition group">
+          <div class="w-8 h-8 rounded-lg bg-rose-50 group-hover:bg-rose-100 flex items-center justify-center shrink-0 transition">
+            <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">Mes favoris</p>
+            <p class="text-xs text-gray-400">{{ stats.nb_favoris|default:0 }} chambre{{ stats.nb_favoris|default:0|pluralize }} sauvegardée{{ stats.nb_favoris|default:0|pluralize }}</p>
+          </div>
+        </a>
+
+        <a href="{% url 'reservations:mes_reservations' %}"
+           class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-transparent hover:bg-amber-50 hover:border-amber-100 transition group">
+          <div class="w-8 h-8 rounded-lg bg-amber-50 group-hover:bg-amber-100 flex items-center justify-center shrink-0 transition">
+            <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">Mes réservations</p>
+            <p class="text-xs text-gray-400">{{ stats.total_reservations }} au total</p>
+          </div>
+        </a>
+
+        <a href="{% url 'contact:contact' %}"
+           class="flex items-center gap-3 p-3 rounded-xl bg-gray-50 border border-transparent hover:bg-purple-50 hover:border-purple-100 transition group">
+          <div class="w-8 h-8 rounded-lg bg-purple-50 group-hover:bg-purple-100 flex items-center justify-center shrink-0 transition">
+            <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-gray-800">Contacter le support</p>
+            <p class="text-xs text-gray-400">Besoin d'aide ?</p>
+          </div>
+        </a>
+
       </div>
-      {% endfor %}
     </div>
-    {% else %}
-    <div class="py-8 text-center">
-      <svg class="mx-auto mb-3 h-10 w-10 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-      </svg>
-      <p class="mb-3 text-base text-gray-400">Aucune réservation pour l'instant.</p>
-      <a href="{% url 'logements:liste_cites' %}" class="bg-primary text-secondary hover:bg-primary/90 inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium transition">
-        Trouver un logement
-      </a>
-    </div>
-    {% endif %}
+
   </div>
 
-  {# Derniers signalements #}
-  <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-    <div class="mb-4 flex items-center justify-between">
-      <h2 class="text-base font-bold text-gray-900">Mes signalements</h2>
-      <a href="{% url 'signalements:mes_signalements' %}" class="text-primary text-sm font-medium hover:underline">Voir tout →</a>
-    </div>
+  {# ── Ligne 3 : Réservations récentes + Favoris récents + Messages ── #}
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
 
-    {% if mes_signalements %}
-    <div class="divide-y divide-gray-50">
-      {% for s in mes_signalements %}
-      <div class="flex items-start gap-3 py-3">
-        <div
-          class="{% if s.statut == 'ouvert' %}bg-red-50 {% elif s.statut == 'en_cours' %}bg-orange-50 {% else %}bg-green-50{% endif %} mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
-        >
-          <svg
-            class="{% if s.statut == 'ouvert' %}text-red-500 {% elif s.statut == 'en_cours' %}text-orange-500 {% else %}text-green-600{% endif %} h-3.5 w-3.5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-            />
+    {# Réservations récentes #}
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-bold text-gray-900">Mes dernières réservations</h2>
+        <a href="{% url 'reservations:mes_reservations' %}" class="text-sm text-primary font-medium hover:underline">Voir tout →</a>
+      </div>
+
+      {% if mes_reservations %}
+        <div class="divide-y divide-gray-50">
+          {% for r in mes_reservations %}
+            <div class="flex items-center gap-3 py-3">
+              <div class="w-10 h-10 rounded-xl bg-gray-100 overflow-hidden shrink-0">
+                {% with r.chambre.photo_principale as photo %}
+                  {% if photo %}
+                    <img src="{{ photo.image.url }}" alt="" class="w-full h-full object-cover"/>
+                  {% else %}
+                    <div class="w-full h-full flex items-center justify-center">
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                      </svg>
+                    </div>
+                  {% endif %}
+                {% endwith %}
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-gray-900 truncate">{{ r.chambre.cite.nom }}</p>
+                <p class="text-xs text-gray-400 truncate">{{ r.chambre.get_type_display }} · {{ r.date_demande|date:"d M Y" }}</p>
+                {% if r.date_visite %}
+                  <p class="text-xs font-medium text-primary mt-0.5">Visite : {{ r.date_visite|date:"d M Y" }}</p>
+                {% endif %}
+              </div>
+
+              <div class="shrink-0 flex flex-col items-end gap-1">
+                <span class="text-xs px-2 py-0.5 rounded-full font-semibold
+                  {% if r.statut == 'en_attente' %}bg-amber-50 text-amber-700
+                  {% elif r.statut == 'confirmee' %}bg-green-50 text-green-700
+                  {% elif r.statut == 'annulee' %}bg-red-50 text-red-600
+                  {% else %}bg-gray-100 text-gray-500{% endif %}">
+                  {{ r.get_statut_display }}
+                </span>
+                {% if r.statut == 'en_attente' %}
+                  <form method="post" action="{% url 'reservations:annuler_client' r.pk %}">
+                    {% csrf_token %}
+                    <button class="text-xs text-red-500 hover:underline">Annuler</button>
+                  </form>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="py-8 text-center">
+          <svg class="w-10 h-10 text-gray-200 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
           </svg>
+          <p class="text-gray-400 text-sm mb-3">Aucune réservation pour l'instant.</p>
+          <a href="{% url 'logements:liste_cites' %}"
+             class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-secondary text-sm font-medium rounded-xl hover:bg-primary/90 transition">
+            Trouver un logement
+          </a>
         </div>
-        <div class="min-w-0 flex-1">
-          <p class="truncate text-sm font-semibold text-gray-900">{{ s.chambre.cite.nom }}</p>
-          <p class="text-xs text-gray-400">{{ s.get_motif_display }} · {{ s.date_signalement|date:"d M Y" }}</p>
-        </div>
-        <span
-          class="{% if s.statut == 'ouvert' %}bg-red-50 {% elif s.statut == 'en_cours'%}bg-orange-50 {% else %}bg-green-50 text-green-700{% endif %} shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold text-orange-600 text-red-600"
-        >
-          {{ s.get_statut_display }}
-        </span>
-      </div>
-      {% endfor %}
-    </div>
-    {% else %}
-    <div class="py-8 text-center">
-      <svg class="mx-auto mb-3 h-10 w-10 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      <p class="text-base text-gray-400">Aucun signalement.</p>
-      <p class="mt-1 text-sm text-gray-300">Tout va bien de votre côté !</p>
-    </div>
-    {% endif %}
-  </div>
-  {# Messages récents #}
-  <div class="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-    <div class="mb-4 flex items-center justify-between">
-      <h2 class="text-base font-bold text-gray-900">Mes messages</h2>
-      <a href="{% url 'contact:mes_messages' %}" class="text-primary text-sm font-medium hover:underline">Voir tout →</a>
+      {% endif %}
     </div>
 
-    {% if mes_messages_recents %}
-    <div class="divide-y divide-gray-50">
-      {% for msg in mes_messages_recents %}
-      <div class="flex items-start gap-3 py-3">
-        {# Icône statut #}
-        <div class="{% if msg.reponse_admin %}bg-green-50{% else %}bg-amber-50{% endif %} mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg">
-          <svg class="{% if msg.reponse_admin %}text-green-600{% else %}text-amber-500{% endif %} h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            {% if msg.reponse_admin %}
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
-            {% else %}
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            {% endif %}
+    {# Favoris récents #}
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-bold text-gray-900">Mes favoris récents</h2>
+        <a href="{% url 'favoris:mes_favoris' %}" class="text-sm text-primary font-medium hover:underline">Voir tout →</a>
+      </div>
+
+      {% if mes_favoris_recents %}
+        <div class="space-y-3">
+          {% for favori in mes_favoris_recents %}
+            {% with c=favori.chambre %}
+            <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition">
+              {# Photo #}
+              <div class="w-10 h-10 rounded-lg bg-gray-200 overflow-hidden shrink-0">
+                {% if c.photos.first %}
+                  <img src="{{ c.photos.first.image.url }}" alt="" class="w-full h-full object-cover"/>
+                {% else %}
+                  <div class="w-full h-full flex items-center justify-center">
+                    <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-gray-900 truncate">{{ c.get_type_display }} — {{ c.cite.nom }}</p>
+                <p class="text-xs text-gray-400">{{ c.loyer|floatformat:0 }} FCFA/mois · {{ c.superficie }} m²</p>
+                {% if c.est_disponible %}
+                  <span class="text-xs text-green-600 font-medium">Disponible</span>
+                {% else %}
+                  <span class="text-xs text-red-400 font-medium">Occupée</span>
+                {% endif %}
+              </div>
+
+              <a href="{% url 'logements:detail_chambre' pk=c.pk %}"
+                 class="shrink-0 p-1.5 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                </svg>
+              </a>
+            </div>
+            {% endwith %}
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="py-8 text-center">
+          <svg class="w-10 h-10 text-gray-200 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
           </svg>
+          <p class="text-gray-400 text-sm mb-3">Aucun favori sauvegardé.</p>
+          <a href="{% url 'logements:liste_chambres' %}"
+             class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-secondary text-sm font-medium rounded-xl hover:bg-primary/90 transition">
+            Parcourir les chambres
+          </a>
         </div>
+      {% endif %}
+    </div>
 
-        <div class="min-w-0 flex-1">
-          {# Destinataire #}
-          <p class="truncate text-sm font-semibold text-gray-900">{% if msg.destinataire %} {{ msg.destinataire.get_full_name }} {% else %} Support CampusNest {% endif %}</p>
-          {# Objet #}
-          <p class="truncate text-xs text-gray-400">{{ msg.objet_message }}</p>
-          {# Réponse ou en attente #} {% if msg.reponse_admin %}
-          <p class="mt-0.5 truncate text-xs font-medium text-green-600">↩ {{ msg.reponse_admin|truncatechars:40 }}</p>
-          {% else %}
-          <p class="mt-0.5 text-xs font-medium text-amber-500">En attente de réponse…</p>
-          {% endif %}
-        </div>
-
-        <div class="flex shrink-0 flex-col items-end gap-1">
-          <span class="{% if msg.reponse_admin %}bg-green-50 {% else %}bg-amber-50 text-amber-700{% endif %} rounded-full px-2 py-0.5 text-xs font-semibold text-green-700">
-            {% if msg.reponse_admin %}Répondu{% else %}En attente{% endif %}
-          </span>
-          <span class="text-xs text-gray-300">{{ msg.date_envoi|date:"d M" }}</span>
-        </div>
+    {# Messages récents #}
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-bold text-gray-900">Mes messages</h2>
+        <a href="{% url 'contact:mes_messages' %}" class="text-sm text-primary font-medium hover:underline">Voir tout →</a>
       </div>
-      {% endfor %}
+
+      {% if mes_messages_recents %}
+        <div class="divide-y divide-gray-50">
+          {% for msg in mes_messages_recents %}
+            <div class="flex items-start gap-3 py-3">
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5
+                          {% if msg.reponse_admin %}bg-green-50{% else %}bg-amber-50{% endif %}">
+                <svg class="w-3.5 h-3.5 {% if msg.reponse_admin %}text-green-600{% else %}text-amber-500{% endif %}"
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {% if msg.reponse_admin %}
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                  {% else %}
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                  {% endif %}
+                </svg>
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold text-gray-900 truncate">
+                  {% if msg.destinataire %}{{ msg.destinataire.get_full_name }}{% else %}Support CampusNest{% endif %}
+                </p>
+                <p class="text-xs text-gray-400 truncate">{{ msg.objet_message }}</p>
+                {% if msg.reponse_admin %}
+                  <p class="text-xs font-medium text-green-600 mt-0.5 truncate">↩ {{ msg.reponse_admin|truncatechars:35 }}</p>
+                {% else %}
+                  <p class="text-xs font-medium text-amber-500 mt-0.5">En attente de réponse…</p>
+                {% endif %}
+              </div>
+
+              <div class="shrink-0 flex flex-col items-end gap-1">
+                <span class="text-xs px-2 py-0.5 rounded-full font-semibold
+                             {% if msg.reponse_admin %}bg-green-50 text-green-700{% else %}bg-amber-50 text-amber-700{% endif %}">
+                  {% if msg.reponse_admin %}Répondu{% else %}En attente{% endif %}
+                </span>
+                <span class="text-xs text-gray-300">{{ msg.date_envoi|date:"d M" }}</span>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="py-8 text-center">
+          <svg class="w-10 h-10 text-gray-200 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+          <p class="text-gray-400 text-sm mb-3">Aucun message envoyé.</p>
+          <a href="{% url 'contact:contact' %}"
+             class="inline-flex items-center gap-1.5 px-4 py-2 bg-primary text-secondary text-sm font-medium rounded-xl hover:bg-primary/90 transition">
+            Contacter le support
+          </a>
+        </div>
+      {% endif %}
     </div>
 
-    {% else %}
-    <div class="py-8 text-center">
-      <svg class="mx-auto mb-3 h-10 w-10 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-      </svg>
-      <p class="mb-3 text-base text-gray-400">Aucun message envoyé.</p>
-      <a href="{% url 'contact:contact' %}" class="bg-primary text-secondary hover:bg-primary/90 inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-medium transition">
-        Contacter le support
-      </a>
-    </div>
-    {% endif %}
   </div>
-</div>
 
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const labels = JSON.parse(document.getElementById("etud-labels").textContent);
+      const counts = JSON.parse(document.getElementById("etud-data").textContent);
+      const maxVal = Math.max(...counts, 1);
+      const maxH   = 112;
+      const container = document.getElementById("chart-etudiant");
+
+      labels.forEach(function (label, i) {
+        const h = Math.round((counts[i] / maxVal) * maxH) || 4;
+        const col = document.createElement("div");
+        col.className = "flex-1 flex flex-col items-center gap-1 group";
+        col.innerHTML =
+          '<span class="text-xs font-bold text-gray-500 opacity-0 group-hover:opacity-100 transition">' + counts[i] + '</span>' +
+          '<div class="w-full bg-primary/10 hover:bg-primary/30 rounded-t-lg transition-all duration-500" style="height:' + h + 'px"></div>' +
+          '<span class="text-xs text-gray-400 font-medium">' + label + '</span>';
+        container.appendChild(col);
+      });
+    });
+  </script>
 
 {% endblock %}
