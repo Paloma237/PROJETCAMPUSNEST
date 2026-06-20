@@ -52,12 +52,11 @@ def reserver_view(request, chambre_pk):
         reservation.client  = request.user
         reservation.statut  = Reservation.Statut.EN_ATTENTE
         reservation.save()
-        messages.success(
+        messages.info(
             request,
-            "Votre demande de réservation a été envoyée au propriétaire."
+            "Réservation créée. Veuillez procéder au paiement pour la confirmer."
         )
-        return redirect("reservations:mes_reservations")
-
+        return redirect("paiements:initier", reservation_pk=reservation.pk)
     return render(request, "reservations/reserver.html", {
         "chambre":            chambre,
         "form":               form,

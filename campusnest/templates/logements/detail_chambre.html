@@ -59,7 +59,7 @@
 
   {# ═══ GALERIE PHOTOS ═══ #}
   {% if photos %}
-  <div class="mb-8 grid h-64 grid-cols-1 gap-3 overflow-hidden rounded-2xl sm:h-80 sm:grid-cols-3 md:h-[380px]">
+  <div class="mb-8 grid h-64 grid-cols-2 gap-3 overflow-hidden rounded-2xl sm:h-80 sm:grid-cols-3 md:h-[380px]">
     {% for photo in photos|slice:":3" %}
     <div class="{% if forloop.first %}sm:col-span-2 sm:row-span-2{% endif %} relative h-full w-full overflow-hidden bg-gray-100">
       <img

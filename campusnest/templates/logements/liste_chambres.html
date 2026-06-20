@@ -102,99 +102,72 @@
     </details>
 
     {# ── Grille des chambres ── #}
+    {# ── Grille des chambres ── #}
     {% if chambres %}
-      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {% for chambre in chambres %}
+      {# grid-cols-2 sur mobile, 3 sur tablette, 4 sur desktop #}
+      <div class="grid grid-cols-2 gap-3 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {% for chambre in page_obj %}
 
-          {# Carte = div (pas un <a>) pour que le bouton favori fonctionne #}
           <div class="group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200/80 bg-white transition-all duration-300 hover:shadow-lg hover:border-primary/20">
 
-            {# ── Photo ── #}
-            <div class="relative h-44 w-full shrink-0 overflow-hidden bg-gray-100 md:h-48">
+            {# ── Photo (hauteur réduite sur mobile) ── #}
+            <div class="relative h-32 w-full shrink-0 overflow-hidden bg-gray-100 md:h-48">
               {% with chambre.photo_principale as photo %}
                 {% if photo %}
                   <img src="{{ photo.image.url }}" alt="{{ chambre }}"
                        class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"/>
                 {% else %}
-                  <div class="from-secondary/20 to-secondary/40 flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br">
-                    <svg class="text-primary/40 h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                    </svg>
-                    <span class="text-primary/50 text-xs font-medium tracking-wider uppercase">Aucune photo</span>
+                  <div class="flex h-full w-full flex-col items-center justify-center bg-gray-50">
+                    <svg class="text-gray-300 h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                   </div>
                 {% endif %}
               {% endwith %}
 
-              {# Badge type #}
-              <div class="absolute top-3 left-3">
-                <span class="rounded-lg border border-gray-200/50 bg-white/80 px-2 py-1 text-xs font-semibold tracking-wide text-gray-700 uppercase backdrop-blur-md">
-                  {{ chambre.get_type_display }}
+              {# Badge loyer (plus compact sur mobile) #}
+              <div class="absolute right-2 bottom-2">
+                <span class="bg-primary/95 text-secondary px-2 py-1 rounded-lg text-[10px] md:text-xs font-bold shadow-sm backdrop-blur-md">
+                  {{ chambre.loyer|floatformat:0 }} FCFA
                 </span>
               </div>
 
-              {# Badge loyer #}
-              <div class="absolute right-3 bottom-3">
-                <span class="bg-primary text-secondary rounded-lg px-2.5 py-1 text-sm font-bold shadow backdrop-blur-md">
-                  {{ chambre.loyer|floatformat:0 }} FCFA/mois
-                </span>
-              </div>
-
-              {# Bouton favori — HORS du <a>, z-index élevé #}
-              <div class="absolute top-3 right-3 z-10">
+              {# Bouton favori (haut droite) #}
+              <div class="absolute top-2 right-2 z-10">
                 {% include "components/btn_favori.html" with chambre=chambre est_favori=chambre.est_favori %}
               </div>
             </div>
 
-            {# ── Infos — lien sur cette partie uniquement ── #}
-            <a href="{% url 'logements:detail_chambre' chambre.pk %}" class="flex flex-grow flex-col p-4">
-              <div class="flex-grow">
-                <p class="text-primary mb-0.5 text-[11px] font-semibold tracking-wider uppercase">{{ chambre.cite.nom }}</p>
-                <p class="line-clamp-2 text-base leading-snug font-medium text-gray-800">{{ chambre.description }}</p>
-                <p class="mt-1.5 flex items-center gap-1 truncate text-sm text-gray-500">
-                  <svg class="h-3.5 w-3.5 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                  </svg>
-                  {{ chambre.cite.adresse }}
-                </p>
-                {% with chambre.note_moyenne as note %}
-                  {% if note %}
-                    <div class="mt-2 flex items-center gap-1">
-                      <svg class="h-3.5 w-3.5 fill-amber-400 text-amber-400" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                      </svg>
-                      <span class="text-sm font-semibold text-gray-700">{{ note }}</span>
-                    </div>
-                  {% endif %}
-                {% endwith %}
-              </div>
-
-              <div class="mt-3 border-t border-gray-100 pt-3">
-                <div class="mb-2 flex items-center justify-between">
-                  <span class="text-sm text-gray-500">Superficie</span>
-                  <span class="text-sm font-semibold text-gray-800">{{ chambre.superficie }} m²</span>
-                </div>
-                <div class="flex flex-wrap gap-1.5">
-                  {% if chambre.meublee %}
-                    <span class="inline-flex items-center gap-1 rounded-full border border-blue-100 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">Meublée</span>
-                  {% endif %}
-                  {% if chambre.wc_interieur %}
-                    <span class="inline-flex items-center gap-1 rounded-full border border-teal-100 bg-teal-50 px-2 py-0.5 text-xs font-medium text-teal-700">WC</span>
-                  {% endif %}
-                  {% if chambre.cuisine %}
-                    <span class="inline-flex items-center gap-1 rounded-full border border-orange-100 bg-orange-50 px-2 py-0.5 text-xs font-medium text-orange-700">Cuisine</span>
-                  {% endif %}
-                  {% if chambre.internet %}
-                    <span class="inline-flex items-center gap-1 rounded-full border border-purple-100 bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-700">Internet</span>
-                  {% endif %}
-                </div>
+            {# ── Infos ── #}
+            <a href="{% url 'logements:detail_chambre' chambre.pk %}" class="flex flex-grow flex-col p-2.5 md:p-4">
+              <p class="text-[10px] md:text-xs font-bold text-primary uppercase truncate">{{ chambre.cite.nom }}</p>
+              <h3 class="text-sm font-semibold text-gray-800 line-clamp-2 mt-0.5 leading-tight">{{ chambre.description }}</h3>
+              
+              <div class="mt-auto pt-3 flex flex-wrap gap-1">
+                {% if chambre.meublee %}<span class="text-[9px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded">Meublée</span>{% endif %}
+                {% if chambre.wc_interieur %}<span class="text-[9px] bg-teal-50 text-teal-700 px-1.5 py-0.5 rounded">WC</span>{% endif %}
+                {% if chambre.cuisine %}<span class="text-[9px] bg-orange-50 text-orange-700 px-1.5 py-0.5 rounded">Cuisine</span>{% endif %}
               </div>
             </a>
 
           </div>
         {% endfor %}
       </div>
+      {% if page_obj.has_other_pages %}
+      <div class="mt-12 flex justify-center items-center gap-2">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}{% for key,val in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ val }}{% endif %}{% endfor %}"
+          class="px-4 py-2 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition">Précédent</a>
+        {% endif %}
+
+        <span class="px-4 py-2 text-sm text-gray-500">
+          Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}{% for key,val in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ val }}{% endif %}{% endfor %}"
+            class="px-4 py-2 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition">Suivant</a>
+        {% endif %}
+      </div>
+    {% endif %}
 
     {% else %}
       <div class="mx-auto mt-12 max-w-sm rounded-2xl border border-gray-200 bg-white p-16 text-center shadow-sm">

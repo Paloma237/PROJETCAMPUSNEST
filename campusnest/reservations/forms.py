@@ -8,16 +8,16 @@ CSS = "w-full px-3 py-2 text-base border border-gray-200 rounded-xl bg-gray-50 f
 
 class ReservationForm(forms.ModelForm):
 
-        date_visite = forms.ModelChoiceField(
+    date_visite = forms.ModelChoiceField(
         queryset=DateVisiteChambre.objects.none(),
         label="Date de visite souhaitée",
         empty_label="— Choisir une date —",
         widget=forms.Select(attrs={"class": "w-full border border-gray-300 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary/40"}),
     )
 
-class Meta:
+    class Meta:
         model  = Reservation
-        fields = ["date_debut", "date_fin", "date_visite"]
+        fields = ["date_debut", "date_fin"]
         widgets = {
             "date_debut": forms.DateInput(
                 attrs={"type": "date", "class": "w-full border border-gray-300 rounded-xl px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-primary/40"}
@@ -27,7 +27,7 @@ class Meta:
             ),
         }
 
-def __init__(self, *args, chambre=None, **kwargs):
+    def __init__(self, *args, chambre=None, **kwargs):
         super().__init__(*args, **kwargs)
         if chambre is not None:
             from django.utils import timezone
@@ -36,7 +36,7 @@ def __init__(self, *args, chambre=None, **kwargs):
                 date__gte=timezone.now().date(),
             ).order_by("date")
 
-def clean(self):
+    def clean(self):
         cleaned = super().clean()
         debut = cleaned.get("date_debut")
         fin   = cleaned.get("date_fin")
@@ -45,7 +45,7 @@ def clean(self):
                 raise forms.ValidationError("La date de fin doit être postérieure à la date de début.")
         return cleaned
 
-def save(self, commit=True):
+    def save(self, commit=True):
         instance = super().save(commit=False)
         # Extraire la date réelle de l'objet DateVisiteChambre sélectionné
         date_visite_obj = self.cleaned_data.get("date_visite")

@@ -29,9 +29,35 @@ class UtilisateurAdmin(UserAdmin):
     )
 
 
+# APRÈS
 @admin.register(ProfilProprietaire)
 class ProfilProprietaireAdmin(admin.ModelAdmin):
-    list_display = ('utilisateur', 'numero_piece', 'est_valide', 'date_validation')
+    list_display  = ["utilisateur", "apercu_piece", "est_valide", "date_validation"]
+    readonly_fields = ["apercu_piece_recto", "apercu_piece_verso"]
+
+    @admin.display(description="Pièce d'identité")
+    def apercu_piece(self, obj):
+        from django.utils.html import format_html
+        liens = []
+        if obj.piece_identite_recto:
+            liens.append(format_html('<a href="{}" target="_blank">Recto</a>', obj.piece_identite_recto.url))
+        if obj.piece_identite_verso:
+            liens.append(format_html('<a href="{}" target="_blank">Verso</a>', obj.piece_identite_verso.url))
+        return format_html(" · ".join(str(l) for l in liens)) if liens else "—"
+
+    @admin.display(description="Recto")
+    def apercu_piece_recto(self, obj):
+        from django.utils.html import format_html
+        if obj.piece_identite_recto:
+            return format_html('<img src="{}" style="max-height:200px;border-radius:8px"/>', obj.piece_identite_recto.url)
+        return "—"
+
+    @admin.display(description="Verso")
+    def apercu_piece_verso(self, obj):
+        from django.utils.html import format_html
+        if obj.piece_identite_verso:
+            return format_html('<img src="{}" style="max-height:200px;border-radius:8px"/>', obj.piece_identite_verso.url)
+        return "—"
     list_filter = ('est_valide',)
     search_fields = ('utilisateur__email', 'utilisateur__nom', 'numero_piece')
     actions = ['valider_profils']

@@ -5,10 +5,6 @@
 {% block sidebar %}{% include "components/sidebar_etudiant.html" %}{% endblock %}
 
 {% block content %}
-
-  {{ stats.six_mois_labels|json_script:"etud-labels" }}
-  {{ stats.six_mois_data|json_script:"etud-data" }}
-
   {# ── Ligne 1 : KPIs ── #}
   <div class="mb-5 grid grid-cols-2 xl:grid-cols-4 gap-4">
 
@@ -108,12 +104,6 @@
 
   {# ── Ligne 2 : Graphique activité (2/3) + Accès rapides (1/3) ── #}
   <div class="mb-5 grid grid-cols-1 xl:grid-cols-3 gap-5">
-
-    {# Graphique activité réservations #}
-    <div class="xl:col-span-2 bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-      <h2 class="text-base font-bold text-gray-900 mb-4">Activité — 6 derniers mois</h2>
-      <div class="flex items-end gap-2 h-36" id="chart-etudiant"></div>
-    </div>
 
     {# Accès rapides #}
     <div class="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">

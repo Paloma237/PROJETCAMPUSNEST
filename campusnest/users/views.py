@@ -32,16 +32,14 @@ def devenir_proprietaire(request):
 
 
 # ─────────────────────────────────────────────
-#  Helper — redirection par rôle et dashboard
-# ────────────────────────────────────────────
+#  Helper — redirection par rôle
+# ─────────────────────────────────────────────
 
 def _redirection_par_role(user):
     if user.role == Utilisateur.Role.ADMIN:
         return "users:admin_dashboard"
 
     if user.role == Utilisateur.Role.PROPRIETAIRE:
-        # ✅ Correction : on utilise ProfilProprietaire.objects.filter()
-        # au lieu de user.proprietaire qui n'existe pas
         valide = ProfilProprietaire.objects.filter(
             utilisateur=user, est_valide=True
         ).exists()
@@ -93,35 +91,55 @@ def inscription_view(request):
         return redirect("users:dashboard")
 
     type_compte = request.POST.get("type_compte") or request.GET.get("type", "client")
-    FormClass = InscriptionProprietaireForm if type_compte == "proprietaire" else InscriptionClientForm
-    form = FormClass(request.POST or None)
+    FormClass   = InscriptionProprietaireForm if type_compte == "proprietaire" else InscriptionClientForm
 
-    if request.method == "POST" and form.is_valid():
-        user = form.save(commit=False)
-        user.is_active = False
-        user.username = user.email
-        user.save()
-        enregistrer_log(request, user, f"Inscription — rôle : {user.role}")
+    if request.method == "POST":
+        # ⚠️ request.FILES est indispensable pour récupérer recto + verso
+        form = FormClass(request.POST, request.FILES)
 
-        otp = OTPCode.generer_pour(user)
-        send_mail(
-            subject="CampusNest — Vérifiez votre adresse email",
-            message=(
-                f"Bonjour {user.email},\n\n"
-                f"Votre code de vérification est : {otp.code}\n\n"
-                f"Valide {OTPCode.OTP_EXPIRY_MINUTES} minutes.\n\n"
-                f"L'équipe CampusNest IUT-FV"
-            ),
-            from_email=None,
-            recipient_list=[user.email],
-            fail_silently=False,
-        )
-        request.session["inscription_otp_email"] = user.email
-        messages.success(request, "Un code de vérification a été envoyé à votre email.")
-        return redirect("users:verifier_otp_inscription")
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.is_active = False
+            user.username  = user.email
+            user.save()
+
+            # Le ProfilProprietaire est créé/mis à jour par form.save(commit=True)
+            # via update_or_create dans InscriptionProprietaireForm.save().
+            # On appelle donc save() à nouveau avec commit=True pour déclencher cette logique.
+            if user.role == Utilisateur.Role.PROPRIETAIRE:
+                # On relie les fichiers uploadés au profil via le formulaire
+                form.instance = user
+                form.save(commit=True)
+            else:
+                # Pour le client, un simple get_or_create n'est pas nécessaire
+                # mais on s'assure que le user est bien sauvegardé
+                pass
+
+            otp = OTPCode.generer_pour(user)
+            enregistrer_log(request, user, f"Inscription — rôle : {user.role}")
+
+            send_mail(
+                subject="CampusNest — Vérifiez votre adresse email",
+                message=(
+                    f"Bonjour {user.email},\n\n"
+                    f"Votre code de vérification est : {otp.code}\n\n"
+                    f"Valide {OTPCode.OTP_EXPIRY_MINUTES} minutes.\n\n"
+                    f"L'équipe CampusNest IUT-FV"
+                ),
+                from_email=None,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+            request.session["inscription_otp_email"] = user.email
+            messages.success(request, "Un code de vérification a été envoyé à votre email.")
+            return redirect("users:verifier_otp_inscription")
+
+    else:
+        form = FormClass()
 
     return render(request, "accounts/inscription.html", {
-        "form": form, "type_compte": type_compte,
+        "form": form,
+        "type_compte": type_compte,
     })
 
 
@@ -137,7 +155,7 @@ def verifier_otp_inscription_view(request):
         code = form.cleaned_data["code"]
         try:
             user = Utilisateur.objects.get(email=email, is_active=False)
-            otp = OTPCode.objects.filter(
+            otp  = OTPCode.objects.filter(
                 utilisateur=user, code=code, utilise=False
             ).order_by("-cree_le").first()
 
@@ -154,7 +172,7 @@ def verifier_otp_inscription_view(request):
                     return redirect("users:validation_en_attente")
 
                 login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-                messages.success(request, f"Bienvenue ! Votre compte est activé.")
+                messages.success(request, "Bienvenue ! Votre compte est activé.")
                 return redirect("users:dashboard")
             else:
                 form.add_error("code", "Code incorrect ou expiré.")
@@ -164,12 +182,12 @@ def verifier_otp_inscription_view(request):
 
     return render(request, "accounts/otp_verification.html", {
         "form": form,
-        "email_masque": _masquer_email(email),
-        "expiry_minutes": OTPCode.OTP_EXPIRY_MINUTES,
-        "titre": "Vérification de votre adresse email",
-        "renvoyer_url": "users:renvoyer_otp_inscription",
-        "retour_url": "users:inscription",
-        "retour_texte": "← Retour à l'inscription",
+        "email_masque":    _masquer_email(email),
+        "expiry_minutes":  OTPCode.OTP_EXPIRY_MINUTES,
+        "titre":           "Vérification de votre adresse email",
+        "renvoyer_url":    "users:renvoyer_otp_inscription",
+        "retour_url":      "users:inscription",
+        "retour_texte":    "← Retour à l'inscription",
     })
 
 
@@ -179,7 +197,7 @@ def renvoyer_otp_inscription_view(request):
         return redirect("users:inscription")
     try:
         user = Utilisateur.objects.get(email=email, is_active=False)
-        otp = OTPCode.generer_pour(user)
+        otp  = OTPCode.generer_pour(user)
         send_mail(
             subject="CampusNest — Nouveau code de vérification",
             message=f"Votre nouveau code : {otp.code}\nValide {OTPCode.OTP_EXPIRY_MINUTES} min.",
@@ -207,7 +225,7 @@ def mot_de_passe_oublie_view(request):
         email = form.cleaned_data["email"]
         try:
             user = Utilisateur.objects.get(email=email, is_active=True)
-            otp = OTPCode.generer_pour(user)
+            otp  = OTPCode.generer_pour(user)
             send_mail(
                 subject="CampusNest — Votre code de vérification",
                 message=(
@@ -243,7 +261,7 @@ def verifier_otp_view(request):
         code = form.cleaned_data["code"]
         try:
             user = Utilisateur.objects.get(email=email, is_active=True)
-            otp = OTPCode.objects.filter(
+            otp  = OTPCode.objects.filter(
                 utilisateur=user, code=code, utilise=False
             ).order_by("-cree_le").first()
 
@@ -260,12 +278,12 @@ def verifier_otp_view(request):
 
     return render(request, "accounts/otp_verification.html", {
         "form": form,
-        "email_masque": _masquer_email(email),
-        "expiry_minutes": OTPCode.OTP_EXPIRY_MINUTES,
-        "titre": "Réinitialisation du mot de passe",
-        "renvoyer_url": "users:renvoyer_otp",
-        "retour_url": "users:mot_de_passe_oublie",
-        "retour_texte": "← Changer d'email",
+        "email_masque":        _masquer_email(email),
+        "expiry_minutes":      OTPCode.OTP_EXPIRY_MINUTES,
+        "titre":               "Réinitialisation du mot de passe",
+        "renvoyer_url":        "users:renvoyer_otp",
+        "retour_url":          "users:mot_de_passe_oublie",
+        "retour_texte":        "← Changer d'email",
         "tentatives_restantes": _otp_tentatives_restantes(request),
     })
 
@@ -276,7 +294,7 @@ def renvoyer_otp_view(request):
         return redirect("users:mot_de_passe_oublie")
     try:
         user = Utilisateur.objects.get(email=email, is_active=True)
-        otp = OTPCode.generer_pour(user)
+        otp  = OTPCode.generer_pour(user)
         send_mail(
             subject="CampusNest — Nouveau code",
             message=f"Votre nouveau code : {otp.code}\nValide {OTPCode.OTP_EXPIRY_MINUTES} min.",
@@ -333,42 +351,38 @@ def profil_view(request):
 def dashboard_view(request):
     return redirect(_redirection_par_role(request.user))
 
+
 @login_required
 def client_dashboard_view(request):
-    import datetime
     from campusnest.contact.models import Conversation
 
     aujourd_hui = timezone.now().date()
 
-    # ── Réservations ──
     toutes_reservations = Reservation.objects.filter(
         client=request.user
     ).select_related("chambre__cite")
 
-    res_attente   = toutes_reservations.filter(statut="en_attente").count()
-    res_validees  = toutes_reservations.filter(statut="confirmee").count()
-    res_annulees  = toutes_reservations.filter(statut="annulee").count()
+    res_attente  = toutes_reservations.filter(statut="en_attente").count()
+    res_validees = toutes_reservations.filter(statut="confirmee").count()
+    res_annulees = toutes_reservations.filter(statut="annulee").count()
 
-    # Réservation confirmée active (logement actuel)
     reservation_active = toutes_reservations.filter(
         statut="confirmee",
         date_debut__lte=aujourd_hui,
         date_fin__gte=aujourd_hui,
     ).first()
 
-    # Réservations des 6 derniers mois (graphique)
     six_mois = []
     for i in range(5, -1, -1):
-        d         = aujourd_hui - datetime.timedelta(days=30 * i)
-        m_debut   = d.replace(day=1)
-        m_fin     = (m_debut + datetime.timedelta(days=32)).replace(day=1)
-        count     = toutes_reservations.filter(
+        d       = aujourd_hui - datetime.timedelta(days=30 * i)
+        m_debut = d.replace(day=1)
+        m_fin   = (m_debut + datetime.timedelta(days=32)).replace(day=1)
+        count   = toutes_reservations.filter(
             date_demande__date__gte=m_debut,
             date_demande__date__lt=m_fin,
         ).count()
         six_mois.append({"mois": m_debut.strftime("%b"), "count": count})
 
-    # ── Favoris ──
     favoris_qs = (
         Favori.objects
         .filter(client=request.user)
@@ -376,41 +390,32 @@ def client_dashboard_view(request):
         .prefetch_related("chambre__photos")
         .order_by("-date_ajout")
     )
-    mes_favoris_recents = favoris_qs[:4]
-    nb_favoris          = favoris_qs.count()
 
-    # ── Messages de contact ──
     mes_messages_recents = MessageContact.objects.filter(
         expediteur=request.user
     ).order_by("-date_envoi")[:4]
 
-    # ── Signalements ──
-    nb_signalements = Signalement.objects.filter(client=request.user).count()
-
-    # ── Chambres disponibles (accès rapide) ──
+    nb_signalements      = Signalement.objects.filter(client=request.user).count()
     chambres_disponibles = Chambre.objects.filter(est_disponible=True).count()
 
     return render(request, "accounts/client_dashboard.html", {
         "reservation_active":   reservation_active,
         "mes_reservations":     toutes_reservations.order_by("-date_demande")[:4],
-        "mes_favoris_recents":  mes_favoris_recents,
+        "mes_favoris_recents":  favoris_qs[:4],
         "mes_messages_recents": mes_messages_recents,
         "stats": {
-            "attente":               res_attente,
-            "validees":              res_validees,
-            "annulees":              res_annulees,
-            "total_reservations":    toutes_reservations.count(),
-            "signalements":          nb_signalements,
-            "nb_favoris":            nb_favoris,
-            "chambres_disponibles":  chambres_disponibles,
-            "six_mois_labels":       [m["mois"]  for m in six_mois],
-            "six_mois_data":         [m["count"] for m in six_mois],
+            "attente":              res_attente,
+            "validees":             res_validees,
+            "annulees":             res_annulees,
+            "total_reservations":   toutes_reservations.count(),
+            "signalements":         nb_signalements,
+            "nb_favoris":           favoris_qs.count(),
+            "chambres_disponibles": chambres_disponibles,
+            "six_mois_labels":      [m["mois"]  for m in six_mois],
+            "six_mois_data":        [m["count"] for m in six_mois],
         },
     })
-"""
-Remplace les fonctions proprietaire_dashboard_view et admin_dashboard_view
-dans campusnest/users/views.py
-"""
+
 
 # ─────────────────────────────────────────────
 #  Dashboard Propriétaire
@@ -418,7 +423,6 @@ dans campusnest/users/views.py
 
 @proprietaire_valide_requis
 def proprietaire_dashboard_view(request):
-# ── Données de base ──
     cites    = Cite.objects.filter(proprietaire=request.user)
     chambres = Chambre.objects.filter(cite__proprietaire=request.user)
 
@@ -435,22 +439,17 @@ def proprietaire_dashboard_view(request):
         chambre__cite__proprietaire=request.user
     ).select_related("client", "chambre__cite")
 
-    # ── Statistiques ──
     total_chambres       = chambres.count()
     chambres_disponibles = chambres.filter(est_disponible=True).count()
     chambres_occupees    = total_chambres - chambres_disponibles
+    taux_occupation      = round((chambres_occupees / total_chambres * 100) if total_chambres else 0)
 
-    # Taux d'occupation (%)
-    taux_occupation = round((chambres_occupees / total_chambres * 100) if total_chambres else 0)
-
-    # Revenus potentiels (toutes chambres disponibles × loyer)
     revenus_potentiels = chambres.filter(est_disponible=False).aggregate(
         total=Sum("loyer")
     )["total"] or 0
 
-    # Revenus estimés ce mois (réservations confirmées actives ce mois)
-    aujourd_hui  = timezone.now().date()
-    debut_mois   = aujourd_hui.replace(day=1)
+    aujourd_hui = timezone.now().date()
+    debut_mois  = aujourd_hui.replace(day=1)
     reservations_actives_mois = toutes_reservations.filter(
         statut=Reservation.Statut.CONFIRMEE,
         date_debut__lte=aujourd_hui,
@@ -458,43 +457,32 @@ def proprietaire_dashboard_view(request):
     )
     revenus_mois = sum(r.montant_total() for r in reservations_actives_mois)
 
-    # Réservations par statut
-    res_en_attente  = toutes_reservations.filter(statut="en_attente").count()
-    res_confirmees  = toutes_reservations.filter(statut="confirmee").count()
-    res_annulees    = toutes_reservations.filter(statut="annulee").count()
+    res_en_attente = toutes_reservations.filter(statut="en_attente").count()
+    res_confirmees = toutes_reservations.filter(statut="confirmee").count()
+    res_annulees   = toutes_reservations.filter(statut="annulee").count()
 
-    # Réservations des 6 derniers mois (pour mini-graphique)
     six_mois = []
     for i in range(5, -1, -1):
-        d = aujourd_hui - datetime.timedelta(days=30 * i)
+        d          = aujourd_hui - datetime.timedelta(days=30 * i)
         mois_debut = d.replace(day=1)
         mois_fin   = (mois_debut + datetime.timedelta(days=32)).replace(day=1)
-        count = toutes_reservations.filter(
+        count      = toutes_reservations.filter(
             date_demande__date__gte=mois_debut,
             date_demande__date__lt=mois_fin,
         ).count()
-        six_mois.append({
-            "mois":  mois_debut.strftime("%b"),
-            "count": count,
-        })
+        six_mois.append({"mois": mois_debut.strftime("%b"), "count": count})
 
-    # Répartition par type de chambre
     repartition_types = list(
         chambres.values("type").annotate(nb=Count("id")).order_by("-nb")
     )
-    
+
     avis_recents = (
         Avis.objects
-        .filter(
-            chambre__in=chambres,   # chambres appartenant au proprio
-            est_visible=True,
-        )
+        .filter(chambre__in=chambres, est_visible=True)
         .select_related("client", "chambre__cite")
-        .order_by("-date_creation")[:4]     # 4 avis les plus récents
+        .order_by("-date_creation")[:4]
     )
 
-
-    # Top 3 chambres par nombre de réservations
     top_chambres = list(
         chambres.annotate(nb_res=Count("reservations"))
                 .order_by("-nb_res")[:3]
@@ -505,22 +493,22 @@ def proprietaire_dashboard_view(request):
         "chambres": chambres[:8],
         "q":        q,
         "reservations_recentes": toutes_reservations[:5],
-        "avis_recents": avis_recents,
+        "avis_recents":          avis_recents,
         "stats": {
-            "total_cites":           cites.count(),
-            "total_chambres":        total_chambres,
-            "chambres_disponibles":  chambres_disponibles,
-            "chambres_occupees":     chambres_occupees,
-            "taux_occupation":       taux_occupation,
-            "revenus_potentiels":    revenus_potentiels,
-            "revenus_mois":          revenus_mois,
-            "reservations_attente":  res_en_attente,
-            "reservations_confirmees": res_confirmees,
-            "reservations_annulees": res_annulees,
-            "six_mois_labels":       [m["mois"]  for m in six_mois],
-            "six_mois_data":         [m["count"] for m in six_mois],
-            "repartition_types":     repartition_types,
-            "top_chambres":          top_chambres,
+            "total_cites":              cites.count(),
+            "total_chambres":           total_chambres,
+            "chambres_disponibles":     chambres_disponibles,
+            "chambres_occupees":        chambres_occupees,
+            "taux_occupation":          taux_occupation,
+            "revenus_potentiels":       revenus_potentiels,
+            "revenus_mois":             revenus_mois,
+            "reservations_attente":     res_en_attente,
+            "reservations_confirmees":  res_confirmees,
+            "reservations_annulees":    res_annulees,
+            "six_mois_labels":          [m["mois"]  for m in six_mois],
+            "six_mois_data":            [m["count"] for m in six_mois],
+            "repartition_types":        repartition_types,
+            "top_chambres":             top_chambres,
         },
     })
 
@@ -534,7 +522,6 @@ def admin_dashboard_view(request):
     aujourd_hui = timezone.now().date()
     debut_mois  = aujourd_hui.replace(day=1)
 
-    # ── Utilisateurs ──
     props_attente = Utilisateur.objects.filter(
         role=Utilisateur.Role.PROPRIETAIRE,
         profil_proprietaire__est_valide=False,
@@ -545,39 +532,34 @@ def admin_dashboard_view(request):
         date_joined__date__gte=debut_mois
     ).count()
 
-    # ── Logements ──
-    total_cites      = Cite.objects.count()
-    total_chambres   = Chambre.objects.count()
-    chambres_dispo   = Chambre.objects.filter(est_disponible=True).count()
+    total_cites       = Cite.objects.count()
+    total_chambres    = Chambre.objects.count()
+    chambres_dispo    = Chambre.objects.filter(est_disponible=True).count()
     chambres_occupees = total_chambres - chambres_dispo
-    taux_occupation  = round((chambres_occupees / total_chambres * 100) if total_chambres else 0)
+    taux_occupation   = round((chambres_occupees / total_chambres * 100) if total_chambres else 0)
 
-    # ── Réservations ──
-    toutes_res         = Reservation.objects.all()
-    res_en_attente     = toutes_res.filter(statut="en_attente").count()
-    res_confirmees     = toutes_res.filter(statut="confirmee").count()
-    res_annulees       = toutes_res.filter(statut="annulee").count()
-    res_ce_mois        = toutes_res.filter(date_demande__date__gte=debut_mois).count()
+    toutes_res     = Reservation.objects.all()
+    res_en_attente = toutes_res.filter(statut="en_attente").count()
+    res_confirmees = toutes_res.filter(statut="confirmee").count()
+    res_annulees   = toutes_res.filter(statut="annulee").count()
+    res_ce_mois    = toutes_res.filter(date_demande__date__gte=debut_mois).count()
 
-    # ── Signalements ──
-    tous_signalements  = Signalement.objects.filter(statut="ouvert")
-    sig_en_cours       = Signalement.objects.filter(statut="en_cours").count()
-    sig_clotures       = Signalement.objects.filter(statut="cloture").count()
+    tous_signalements = Signalement.objects.filter(statut="ouvert")
+    sig_en_cours      = Signalement.objects.filter(statut="en_cours").count()
+    sig_clotures      = Signalement.objects.filter(statut="cloture").count()
 
-    # ── Répartition signalements par motif ──
     repartition_sig = list(
         Signalement.objects.values("motif")
                            .annotate(nb=Count("id"))
                            .order_by("-nb")[:5]
     )
 
-    # ── Activité des 6 derniers mois (inscriptions + réservations) ──
     six_mois_inscriptions = []
     six_mois_reservations = []
     for i in range(5, -1, -1):
-        d          = aujourd_hui - datetime.timedelta(days=30 * i)
-        m_debut    = d.replace(day=1)
-        m_fin      = (m_debut + datetime.timedelta(days=32)).replace(day=1)
+        d       = aujourd_hui - datetime.timedelta(days=30 * i)
+        m_debut = d.replace(day=1)
+        m_fin   = (m_debut + datetime.timedelta(days=32)).replace(day=1)
         six_mois_inscriptions.append({
             "mois":  m_debut.strftime("%b"),
             "count": Utilisateur.objects.filter(
@@ -593,7 +575,6 @@ def admin_dashboard_view(request):
             ).count(),
         })
 
-    # ── Top 5 propriétaires par nombre de chambres ──
     top_proprietaires = list(
         Utilisateur.objects.filter(role="proprietaire")
                            .annotate(nb_chambres=Count("cites__chambres"))
@@ -608,38 +589,33 @@ def admin_dashboard_view(request):
         "logs_recents":             logs,
         "top_proprietaires":        top_proprietaires,
         "stats": {
-            # Utilisateurs
-            "total_etudiants":          total_clients,
-            "total_proprietaires":      total_proprietaires,
-            "nouveaux_ce_mois":         nouveaux_ce_mois,
-            "proprietaires_attente":    props_attente.count(),
-            # Logements
-            "total_cites":              total_cites,
-            "total_chambres":           total_chambres,
-            "chambres_disponibles":     chambres_dispo,
-            "chambres_occupees":        chambres_occupees,
-            "taux_occupation":          taux_occupation,
-            # Réservations
-            "total_reservations":       toutes_res.count(),
-            "reservations_attente":     res_en_attente,
-            "reservations_confirmees":  res_confirmees,
-            "reservations_annulees":    res_annulees,
-            "reservations_ce_mois":     res_ce_mois,
-            # Signalements
-            "signalements_ouverts":     tous_signalements.count(),
-            "signalements_en_cours":    sig_en_cours,
-            "signalements_clotures":    sig_clotures,
-            "repartition_signalements": repartition_sig,
-            # Graphiques
-            "six_mois_labels":          [m["mois"]  for m in six_mois_inscriptions],
-            "six_mois_inscriptions":    [m["count"] for m in six_mois_inscriptions],
-            "six_mois_reservations":    [m["count"] for m in six_mois_reservations],
+            "total_etudiants":           total_clients,
+            "total_proprietaires":       total_proprietaires,
+            "nouveaux_ce_mois":          nouveaux_ce_mois,
+            "proprietaires_attente":     props_attente.count(),
+            "total_cites":               total_cites,
+            "total_chambres":            total_chambres,
+            "chambres_disponibles":      chambres_dispo,
+            "chambres_occupees":         chambres_occupees,
+            "taux_occupation":           taux_occupation,
+            "total_reservations":        toutes_res.count(),
+            "reservations_attente":      res_en_attente,
+            "reservations_confirmees":   res_confirmees,
+            "reservations_annulees":     res_annulees,
+            "reservations_ce_mois":      res_ce_mois,
+            "signalements_ouverts":      tous_signalements.count(),
+            "signalements_en_cours":     sig_en_cours,
+            "signalements_clotures":     sig_clotures,
+            "repartition_signalements":  repartition_sig,
+            "six_mois_labels":           [m["mois"]  for m in six_mois_inscriptions],
+            "six_mois_inscriptions":     [m["count"] for m in six_mois_inscriptions],
+            "six_mois_reservations":     [m["count"] for m in six_mois_reservations],
         },
     })
 
+
 @admin_requis
 def valider_proprietaire_view(request, pk):
-    # ✅ Correction : ProfilProprietaire (pas Proprietaire)
     profil = get_object_or_404(ProfilProprietaire, utilisateur__pk=pk)
     if request.method == "POST":
         profil.est_valide      = True
@@ -663,6 +639,55 @@ def suspendre_compte_view(request, pk):
     return redirect("users:admin_dashboard")
 
 
+@admin_requis
+def gerer_proprietaire_view(request, pk):
+    profil = get_object_or_404(ProfilProprietaire, utilisateur__pk=pk)
+    user   = profil.utilisateur
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+
+        if action == "valider":
+            profil.est_valide      = True
+            profil.date_validation = timezone.now()
+            profil.save()
+            user.is_active = True
+            user.save(update_fields=["is_active"])
+            enregistrer_log(request, request.user, f"Propriétaire validé : {user.email}")
+            messages.success(request, f"Le compte de {user.get_full_name()} a été validé.")
+
+        elif action == "suspendre":
+            user.is_active = False
+            user.save(update_fields=["is_active"])
+            enregistrer_log(request, request.user, f"Compte suspendu : {user.email}")
+            messages.warning(request, f"Le compte de {user.get_full_name()} a été suspendu.")
+
+        return redirect("users:admin_dashboard")
+
+    cites        = Cite.objects.filter(proprietaire=user)
+    chambres     = Chambre.objects.filter(cite__proprietaire=user)
+    reservations = Reservation.objects.filter(chambre__cite__proprietaire=user).count()
+
+    return render(request, "accounts/gerer_proprietaire.html", {
+        "profil":          profil,
+        "proprietaire":    user,
+        "nb_cites":        cites.count(),
+        "nb_chambres":     chambres.count(),
+        "nb_reservations": reservations,
+    })
+
+
+@admin_requis
+def liste_proprietaires_view(request):
+    proprietaires = Utilisateur.objects.filter(
+        role=Utilisateur.Role.PROPRIETAIRE
+    ).select_related("profil_proprietaire").order_by("profil_proprietaire__est_valide", "nom")
+
+    return render(request, "accounts/liste_proprietaires.html", {
+        "proprietaires": proprietaires,
+    })
+
+
 # ─────────────────────────────────────────────
 #  Helpers privés
 # ─────────────────────────────────────────────
@@ -677,50 +702,3 @@ def _masquer_email(email: str) -> str:
 
 def _otp_tentatives_restantes(request) -> int:
     return max(0, 5 - request.session.get("otp_attempts", 0))
-
-@admin_requis
-def gerer_proprietaire_view(request, pk):
-    profil = get_object_or_404(ProfilProprietaire, utilisateur__pk=pk)
-    user   = profil.utilisateur
-
-    if request.method == "POST":
-        action = request.POST.get("action")
-        print(f">>> ACTION REÇUE : {action}") 
-        print(f">>> POST data : {request.POST}")
-
-        if action == "valider":
-            profil.est_valide      = True
-            profil.date_validation = timezone.now()
-            profil.save()
-            user.is_active = True
-            user.save(update_fields=["is_active"])
-            enregistrer_log(request, request.user,
-                f"Propriétaire validé : {user.email}")
-            messages.success(request,
-                f"Le compte de {user.get_full_name()} a été validé.")
-
-        elif action == "suspendre":
-            user.is_active = False
-            user.save(update_fields=["is_active"])
-            enregistrer_log(request, request.user,
-                f"Compte suspendu : {user.email}")
-            messages.warning(request,
-                f"Le compte de {user.get_full_name()} a été suspendu.")
-
-        return redirect("users:admin_dashboard")
-
-    # Statistiques du propriétaire
-
-    cites    = Cite.objects.filter(proprietaire=user)
-    chambres = Chambre.objects.filter(cite__proprietaire=user)
-    reservations = Reservation.objects.filter(
-        chambre__cite__proprietaire=user
-    ).count()
-
-    return render(request, "accounts/gerer_proprietaire.html", {
-        "profil":      profil,
-        "proprietaire": user,
-        "nb_cites":    cites.count(),
-        "nb_chambres": chambres.count(),
-        "nb_reservations": reservations,
-    })

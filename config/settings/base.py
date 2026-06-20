@@ -90,12 +90,12 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "campusnest.users",
     "campusnest.logements",
-    #"campusnest.core",
     "campusnest.reservations",
     "campusnest.avis",
     "campusnest.signalements",
     "campusnest.contact",
     "campusnest.favoris",
+    "campusnest.paiements",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -170,6 +170,9 @@ STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 ]
+
+# Paiements
+MONTANT_RESERVATION = 1000  # FCFA — commission de réservation CampusNest
 
 # MEDIA
 # ------------------------------------------------------------------------------

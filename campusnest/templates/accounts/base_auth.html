@@ -1,55 +1,70 @@
 <!DOCTYPE html>
 <html lang="fr" class="h-full">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>{% block title %}CampusNest{% endblock %} — Espace Connexion</title>
-  {% load static %}
-  <link rel="stylesheet" href="{% static 'css/output.css' %}"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>{% block title %}CampusNest{% endblock %} — Espace Connexion</title>
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/output.css' %}"/>
 </head>
-
 <body class="h-full bg-[#E5EBE5] flex items-center justify-center p-4 md:p-8">
 
-  {# Carte principale #}
-  <div class="w-full max-w-5xl bg-white shadow-2xl shadow-primary/10 rounded-3xl overflow-hidden flex min-h-[550px]">
- 
-    {# ── SIDEBAR GAUCHE (Image + Citation) ── #}
-    <div class="hidden md:flex md:w-2/5 flex-col justify-between p-10 bg-cover bg-center bg-no-repeat relative">
-      <div class="absolute inset-0 bg-primary/90 z-0"></div> {# Logo en haut #}
-      <div class="relative z-10">
-        <a href="/" class="flex items-center text-white gap-2 font-bold text-lg">
-          <img src="{% static 'images/WhatsApp_Image_2026-05-25_at_17.43.41-removebg-preview.png' %}" alt="CampusNest" class="h-9 w-9" />
-          <span>CampusNest</span>
-        </a>
-      </div>
+{# Carte principale #}
+<div class="w-full max-w-5xl bg-white shadow-2xl shadow-primary/10 rounded-3xl overflow-hidden flex min-h-[550px]">
 
-      {# Citation en bas #}
-      <div class="relative z-10 text-white">
-        <p class="text-white/70 text-[11px] uppercase tracking-widest font-bold mb-3">CampusNest IUT-FV</p>
-        <blockquote class="text-lg italic font-medium leading-tight">
-          « Trouvez votre chambre avant même d'arriver au campus. »
-        </blockquote>
-      </div>
+  {# ── SIDEBAR GAUCHE ── #}
+  <div class="hidden md:flex md:w-2/5 flex-col justify-between p-10 bg-cover bg-center bg-no-repeat relative">
+    <div class="absolute inset-0 bg-primary/90 z-0"></div>
+
+    {# Logo en haut #}
+    <div class="relative z-10">
+      <a href="/" class="flex items-center text-white gap-2 font-bold text-lg">
+        <img src="{% static 'images/WhatsApp_Image_2026-05-25_at_17.43.41-removebg-preview.png' %}" alt="CampusNest" class="h-9 w-9" />
+        <span>CampusNest</span>
+      </a>
     </div>
- 
-    {# ── ZONE FORMULAIRE DROITE ── #}
-    <div class="flex-1 p-8 sm:p-16 flex flex-col justify-center bg-white">
-      
-      {# Messages d'alerte #}
-      {% if messages %}
-        <div class="mb-6 space-y-2">
-          {% for message in messages %}
-            <div class="px-4 py-3 rounded-xl text-sm font-bold {% if message.tags == 'success' %}bg-green-50 text-green-700{% else %}bg-red-50 text-red-700{% endif %}">
-              {{ message }}
-            </div>
-          {% endfor %}
-        </div>
-      {% endif %}
- 
-      {# Injection du contenu (Connexion/Inscription) #}
-      {% block content %}{% endblock %}
-      
+
+    {# Bloc citation en bas — enrichi #}
+    <div class="relative z-10 text-white">
+
+      {# Citation principale — modifiable par JS #}
+      <blockquote id="sidebar-quote" class="text-lg italic font-medium leading-snug transition-all duration-500">
+        {% block sidebar_quote %}« Le logement étudiant, simplifié. Rejoignez la communauté de l'IUT-FV. »{% endblock %}
+      </blockquote>
+
+      {# Sous-texte descriptif #}
+      <p id="sidebar-sub" class="mt-3 text-sm text-white/50 leading-relaxed">
+        {% block sidebar_sub %}Trouvez, réservez et gérez votre logement en toute sérénité.{% endblock %}
+      </p>
+
+      {# Séparateur décoratif #}
+      <div class="mt-6 flex gap-1.5">
+        <span class="h-1 w-8 rounded-full bg-white/80"></span>
+        <span class="h-1 w-3 rounded-full bg-white/30"></span>
+        <span class="h-1 w-1.5 rounded-full bg-white/20"></span>
+      </div>
     </div>
   </div>
+
+  {# ── ZONE FORMULAIRE DROITE ── #}
+  <div class="flex-1 p-8 sm:p-16 flex flex-col justify-center bg-white">
+
+    {# Messages d'alerte #}
+    {% if messages %}
+    <div class="mb-6 space-y-2">
+      {% for message in messages %}
+      <div class="px-4 py-3 rounded-xl text-sm font-bold {% if message.tags == 'success' %}bg-green-50 text-green-700{% else %}bg-red-50 text-red-700{% endif %}">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {# Contenu (Connexion / Inscription) #}
+    {% block content %}{% endblock %}
+  </div>
+</div>
+
+{% block extra_js %}{% endblock %}
 </body>
 </html>

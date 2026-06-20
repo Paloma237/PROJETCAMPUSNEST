@@ -1,79 +1,13 @@
-{% comment %} {# ─────────────────────────────────────────────────────────────────────
-   Composant : bouton favori ♥
-   Emplacement fichier : templates/components/btn_favori.html
-
-   Utilisation dans n'importe quel template :
-       {% include "components/btn_favori.html" with chambre=chambre %}
-
-   Prérequis dans la view qui rend ce template :
-       • Passer `est_favori` (booléen) dans le contexte.
-       • Exemple dans la view detail_chambre :
-
-           from campusnest.favoris.models import Favori
-
-           est_favori = (
-               request.user.is_authenticated
-               and request.user.role == "client"
-               and Favori.objects.filter(client=request.user, chambre=chambre).exists()
-           )
-           return render(request, "logements/detail_chambre.html", {
-               "chambre":    chambre,
-               "est_favori": est_favori,
-               ...
-           })
-
-   Pour les pages de listing (plusieurs chambres), annoter le queryset :
-
-           from django.db.models import Exists, OuterRef
-           from campusnest.favoris.models import Favori
-
-           chambres = Chambre.objects.annotate(
-               est_favori=Exists(
-                   Favori.objects.filter(
-                       client=request.user,
-                       chambre=OuterRef("pk"),
-                   )
-               )
-           ) if request.user.is_authenticated and request.user.role == "client"
-             else Chambre.objects.annotate(est_favori=Value(False))
-
-           # Dans le template de listing, passer chambre.est_favori :
-           # {% include "components/btn_favori.html" with chambre=chambre est_favori=chambre.est_favori %}
-───────────────────────────────────────────────────────────────────── #} {% endcomment %}
-
 {% if user.is_authenticated and user.role == "client" %}
-  <form method="post" action="{% url 'favoris:toggle' chambre_pk=chambre.pk %}">
+  <form method="post" action="{% url 'favoris:toggle' chambre_pk=chambre.pk %}" class="inline-block">
     {% csrf_token %}
-    <button
-      type="submit"
-      title="{% if est_favori %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}"
-      class="flex items-center gap-1.5 px-3 py-2 rounded-xl border transition
-             {% if est_favori %}
-               border-rose-200 bg-rose-50 text-rose-500 hover:bg-rose-100
-             {% else %}
-               border-gray-200 bg-white text-gray-400 hover:border-rose-200 hover:text-rose-400
-             {% endif %}">
-
-      {% if est_favori %}
-        {# Cœur plein #}
-        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
-                   2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
-                   C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5
-                   c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    <button type="submit" 
+            title="{% if est_favori %}Retirer des favoris{% else %}Ajouter aux favoris{% endif %}"
+            class="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-sm border border-gray-100 hover:bg-white transition-all duration-200">
+        <svg class="w-5 h-5 transition-colors duration-200 {% if est_favori %}fill-rose-500 text-rose-500{% else %}text-gray-400 hover:text-rose-500{% endif %}" 
+             fill="currentColor" viewBox="0 0 20 20">
+            <path d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"/>
         </svg>
-        <span class="text-xs font-medium">Sauvegardé</span>
-      {% else %}
-        {# Cœur vide #}
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round"
-                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682
-                   a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318
-                   a4.5 4.5 0 00-6.364 0z"/>
-        </svg>
-        <span class="text-xs font-medium">Sauvegarder</span>
-      {% endif %}
-
     </button>
   </form>
 {% endif %}

@@ -1,0 +1,66 @@
+{% extends "accounts/base_dashboard.html" %}
+{% block content %}
+<div class="max-w-lg mx-auto py-10 px-4 text-center">
+
+  <!-- Icône succès -->
+  <div class="flex justify-center mb-4">
+    <div class="bg-green-100 rounded-full p-5">
+      <svg class="w-12 h-12 text-green-600" fill="none" stroke="currentColor"
+           stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+      </svg>
+    </div>
+  </div>
+
+  <h1 class="text-2xl font-bold text-gray-800 mb-1">Paiement réussi !</h1>
+  <p class="text-gray-500 mb-8">Votre réservation est enregistrée.</p>
+
+  <!-- Reçu -->
+  <div class="bg-white rounded-xl shadow p-6 text-left space-y-3 mb-8">
+    <h2 class="font-semibold text-gray-700 border-b pb-2 mb-3">Reçu de paiement</h2>
+
+    <div class="flex justify-between text-sm">
+      <span class="text-gray-500">Référence</span>
+      <span class="font-mono font-semibold text-gray-800">{{ paiement.reference }}</span>
+    </div>
+    <div class="flex justify-between text-sm">
+      <span class="text-gray-500">Montant</span>
+      <span class="font-bold text-green-700">{{ paiement.montant|floatformat:0 }} FCFA</span>
+    </div>
+    <div class="flex justify-between text-sm">
+      <span class="text-gray-500">Opérateur</span>
+      <span>{{ paiement.get_operateur_display }}</span>
+    </div>
+    <div class="flex justify-between text-sm">
+      <span class="text-gray-500">Numéro</span>
+      <span>{{ paiement.numero_telephone }}</span>
+    </div>
+    <div class="flex justify-between text-sm">
+      <span class="text-gray-500">Date</span>
+      <span>{{ paiement.date_paiement|date:"d/m/Y H:i" }}</span>
+    </div>
+
+    <div class="border-t pt-3 mt-3">
+      <p class="text-sm text-gray-500">Chambre</p>
+      <p class="font-semibold text-gray-800">{{ paiement.reservation.chambre }}</p>
+      <p class="text-sm text-gray-500 mt-1">
+        Du {{ paiement.reservation.date_debut|date:"d/m/Y" }}
+        au {{ paiement.reservation.date_fin|date:"d/m/Y" }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="flex flex-col gap-3">
+    <a href="{% url 'reservations:detail' pk=paiement.reservation.pk %}"
+       class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition">
+      Voir ma réservation
+    </a>
+    <a href="{% url 'reservations:mes_reservations' %}"
+       class="text-gray-500 hover:text-gray-700 text-sm underline">
+      Toutes mes réservations
+    </a>
+  </div>
+
+</div>
+{% endblock %}

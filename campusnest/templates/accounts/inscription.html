@@ -1,11 +1,17 @@
-{% extends "accounts/base_auth.html" %}{% block sidebar_quote %}« Rejoignez la communauté de l'IUT-FV. »{% endblock %} {% block content %}
+{% extends "accounts/base_auth.html" %}
+
+{% block sidebar_quote %}« Trouvez votre chambre avant même d'arriver au campus. »{% endblock %}
+{% block sidebar_sub %}Réservez en ligne, en toute sécurité, depuis chez vous.{% endblock %}
+
+{% block content %}
 <h1 class="mb-1 text-2xl font-medium text-gray-900">Créer un compte</h1>
 <p class="mb-4 text-base text-gray-500">Choisissez votre profil</p>
 
-{# Sélecteur de rôle — reproduit la maquette #}
+{# Sélecteur de rôle #}
 <div class="mb-5 grid grid-cols-2 gap-3">
   <a
     href="?type=client"
+    data-role="client"
     class="{% if type_compte != 'proprietaire' %}border-secondary-400 bg-secondary-50 text-primary {% else %}border-gray-200 hover:border-secondary-300{% endif %} flex flex-col items-center gap-1.5 rounded-xl border py-3 text-base font-medium text-gray-400 transition"
   >
     <span class="text-lg">🎓</span>
@@ -13,6 +19,7 @@
   </a>
   <a
     href="?type=proprietaire"
+    data-role="proprietaire"
     class="{% if type_compte == 'proprietaire' %}border-secondary-400 bg-secondary-50 text-primary {% else %}border-gray-200 hover:border-secondary-300{% endif %} flex flex-col items-center gap-1.5 rounded-xl border py-3 text-base font-medium text-gray-400 transition"
   >
     <span class="text-lg">🏢</span>
@@ -20,14 +27,16 @@
   </a>
 </div>
 
-<form method="post" novalidate>
+{# enctype="multipart/form-data" obligatoire pour l'upload de fichiers #}
+<form method="post" enctype="multipart/form-data" novalidate>
   {% csrf_token %}
   <input type="hidden" name="type_compte" value="{{ type_compte }}" />
+
   {% if form.errors %}
   <div class="mb-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-600">
-    {% for field, errors in form.errors.items %} {% for error in errors %}
+    {% for field, errors in form.errors.items %}{% for error in errors %}
     <p>{{ field }} : {{ error }}</p>
-    {% endfor %} {% endfor %}
+    {% endfor %}{% endfor %}
   </div>
   {% endif %}
 
@@ -46,8 +55,7 @@
   </div>
 
   <label class="mb-1.5 block text-sm font-medium tracking-wide text-gray-500 uppercase">Mot de passe</label>
-  <!-- Ajout d'un conteneur 'relative' pour positionner l'œil -->
-  <div class="relative">
+  <div class="relative mb-1">
     <input
       id="password1"
       type="password"
@@ -55,26 +63,19 @@
       placeholder="••••••••"
       class="focus:ring-secondary/50 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-base transition focus:ring-2 focus:outline-none"
     />
-    <!-- Bouton de l'œil inséré sans modifier le style de ton input -->
-    <button type="button" id="toggle-password" class="password-toggle absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none">
-      <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-        />
+    <button type="button" class="password-toggle absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
       </svg>
     </button>
   </div>
-
   {% if form.password1.errors %}
-  <p class="mt-1 text-sm text-red-600">{{ form.password1.errors|first }}</p>
+  <p class="mb-2 text-sm text-red-600">{{ form.password1.errors|first }}</p>
   {% endif %}
 
   <div class="mb-3">
     <label class="mb-1.5 block text-sm font-medium tracking-wide text-gray-500 uppercase">Confirmer le mot de passe</label>
-
     <div class="relative">
       <input
         type="password"
@@ -82,44 +83,23 @@
         placeholder="••••••••"
         class="focus:ring-secondary/50 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-base transition focus:ring-2 focus:outline-none"
       />
-
-      <!-- On utilise une classe 'password-toggle' à la place d'un ID unique -->
       <button type="button" class="password-toggle absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 focus:outline-none">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-          />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
         </svg>
       </button>
     </div>
-
     {% if form.password2.errors %}
     <p class="mt-1 text-sm text-red-600">{{ form.password2.errors|first }}</p>
     {% endif %}
   </div>
 
-  <!-- Le script mis à jour pour écouter TOUS les boutons avec la classe .password-toggle -->
-  <script>
-    document.querySelectorAll('.password-toggle').forEach((button) => {
-      button.addEventListener('click', function () {
-        // Trouve l'input qui est dans le même bloc '.relative' que le bouton cliqué
-        const passwordInput = this.closest('.relative').querySelector('input');
-
-        if (passwordInput.type === 'password') {
-          passwordInput.type = 'text';
-        } else {
-          passwordInput.type = 'password';
-        }
-      });
-    });
-  </script>
-
   {% if type_compte == 'proprietaire' %}
   <div class="mb-3">
-    <div>
+
+    {# Téléphone #}
+    <div class="mb-3">
       <label class="mb-1.5 block text-sm font-medium tracking-wide text-gray-500 uppercase">Téléphone</label>
       <input
         type="text"
@@ -128,26 +108,199 @@
         placeholder="6XX XXX XXX"
         class="focus:ring-secondary/50 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-base transition focus:ring-2 focus:outline-none"
       />
+      {% if form.telephone.errors %}
+      <p class="mt-1 text-sm text-red-600">{{ form.telephone.errors|first }}</p>
+      {% endif %}
     </div>
-    <label class="mb-1.5 block text-sm font-medium tracking-wide text-gray-500 uppercase">N° pièce d'identité</label>
-    <input
-      type="text"
-      name="numero_piece"
-      value="{{ form.numero_piece.value|default:'' }}"
-      placeholder="CNI / Passeport"
-      class="focus:ring-secondary/50 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-base transition focus:ring-2 focus:outline-none"
-    />
-    {% if form.numero_piece.errors %}
-    <p class="mt-1 text-sm text-red-600">{{ form.numero_piece.errors|first }}</p>
-    {% endif %}
+
+    {# Pièce d'identité — recto + verso #}
+    <div>
+      <label class="mb-1 block text-sm font-medium tracking-wide text-gray-500 uppercase">
+        Pièce d'identité
+        <span class="ml-1 normal-case text-gray-400 font-normal">(CNI ou Passeport — recto &amp; verso)</span>
+      </label>
+      <p class="mb-3 text-xs text-gray-400">Formats acceptés : JPG, PNG, PDF — max 5 Mo par fichier.</p>
+
+      <div class="grid grid-cols-2 gap-3">
+
+        {# Zone recto #}
+        <div>
+          <p class="mb-1.5 text-xs font-semibold uppercase tracking-wide text-gray-400">Recto</p>
+          <label
+            for="piece_recto"
+            id="label-recto"
+            class="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 py-5 cursor-pointer transition hover:border-secondary-400 hover:bg-secondary-50"
+          >
+            {# Icône par défaut #}
+            <span id="icon-recto">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5V19a1.5 1.5 0 0 0 1.5 1.5h15A1.5 1.5 0 0 0 21 19v-2.5M16.5 12 12 7.5m0 0L7.5 12M12 7.5V17" />
+              </svg>
+            </span>
+            {# Prévisualisation image (cachée au départ) #}
+            <img id="preview-recto" src="#" alt="Aperçu recto" class="hidden max-h-20 w-full rounded-lg object-contain" />
+            <span id="text-recto" class="text-xs text-gray-400 text-center px-2">Cliquez ou déposez le recto</span>
+          </label>
+          <input
+            type="file"
+            id="piece_recto"
+            name="piece_identite_recto"
+            accept="image/jpeg,image/png,application/pdf"
+            class="hidden"
+          />
+          {% if form.piece_identite_recto.errors %}
+          <p class="mt-1 text-xs text-red-600">{{ form.piece_identite_recto.errors|first }}</p>
+          {% endif %}
+        </div>
+
+        {# Zone verso #}
+        <div>
+          <p class="mb-1.5 text-xs font-semibold uppercase tracking-wide text-gray-400">Verso</p>
+          <label
+            for="piece_verso"
+            id="label-verso"
+            class="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 py-5 cursor-pointer transition hover:border-secondary-400 hover:bg-secondary-50"
+          >
+            <span id="icon-verso">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5V19a1.5 1.5 0 0 0 1.5 1.5h15A1.5 1.5 0 0 0 21 19v-2.5M16.5 12 12 7.5m0 0L7.5 12M12 7.5V17" />
+              </svg>
+            </span>
+            <img id="preview-verso" src="#" alt="Aperçu verso" class="hidden max-h-20 w-full rounded-lg object-contain" />
+            <span id="text-verso" class="text-xs text-gray-400 text-center px-2">Cliquez ou déposez le verso</span>
+          </label>
+          <input
+            type="file"
+            id="piece_verso"
+            name="piece_identite_verso"
+            accept="image/jpeg,image/png,application/pdf"
+            class="hidden"
+          />
+          {% if form.piece_identite_verso.errors %}
+          <p class="mt-1 text-xs text-red-600">{{ form.piece_identite_verso.errors|first }}</p>
+          {% endif %}
+        </div>
+
+      </div>{# fin grid #}
+    </div>
+
   </div>
   {% endif %}
 
-  <button type="submit" class="bg-primary text-secondary hover:bg-primary/90 mt-1 w-full rounded-xl py-3 text-base font-medium transition">Créer mon compte</button>
+  <button type="submit" class="bg-primary text-secondary hover:bg-primary/90 mt-1 w-full rounded-xl py-3 text-base font-medium transition">
+    Créer mon compte
+  </button>
 </form>
 
 <p class="mt-4 text-center text-base text-gray-400">
   Déjà inscrit ?
   <a href="{% url 'users:connexion' %}" class="text-primary font-medium hover:underline">Se connecter</a>
 </p>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+  // ── Messages dynamiques par rôle ──────────────────────────────
+  const SIDEBAR_CONTENT = {
+    client: {
+      icon:  '🎓',
+      label: 'Pour les étudiants',
+      quote: '« Trouve ta chambre idéale avant même d\'arriver au campus — sereinement, depuis chez toi. »',
+      sub:   'Parcours les cités, compare les chambres et réserve en quelques clics.',
+    },
+    proprietaire: {
+      icon:  '🏢',
+      label: 'Pour les propriétaires',
+      quote: '« Mettez vos logements en valeur et trouvez des locataires fiables en toute simplicité. »',
+      sub:   'Publiez vos annonces, gérez vos réservations et encaissez vos loyers sur une seule plateforme.',
+    },
+    default: {
+      icon:  '🏠',
+      label: 'CampusNest IUT-FV',
+      quote: '« Le logement étudiant, simplifié. Rejoignez la communauté de l\'IUT-FV. »',
+      sub:   'Trouvez, réservez et gérez votre logement en toute sérénité.',
+    },
+  };
+
+  function updateSidebar(role) {
+    const data = SIDEBAR_CONTENT[role] || SIDEBAR_CONTENT.default;
+    const ids  = ['sidebar-icon', 'sidebar-label', 'sidebar-quote', 'sidebar-sub'];
+    const keys = ['icon', 'label', 'quote', 'sub'];
+
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.opacity = '0';
+    });
+
+    setTimeout(() => {
+      ids.forEach((id, i) => {
+        const el = document.getElementById(id);
+        if (el) { el.textContent = data[keys[i]]; el.style.opacity = '1'; }
+      });
+    }, 250);
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  updateSidebar(params.get('type') || 'client');
+
+  document.querySelectorAll('[data-role]').forEach(btn => {
+    btn.addEventListener('click', () => updateSidebar(btn.dataset.role));
+  });
+
+  // ── Toggle mot de passe ───────────────────────────────────────
+  document.querySelectorAll('.password-toggle').forEach(button => {
+    button.addEventListener('click', function () {
+      const input = this.closest('.relative').querySelector('input');
+      input.type  = input.type === 'password' ? 'text' : 'password';
+    });
+  });
+
+  // ── Prévisualisation pièce d'identité ─────────────────────────
+  function setupFilePreview(inputId, previewId, iconId, textId) {
+    const input   = document.getElementById(inputId);
+    const preview = document.getElementById(previewId);
+    const icon    = document.getElementById(iconId);
+    const text    = document.getElementById(textId);
+
+    if (!input) return;
+
+    input.addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) return;
+
+      const isPdf = file.type === 'application/pdf';
+
+      if (isPdf) {
+        // PDF : pas d'aperçu image, on affiche juste le nom
+        preview.classList.add('hidden');
+        icon.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+          </svg>`;
+        text.textContent = file.name.length > 22 ? file.name.slice(0, 20) + '…' : file.name;
+      } else {
+        // Image : aperçu inline
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          preview.src = e.target.result;
+          preview.classList.remove('hidden');
+          icon.classList.add('hidden');
+          text.textContent = '✓ ' + (file.name.length > 18 ? file.name.slice(0, 16) + '…' : file.name);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
+
+  setupFilePreview('piece_recto', 'preview-recto', 'icon-recto', 'text-recto');
+  setupFilePreview('piece_verso', 'preview-verso', 'icon-verso', 'text-verso');
+</script>
+
+<style>
+  #sidebar-icon, #sidebar-label, #sidebar-quote, #sidebar-sub {
+    transition: opacity 0.25s ease;
+  }
+</style>
 {% endblock %}

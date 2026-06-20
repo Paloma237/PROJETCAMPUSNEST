@@ -10,11 +10,11 @@ from django.views import defaults as default_views
 
 
 urlpatterns = [
-    # ─── Admin Django ────────────────────────────────────────────
-    path("admin/", admin.site.urls),
-
     # ─── Racine : redirige vers la page d'accueil ────────────────
     path("", include("campusnest.logements.urls", namespace="logements")),               # home = liste des cités
+    
+        # ─── Admin Django ────────────────────────────────────────────
+    path("admin/", admin.site.urls),
 
     # ─── Authentification ────────────────────────────────────────
     path("comptes/", include("campusnest.users.urls", namespace="users")),
@@ -33,6 +33,9 @@ urlpatterns = [
     
     # ─── Favoris ─────────────────────────────────────────────────
     path("favoris/", include("campusnest.favoris.urls", namespace="favoris")),
+    
+    # ─── Paiements ───────────────────────────────────────────────
+    path("paiements/", include("campusnest.paiements.urls", namespace="paiements")),
 ]
 
 # ─── Servir les fichiers media en développement ──────────────────

@@ -33,5 +33,6 @@ urlpatterns = [
     path("suspendre/<int:pk>/", views.suspendre_compte_view,     name="suspendre_compte"),
     path("dashboard/admin/",         views.admin_dashboard_view,        name="admin_dashboard"),
     path("proprietaire/<int:pk>/gerer/", views.gerer_proprietaire_view, name="gerer_proprietaire"),
+    path("comptes/proprietaires/", views.liste_proprietaires_view, name="liste_proprietaires"),
 
 ]

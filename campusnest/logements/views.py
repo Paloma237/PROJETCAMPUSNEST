@@ -7,6 +7,7 @@ from campusnest.users.utils import admin_requis, proprietaire_valide_requis
 from .models import Chambre, Cite, PhotoCity, PhotoChambre
 from .forms import ChambreForm, CiteForm, DateVisiteFormSet
 from campusnest.favoris.models import Favori
+from django.core.paginator import Paginator
 
 
 # ─────────────────────────────────────────────
@@ -73,10 +74,14 @@ def liste_cites_view(request):
             Q(adresse__icontains=q) |
             Q(chambres__description__icontains=q)
         ).distinct()
+    paginator = Paginator(cites, 12)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
     return render(request, "logements/liste_cites.html", {
         "cites": cites,
-        "q": q
+        "q": q,
+        "page_obj": page_obj,
     })
     
 def liste_chambres_view(request):
@@ -117,12 +122,15 @@ def liste_chambres_view(request):
         chambres = chambres.annotate(
             est_favori=Value(False, output_field=BooleanField())
         )
-
+    paginator = Paginator(chambres, 12) 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
     return render(request, "logements/liste_chambres.html", {
         "chambres":      chambres,
         "q":             q,
         "types_chambre": Chambre.Type.choices,
+        "page_obj": page_obj,
     })
 
 def detail_cite_view(request, pk):

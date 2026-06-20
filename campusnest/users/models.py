@@ -67,11 +67,24 @@ class Utilisateur(AbstractUser):
 
 class ProfilProprietaire(models.Model):
     """Informations complémentaires du propriétaire. Créé via signal post_save."""
-    utilisateur     = models.OneToOneField(
+    utilisateur = models.OneToOneField(
         Utilisateur, on_delete=models.CASCADE,
         related_name="profil_proprietaire",
     )
-    numero_piece    = models.CharField("N° pièce d'identité", max_length=50, blank=True)
+    # ── Pièce d'identité (recto + verso) ──────────────────────────
+    # Remplace l'ancien champ texte `numero_piece`.
+    # Les fichiers sont stockés dans media/pieces_identite/recto/ et /verso/
+    piece_identite_recto = models.ImageField(
+        "Recto pièce d'identité",
+        upload_to="pieces_identite/recto/",
+        blank=True,
+    )
+    piece_identite_verso = models.ImageField(
+        "Verso pièce d'identité",
+        upload_to="pieces_identite/verso/",
+        blank=True,
+    )
+    # ──────────────────────────────────────────────────────────────
     est_valide      = models.BooleanField("Validé par l'admin", default=False)
     date_validation = models.DateTimeField(null=True, blank=True)
 

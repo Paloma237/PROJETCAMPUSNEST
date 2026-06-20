@@ -2,6 +2,7 @@
 campusnest/reservations/models.py
 """
 from django.db import models
+from dateutil.relativedelta import relativedelta
 from django.utils import timezone
 
 
@@ -74,6 +75,14 @@ class Reservation(models.Model):
 
     def duree_jours(self):
         return (self.date_fin - self.date_debut).days
+    def nombre_mois(self):
+    #Nombre de mois complets entre date_debut et date_fin.
+        delta = relativedelta(self.date_fin, self.date_debut)
+        return delta.months + (delta.years * 12)
 
     def montant_total(self):
-        return round(self.chambre.loyer * self.duree_jours() / 30)
+    #Loyer mensuel × nombre de mois complets.
+        mois = self.nombre_mois()
+        if mois == 0:
+            mois = 1  # minimum 1 mois facturé si la durée est inférieure à un mois
+        return self.chambre.loyer * mois
